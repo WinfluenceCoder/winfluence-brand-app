@@ -14,8 +14,25 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedSecurityRouteImport } from './routes/_authenticated/security'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedMessagesSystemRouteImport } from './routes/_authenticated/messages.system'
+import { Route as AuthenticatedMessagesPersonalRouteImport } from './routes/_authenticated/messages.personal'
+import { Route as AuthenticatedMessagesNotificationsRouteImport } from './routes/_authenticated/messages.notifications'
+import { Route as AuthenticatedInfluencersSearchRouteImport } from './routes/_authenticated/influencers.search'
+import { Route as AuthenticatedInfluencersHiredRouteImport } from './routes/_authenticated/influencers.hired'
+import { Route as AuthenticatedInfluencersFavoritesRouteImport } from './routes/_authenticated/influencers.favorites'
+import { Route as AuthenticatedInfluencersCurrentRouteImport } from './routes/_authenticated/influencers.current'
+import { Route as AuthenticatedCampaignsRunningRouteImport } from './routes/_authenticated/campaigns.running'
+import { Route as AuthenticatedCampaignsPublishedRouteImport } from './routes/_authenticated/campaigns.published'
+import { Route as AuthenticatedCampaignsNewRouteImport } from './routes/_authenticated/campaigns.new'
+import { Route as AuthenticatedCampaignsExpiredRouteImport } from './routes/_authenticated/campaigns.expired'
+import { Route as AuthenticatedCampaignsDraftsRouteImport } from './routes/_authenticated/campaigns.drafts'
+import { Route as AuthenticatedCampaignsCompletedRouteImport } from './routes/_authenticated/campaigns.completed'
+import { Route as AuthenticatedCampaignsArchiveRouteImport } from './routes/_authenticated/campaigns.archive'
+import { Route as AuthenticatedAnalyticsInfluencersRouteImport } from './routes/_authenticated/analytics.influencers'
+import { Route as AuthenticatedAnalyticsCampaignsRouteImport } from './routes/_authenticated/analytics.campaigns'
 
 const SignedOutRoute = SignedOutRouteImport.update({
   id: '/signed-out',
@@ -41,6 +58,11 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSecurityRoute = AuthenticatedSecurityRouteImport.update({
   id: '/security',
   path: '/security',
@@ -51,6 +73,102 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMessagesSystemRoute =
+  AuthenticatedMessagesSystemRouteImport.update({
+    id: '/messages/system',
+    path: '/messages/system',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedMessagesPersonalRoute =
+  AuthenticatedMessagesPersonalRouteImport.update({
+    id: '/messages/personal',
+    path: '/messages/personal',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedMessagesNotificationsRoute =
+  AuthenticatedMessagesNotificationsRouteImport.update({
+    id: '/messages/notifications',
+    path: '/messages/notifications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedInfluencersSearchRoute =
+  AuthenticatedInfluencersSearchRouteImport.update({
+    id: '/influencers/search',
+    path: '/influencers/search',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedInfluencersHiredRoute =
+  AuthenticatedInfluencersHiredRouteImport.update({
+    id: '/influencers/hired',
+    path: '/influencers/hired',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedInfluencersFavoritesRoute =
+  AuthenticatedInfluencersFavoritesRouteImport.update({
+    id: '/influencers/favorites',
+    path: '/influencers/favorites',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedInfluencersCurrentRoute =
+  AuthenticatedInfluencersCurrentRouteImport.update({
+    id: '/influencers/current',
+    path: '/influencers/current',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCampaignsRunningRoute =
+  AuthenticatedCampaignsRunningRouteImport.update({
+    id: '/campaigns/running',
+    path: '/campaigns/running',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCampaignsPublishedRoute =
+  AuthenticatedCampaignsPublishedRouteImport.update({
+    id: '/campaigns/published',
+    path: '/campaigns/published',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCampaignsNewRoute =
+  AuthenticatedCampaignsNewRouteImport.update({
+    id: '/campaigns/new',
+    path: '/campaigns/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCampaignsExpiredRoute =
+  AuthenticatedCampaignsExpiredRouteImport.update({
+    id: '/campaigns/expired',
+    path: '/campaigns/expired',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCampaignsDraftsRoute =
+  AuthenticatedCampaignsDraftsRouteImport.update({
+    id: '/campaigns/drafts',
+    path: '/campaigns/drafts',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCampaignsCompletedRoute =
+  AuthenticatedCampaignsCompletedRouteImport.update({
+    id: '/campaigns/completed',
+    path: '/campaigns/completed',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCampaignsArchiveRoute =
+  AuthenticatedCampaignsArchiveRouteImport.update({
+    id: '/campaigns/archive',
+    path: '/campaigns/archive',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAnalyticsInfluencersRoute =
+  AuthenticatedAnalyticsInfluencersRouteImport.update({
+    id: '/analytics/influencers',
+    path: '/analytics/influencers',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAnalyticsCampaignsRoute =
+  AuthenticatedAnalyticsCampaignsRouteImport.update({
+    id: '/analytics/campaigns',
+    path: '/analytics/campaigns',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
@@ -59,6 +177,23 @@ export interface FileRoutesByFullPath {
   '/signed-out': typeof SignedOutRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/security': typeof AuthenticatedSecurityRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/analytics/campaigns': typeof AuthenticatedAnalyticsCampaignsRoute
+  '/analytics/influencers': typeof AuthenticatedAnalyticsInfluencersRoute
+  '/campaigns/archive': typeof AuthenticatedCampaignsArchiveRoute
+  '/campaigns/completed': typeof AuthenticatedCampaignsCompletedRoute
+  '/campaigns/drafts': typeof AuthenticatedCampaignsDraftsRoute
+  '/campaigns/expired': typeof AuthenticatedCampaignsExpiredRoute
+  '/campaigns/new': typeof AuthenticatedCampaignsNewRoute
+  '/campaigns/published': typeof AuthenticatedCampaignsPublishedRoute
+  '/campaigns/running': typeof AuthenticatedCampaignsRunningRoute
+  '/influencers/current': typeof AuthenticatedInfluencersCurrentRoute
+  '/influencers/favorites': typeof AuthenticatedInfluencersFavoritesRoute
+  '/influencers/hired': typeof AuthenticatedInfluencersHiredRoute
+  '/influencers/search': typeof AuthenticatedInfluencersSearchRoute
+  '/messages/notifications': typeof AuthenticatedMessagesNotificationsRoute
+  '/messages/personal': typeof AuthenticatedMessagesPersonalRoute
+  '/messages/system': typeof AuthenticatedMessagesSystemRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -66,7 +201,24 @@ export interface FileRoutesByTo {
   '/signed-out': typeof SignedOutRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/security': typeof AuthenticatedSecurityRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/': typeof AuthenticatedIndexRoute
+  '/analytics/campaigns': typeof AuthenticatedAnalyticsCampaignsRoute
+  '/analytics/influencers': typeof AuthenticatedAnalyticsInfluencersRoute
+  '/campaigns/archive': typeof AuthenticatedCampaignsArchiveRoute
+  '/campaigns/completed': typeof AuthenticatedCampaignsCompletedRoute
+  '/campaigns/drafts': typeof AuthenticatedCampaignsDraftsRoute
+  '/campaigns/expired': typeof AuthenticatedCampaignsExpiredRoute
+  '/campaigns/new': typeof AuthenticatedCampaignsNewRoute
+  '/campaigns/published': typeof AuthenticatedCampaignsPublishedRoute
+  '/campaigns/running': typeof AuthenticatedCampaignsRunningRoute
+  '/influencers/current': typeof AuthenticatedInfluencersCurrentRoute
+  '/influencers/favorites': typeof AuthenticatedInfluencersFavoritesRoute
+  '/influencers/hired': typeof AuthenticatedInfluencersHiredRoute
+  '/influencers/search': typeof AuthenticatedInfluencersSearchRoute
+  '/messages/notifications': typeof AuthenticatedMessagesNotificationsRoute
+  '/messages/personal': typeof AuthenticatedMessagesPersonalRoute
+  '/messages/system': typeof AuthenticatedMessagesSystemRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -76,7 +228,24 @@ export interface FileRoutesById {
   '/signed-out': typeof SignedOutRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/security': typeof AuthenticatedSecurityRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/analytics/campaigns': typeof AuthenticatedAnalyticsCampaignsRoute
+  '/_authenticated/analytics/influencers': typeof AuthenticatedAnalyticsInfluencersRoute
+  '/_authenticated/campaigns/archive': typeof AuthenticatedCampaignsArchiveRoute
+  '/_authenticated/campaigns/completed': typeof AuthenticatedCampaignsCompletedRoute
+  '/_authenticated/campaigns/drafts': typeof AuthenticatedCampaignsDraftsRoute
+  '/_authenticated/campaigns/expired': typeof AuthenticatedCampaignsExpiredRoute
+  '/_authenticated/campaigns/new': typeof AuthenticatedCampaignsNewRoute
+  '/_authenticated/campaigns/published': typeof AuthenticatedCampaignsPublishedRoute
+  '/_authenticated/campaigns/running': typeof AuthenticatedCampaignsRunningRoute
+  '/_authenticated/influencers/current': typeof AuthenticatedInfluencersCurrentRoute
+  '/_authenticated/influencers/favorites': typeof AuthenticatedInfluencersFavoritesRoute
+  '/_authenticated/influencers/hired': typeof AuthenticatedInfluencersHiredRoute
+  '/_authenticated/influencers/search': typeof AuthenticatedInfluencersSearchRoute
+  '/_authenticated/messages/notifications': typeof AuthenticatedMessagesNotificationsRoute
+  '/_authenticated/messages/personal': typeof AuthenticatedMessagesPersonalRoute
+  '/_authenticated/messages/system': typeof AuthenticatedMessagesSystemRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -87,6 +256,23 @@ export interface FileRouteTypes {
     | '/signed-out'
     | '/profile'
     | '/security'
+    | '/settings'
+    | '/analytics/campaigns'
+    | '/analytics/influencers'
+    | '/campaigns/archive'
+    | '/campaigns/completed'
+    | '/campaigns/drafts'
+    | '/campaigns/expired'
+    | '/campaigns/new'
+    | '/campaigns/published'
+    | '/campaigns/running'
+    | '/influencers/current'
+    | '/influencers/favorites'
+    | '/influencers/hired'
+    | '/influencers/search'
+    | '/messages/notifications'
+    | '/messages/personal'
+    | '/messages/system'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -94,7 +280,24 @@ export interface FileRouteTypes {
     | '/signed-out'
     | '/profile'
     | '/security'
+    | '/settings'
     | '/'
+    | '/analytics/campaigns'
+    | '/analytics/influencers'
+    | '/campaigns/archive'
+    | '/campaigns/completed'
+    | '/campaigns/drafts'
+    | '/campaigns/expired'
+    | '/campaigns/new'
+    | '/campaigns/published'
+    | '/campaigns/running'
+    | '/influencers/current'
+    | '/influencers/favorites'
+    | '/influencers/hired'
+    | '/influencers/search'
+    | '/messages/notifications'
+    | '/messages/personal'
+    | '/messages/system'
   id:
     | '__root__'
     | '/_authenticated'
@@ -103,7 +306,24 @@ export interface FileRouteTypes {
     | '/signed-out'
     | '/_authenticated/profile'
     | '/_authenticated/security'
+    | '/_authenticated/settings'
     | '/_authenticated/'
+    | '/_authenticated/analytics/campaigns'
+    | '/_authenticated/analytics/influencers'
+    | '/_authenticated/campaigns/archive'
+    | '/_authenticated/campaigns/completed'
+    | '/_authenticated/campaigns/drafts'
+    | '/_authenticated/campaigns/expired'
+    | '/_authenticated/campaigns/new'
+    | '/_authenticated/campaigns/published'
+    | '/_authenticated/campaigns/running'
+    | '/_authenticated/influencers/current'
+    | '/_authenticated/influencers/favorites'
+    | '/_authenticated/influencers/hired'
+    | '/_authenticated/influencers/search'
+    | '/_authenticated/messages/notifications'
+    | '/_authenticated/messages/personal'
+    | '/_authenticated/messages/system'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -150,6 +370,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/security': {
       id: '/_authenticated/security'
       path: '/security'
@@ -164,19 +391,168 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/messages/system': {
+      id: '/_authenticated/messages/system'
+      path: '/messages/system'
+      fullPath: '/messages/system'
+      preLoaderRoute: typeof AuthenticatedMessagesSystemRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/messages/personal': {
+      id: '/_authenticated/messages/personal'
+      path: '/messages/personal'
+      fullPath: '/messages/personal'
+      preLoaderRoute: typeof AuthenticatedMessagesPersonalRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/messages/notifications': {
+      id: '/_authenticated/messages/notifications'
+      path: '/messages/notifications'
+      fullPath: '/messages/notifications'
+      preLoaderRoute: typeof AuthenticatedMessagesNotificationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/influencers/search': {
+      id: '/_authenticated/influencers/search'
+      path: '/influencers/search'
+      fullPath: '/influencers/search'
+      preLoaderRoute: typeof AuthenticatedInfluencersSearchRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/influencers/hired': {
+      id: '/_authenticated/influencers/hired'
+      path: '/influencers/hired'
+      fullPath: '/influencers/hired'
+      preLoaderRoute: typeof AuthenticatedInfluencersHiredRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/influencers/favorites': {
+      id: '/_authenticated/influencers/favorites'
+      path: '/influencers/favorites'
+      fullPath: '/influencers/favorites'
+      preLoaderRoute: typeof AuthenticatedInfluencersFavoritesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/influencers/current': {
+      id: '/_authenticated/influencers/current'
+      path: '/influencers/current'
+      fullPath: '/influencers/current'
+      preLoaderRoute: typeof AuthenticatedInfluencersCurrentRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/campaigns/running': {
+      id: '/_authenticated/campaigns/running'
+      path: '/campaigns/running'
+      fullPath: '/campaigns/running'
+      preLoaderRoute: typeof AuthenticatedCampaignsRunningRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/campaigns/published': {
+      id: '/_authenticated/campaigns/published'
+      path: '/campaigns/published'
+      fullPath: '/campaigns/published'
+      preLoaderRoute: typeof AuthenticatedCampaignsPublishedRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/campaigns/new': {
+      id: '/_authenticated/campaigns/new'
+      path: '/campaigns/new'
+      fullPath: '/campaigns/new'
+      preLoaderRoute: typeof AuthenticatedCampaignsNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/campaigns/expired': {
+      id: '/_authenticated/campaigns/expired'
+      path: '/campaigns/expired'
+      fullPath: '/campaigns/expired'
+      preLoaderRoute: typeof AuthenticatedCampaignsExpiredRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/campaigns/drafts': {
+      id: '/_authenticated/campaigns/drafts'
+      path: '/campaigns/drafts'
+      fullPath: '/campaigns/drafts'
+      preLoaderRoute: typeof AuthenticatedCampaignsDraftsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/campaigns/completed': {
+      id: '/_authenticated/campaigns/completed'
+      path: '/campaigns/completed'
+      fullPath: '/campaigns/completed'
+      preLoaderRoute: typeof AuthenticatedCampaignsCompletedRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/campaigns/archive': {
+      id: '/_authenticated/campaigns/archive'
+      path: '/campaigns/archive'
+      fullPath: '/campaigns/archive'
+      preLoaderRoute: typeof AuthenticatedCampaignsArchiveRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/analytics/influencers': {
+      id: '/_authenticated/analytics/influencers'
+      path: '/analytics/influencers'
+      fullPath: '/analytics/influencers'
+      preLoaderRoute: typeof AuthenticatedAnalyticsInfluencersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/analytics/campaigns': {
+      id: '/_authenticated/analytics/campaigns'
+      path: '/analytics/campaigns'
+      fullPath: '/analytics/campaigns'
+      preLoaderRoute: typeof AuthenticatedAnalyticsCampaignsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedSecurityRoute: typeof AuthenticatedSecurityRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedAnalyticsCampaignsRoute: typeof AuthenticatedAnalyticsCampaignsRoute
+  AuthenticatedAnalyticsInfluencersRoute: typeof AuthenticatedAnalyticsInfluencersRoute
+  AuthenticatedCampaignsArchiveRoute: typeof AuthenticatedCampaignsArchiveRoute
+  AuthenticatedCampaignsCompletedRoute: typeof AuthenticatedCampaignsCompletedRoute
+  AuthenticatedCampaignsDraftsRoute: typeof AuthenticatedCampaignsDraftsRoute
+  AuthenticatedCampaignsExpiredRoute: typeof AuthenticatedCampaignsExpiredRoute
+  AuthenticatedCampaignsNewRoute: typeof AuthenticatedCampaignsNewRoute
+  AuthenticatedCampaignsPublishedRoute: typeof AuthenticatedCampaignsPublishedRoute
+  AuthenticatedCampaignsRunningRoute: typeof AuthenticatedCampaignsRunningRoute
+  AuthenticatedInfluencersCurrentRoute: typeof AuthenticatedInfluencersCurrentRoute
+  AuthenticatedInfluencersFavoritesRoute: typeof AuthenticatedInfluencersFavoritesRoute
+  AuthenticatedInfluencersHiredRoute: typeof AuthenticatedInfluencersHiredRoute
+  AuthenticatedInfluencersSearchRoute: typeof AuthenticatedInfluencersSearchRoute
+  AuthenticatedMessagesNotificationsRoute: typeof AuthenticatedMessagesNotificationsRoute
+  AuthenticatedMessagesPersonalRoute: typeof AuthenticatedMessagesPersonalRoute
+  AuthenticatedMessagesSystemRoute: typeof AuthenticatedMessagesSystemRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedSecurityRoute: AuthenticatedSecurityRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedAnalyticsCampaignsRoute: AuthenticatedAnalyticsCampaignsRoute,
+  AuthenticatedAnalyticsInfluencersRoute:
+    AuthenticatedAnalyticsInfluencersRoute,
+  AuthenticatedCampaignsArchiveRoute: AuthenticatedCampaignsArchiveRoute,
+  AuthenticatedCampaignsCompletedRoute: AuthenticatedCampaignsCompletedRoute,
+  AuthenticatedCampaignsDraftsRoute: AuthenticatedCampaignsDraftsRoute,
+  AuthenticatedCampaignsExpiredRoute: AuthenticatedCampaignsExpiredRoute,
+  AuthenticatedCampaignsNewRoute: AuthenticatedCampaignsNewRoute,
+  AuthenticatedCampaignsPublishedRoute: AuthenticatedCampaignsPublishedRoute,
+  AuthenticatedCampaignsRunningRoute: AuthenticatedCampaignsRunningRoute,
+  AuthenticatedInfluencersCurrentRoute: AuthenticatedInfluencersCurrentRoute,
+  AuthenticatedInfluencersFavoritesRoute:
+    AuthenticatedInfluencersFavoritesRoute,
+  AuthenticatedInfluencersHiredRoute: AuthenticatedInfluencersHiredRoute,
+  AuthenticatedInfluencersSearchRoute: AuthenticatedInfluencersSearchRoute,
+  AuthenticatedMessagesNotificationsRoute:
+    AuthenticatedMessagesNotificationsRoute,
+  AuthenticatedMessagesPersonalRoute: AuthenticatedMessagesPersonalRoute,
+  AuthenticatedMessagesSystemRoute: AuthenticatedMessagesSystemRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
