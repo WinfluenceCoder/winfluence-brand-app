@@ -49,12 +49,17 @@ function LoginPage() {
     defaultValues: { email: "" },
   });
 
-  const mapAuthError = (msg?: string | null) => {
-    const m = (msg ?? "").toLowerCase();
-    if (m.includes("invalid login") || m.includes("invalid credentials")) return t("auth.errors.invalidCredentials");
-    if (m.includes("email not confirmed")) return t("auth.errors.emailNotConfirmed");
-    if (m.includes("network") || m.includes("fetch")) return t("auth.errors.network");
-    return t("auth.errors.generic");
+  const mapAuthError = (err?: { message?: string | null; code?: string | null } | null) => {
+    const msg = (err?.message ?? "").toLowerCase();
+    const code = (err?.code ?? "").toLowerCase();
+    if (code === "weak_password" || msg.includes("weak") || msg.includes("pwned")) return t("auth.errors.weakPassword");
+    if (code === "user_already_exists" || msg.includes("already registered") || msg.includes("user already")) return t("auth.errors.userExists");
+    if (code === "email_address_invalid" || msg.includes("invalid email") || msg.includes("email address") && msg.includes("invalid")) return t("auth.errors.emailInvalid");
+    if (code === "over_email_send_rate_limit" || msg.includes("rate limit") || msg.includes("too many")) return t("auth.errors.rateLimit");
+    if (msg.includes("invalid login") || msg.includes("invalid credentials")) return t("auth.errors.invalidCredentials");
+    if (msg.includes("email not confirmed")) return t("auth.errors.emailNotConfirmed");
+    if (msg.includes("network") || msg.includes("fetch")) return t("auth.errors.network");
+    return err?.message || t("auth.errors.generic");
   };
 
   const onLogin = async (v: z.infer<typeof schemas.login>) => {
