@@ -9,6 +9,7 @@ if (!i18n.isInitialized) {
     fallbackLng: "de",
     interpolation: { escapeValue: false },
     returnNull: false,
+    react: { useSuspense: false },
   });
 }
 
