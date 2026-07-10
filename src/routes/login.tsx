@@ -66,7 +66,7 @@ function LoginPage() {
     setBanner(null);
     const { error } = await supabase.auth.signInWithPassword(v);
     if (error) {
-      toast.error(mapAuthError(error.message));
+      toast.error(mapAuthError(error));
       return;
     }
     navigate({ to: "/" });
@@ -80,7 +80,7 @@ function LoginPage() {
       options: { emailRedirectTo: `${window.location.origin}/` },
     });
     if (error) {
-      toast.error(mapAuthError(error.message));
+      toast.error(mapAuthError(error));
       return;
     }
     setBanner(t("auth.signupConfirm"));
@@ -92,7 +92,7 @@ function LoginPage() {
       redirectTo: `${window.location.origin}/reset-password`,
     });
     if (error) {
-      toast.error(mapAuthError(error.message));
+      toast.error(mapAuthError(error));
       return;
     }
     setBanner(t("auth.resetLinkSent"));
