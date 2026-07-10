@@ -45,6 +45,10 @@
       "emailNotConfirmed": "Bitte bestätige zuerst deine E-Mail-Adresse.",
       "network": "Netzwerkfehler. Bitte versuche es erneut.",
       "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+      "weakPassword": "Dieses Passwort ist unsicher (in bekannten Datenlecks aufgetaucht). Bitte wähle ein stärkeres Passwort.",
+      "userExists": "Für diese E-Mail-Adresse existiert bereits ein Konto.",
+      "emailInvalid": "Diese E-Mail-Adresse ist ungültig.",
+      "rateLimit": "Zu viele Versuche. Bitte warte kurz und versuche es erneut.",
       "recoverySessionMissing": "Der Link ist ungültig oder abgelaufen. Bitte fordere einen neuen an."
     }
   },
