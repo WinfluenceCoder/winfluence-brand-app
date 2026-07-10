@@ -1,4 +1,6 @@
 import { useTranslation } from "react-i18next";
+import logo from "@/assets/winfluence-logo.png.asset.json";
+
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   Home,
@@ -98,11 +100,10 @@ export function AppSidebar() {
         {collapsed ? (
           <span className="text-xl font-bold tracking-tight text-primary">w</span>
         ) : (
-          <span className="text-xl font-bold tracking-tight text-primary">
-            winfluence
-          </span>
+          <img src={logo.url} alt="winfluence" className="h-6 w-auto" />
         )}
       </SidebarHeader>
+
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
