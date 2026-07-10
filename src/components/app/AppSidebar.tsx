@@ -1,4 +1,6 @@
 import { useTranslation } from "react-i18next";
+import logo from "@/assets/winfluence-logo.png.asset.json";
+
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   Home,
