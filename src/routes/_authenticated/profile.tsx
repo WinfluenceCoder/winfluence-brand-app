@@ -121,30 +121,8 @@ function ProfilePage() {
     }
   };
 
-  const onSubmit = async (values: FormValues) => {
-    if (!logoUrl) {
-      toast.error(t("validation.required"));
-      return;
-    }
-    try {
-      await saveBrand({
-        data: {
-          ...values,
-          insta_url: values.insta_url || null,
-          job_title: values.job_title || null,
-          user_linkedin_url: values.user_linkedin_url || null,
-          mobile: values.mobile || null,
-          brand_name: brand?.brand_name ?? null,
-          logo_url: logoUrl,
-        },
-      });
-      toast.success(t("profile.saved"));
-      await qc.invalidateQueries({ queryKey: ["my-brand"] });
-    } catch (err) {
-      console.error(err);
-      toast.error(t("profile.saveError"));
-    }
-  };
+
+
 
   const initials = `${brand?.first_name?.[0] ?? ""}${brand?.last_name?.[0] ?? ""}`.toUpperCase() || "?";
   const errors = form.formState.errors;
