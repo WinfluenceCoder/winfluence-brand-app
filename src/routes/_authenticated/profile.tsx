@@ -147,19 +147,58 @@ function ProfilePage() {
   };
 
   const initials = `${brand?.first_name?.[0] ?? ""}${brand?.last_name?.[0] ?? ""}`.toUpperCase() || "?";
+  const errors = form.formState.errors;
+  const invalidCls = "border-destructive focus-visible:ring-destructive";
+  const [logoError, setLogoError] = useState<string | null>(null);
+
+  const onSubmitWrapped = form.handleSubmit(
+    async (values) => {
+      if (!logoUrl) {
+        setLogoError(t("validation.required"));
+        return;
+      }
+      setLogoError(null);
+      try {
+        await saveBrand({
+          data: {
+            ...values,
+            insta_url: values.insta_url || null,
+            job_title: values.job_title || null,
+            user_linkedin_url: values.user_linkedin_url || null,
+            mobile: values.mobile || null,
+            brand_name: brand?.brand_name ?? null,
+            logo_url: logoUrl,
+          },
+        });
+        toast.success(t("profile.saved"));
+        await qc.invalidateQueries({ queryKey: ["my-brand"] });
+      } catch (err) {
+        console.error(err);
+        toast.error(t("profile.saveError"));
+      }
+    },
+    () => {
+      if (!logoUrl) setLogoError(t("validation.required"));
+    },
+  );
+  void onSubmit;
 
   return (
     <div className="p-8 max-w-3xl">
       <h1 className="text-2xl font-semibold tracking-tight">{t("profile.title")}</h1>
 
-      <form onSubmit={form.handleSubmit(onSubmit)} className="mt-8 space-y-10">
+      <form onSubmit={onSubmitWrapped} className="mt-8 space-y-10" noValidate>
         {/* Firma */}
         <section className="space-y-6">
           <h2 className="text-lg font-semibold border-b pb-2">{t("profile.companySection")}</h2>
 
           <div className="flex items-start gap-6">
             <div className="flex flex-col items-center gap-2">
-              <div className="h-24 w-24 rounded-lg border bg-muted overflow-hidden flex items-center justify-center">
+              <div
+                className={`h-24 w-24 rounded-lg border bg-muted overflow-hidden flex items-center justify-center ${
+                  logoError ? "border-destructive" : ""
+                }`}
+              >
                 {logoUrl ? (
                   <img src={logoUrl} alt="logo" className="h-full w-full object-cover" />
                 ) : (
@@ -171,6 +210,7 @@ function ProfilePage() {
                 {uploading ? t("common.loading") : t("profile.uploadLogo")}
                 <input type="file" accept="image/*" className="hidden" onChange={onLogoChange} disabled={uploading} />
               </Label>
+              {logoError && <p className="text-xs text-destructive">{logoError}</p>}
             </div>
             <p className="text-sm text-muted-foreground mt-2">{t("profile.logoHint")}</p>
           </div>
@@ -186,16 +226,30 @@ function ProfilePage() {
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="domain">{t("profile.domain")}</Label>
-            <Input id="domain" {...form.register("domain")} />
-            {form.formState.errors.domain && (
-              <p className="text-xs text-destructive">{form.formState.errors.domain.message}</p>
-            )}
+            <Label htmlFor="domain" className={errors.domain ? "text-destructive" : ""}>
+              {t("profile.domain")}
+            </Label>
+            <Input
+              id="domain"
+              aria-invalid={!!errors.domain}
+              className={errors.domain ? invalidCls : ""}
+              {...form.register("domain")}
+            />
+            {errors.domain && <p className="text-xs text-destructive">{errors.domain.message}</p>}
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="insta_url">{t("profile.instaHandle")}</Label>
-            <Input id="insta_url" {...form.register("insta_url")} placeholder="@brand" />
+            <Label htmlFor="insta_url" className={errors.insta_url ? "text-destructive" : ""}>
+              {t("profile.instaHandle")}
+            </Label>
+            <Input
+              id="insta_url"
+              aria-invalid={!!errors.insta_url}
+              className={errors.insta_url ? invalidCls : ""}
+              placeholder="@brand"
+              {...form.register("insta_url")}
+            />
+            {errors.insta_url && <p className="text-xs text-destructive">{errors.insta_url.message}</p>}
           </div>
         </section>
 
@@ -204,12 +258,12 @@ function ProfilePage() {
           <h2 className="text-lg font-semibold border-b pb-2">{t("profile.contactSection")}</h2>
 
           <div className="grid gap-2">
-            <Label>{t("profile.gender")}</Label>
+            <Label className={errors.gender ? "text-destructive" : ""}>{t("profile.gender")}</Label>
             <Select
               value={form.watch("gender")}
               onValueChange={(v) => form.setValue("gender", v as FormValues["gender"], { shouldValidate: true })}
             >
-              <SelectTrigger>
+              <SelectTrigger aria-invalid={!!errors.gender} className={errors.gender ? invalidCls : ""}>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -218,35 +272,62 @@ function ProfilePage() {
                 <SelectItem value="diverse">{t("profile.genderDiverse")}</SelectItem>
               </SelectContent>
             </Select>
+            {errors.gender && <p className="text-xs text-destructive">{errors.gender.message}</p>}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="first_name">{t("profile.firstName")}</Label>
-              <Input id="first_name" {...form.register("first_name")} />
-              {form.formState.errors.first_name && (
-                <p className="text-xs text-destructive">{form.formState.errors.first_name.message}</p>
-              )}
+              <Label htmlFor="first_name" className={errors.first_name ? "text-destructive" : ""}>
+                {t("profile.firstName")}
+              </Label>
+              <Input
+                id="first_name"
+                aria-invalid={!!errors.first_name}
+                className={errors.first_name ? invalidCls : ""}
+                {...form.register("first_name")}
+              />
+              {errors.first_name && <p className="text-xs text-destructive">{errors.first_name.message}</p>}
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="last_name">{t("profile.lastName")}</Label>
-              <Input id="last_name" {...form.register("last_name")} />
-              {form.formState.errors.last_name && (
-                <p className="text-xs text-destructive">{form.formState.errors.last_name.message}</p>
-              )}
+              <Label htmlFor="last_name" className={errors.last_name ? "text-destructive" : ""}>
+                {t("profile.lastName")}
+              </Label>
+              <Input
+                id="last_name"
+                aria-invalid={!!errors.last_name}
+                className={errors.last_name ? invalidCls : ""}
+                {...form.register("last_name")}
+              />
+              {errors.last_name && <p className="text-xs text-destructive">{errors.last_name.message}</p>}
             </div>
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="job_title">{t("profile.jobTitle")}</Label>
-            <Input id="job_title" {...form.register("job_title")} />
+            <Label htmlFor="job_title" className={errors.job_title ? "text-destructive" : ""}>
+              {t("profile.jobTitle")}
+            </Label>
+            <Input
+              id="job_title"
+              aria-invalid={!!errors.job_title}
+              className={errors.job_title ? invalidCls : ""}
+              {...form.register("job_title")}
+            />
+            {errors.job_title && <p className="text-xs text-destructive">{errors.job_title.message}</p>}
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="user_linkedin_url">{t("profile.linkedin")}</Label>
-            <Input id="user_linkedin_url" {...form.register("user_linkedin_url")} placeholder="https://linkedin.com/in/…" />
-            {form.formState.errors.user_linkedin_url && (
-              <p className="text-xs text-destructive">{form.formState.errors.user_linkedin_url.message}</p>
+            <Label htmlFor="user_linkedin_url" className={errors.user_linkedin_url ? "text-destructive" : ""}>
+              {t("profile.linkedin")}
+            </Label>
+            <Input
+              id="user_linkedin_url"
+              aria-invalid={!!errors.user_linkedin_url}
+              className={errors.user_linkedin_url ? invalidCls : ""}
+              placeholder="https://linkedin.com/in/…"
+              {...form.register("user_linkedin_url")}
+            />
+            {errors.user_linkedin_url && (
+              <p className="text-xs text-destructive">{errors.user_linkedin_url.message}</p>
             )}
           </div>
 
@@ -264,11 +345,17 @@ function ProfilePage() {
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="mobile">{t("profile.mobile")}</Label>
-            <Input id="mobile" {...form.register("mobile")} placeholder="+41 79 999 99 99" />
-            {form.formState.errors.mobile && (
-              <p className="text-xs text-destructive">{form.formState.errors.mobile.message}</p>
-            )}
+            <Label htmlFor="mobile" className={errors.mobile ? "text-destructive" : ""}>
+              {t("profile.mobile")}
+            </Label>
+            <Input
+              id="mobile"
+              aria-invalid={!!errors.mobile}
+              className={errors.mobile ? invalidCls : ""}
+              placeholder="+41 79 999 99 99"
+              {...form.register("mobile")}
+            />
+            {errors.mobile && <p className="text-xs text-destructive">{errors.mobile.message}</p>}
           </div>
         </section>
 
@@ -288,3 +375,4 @@ function ProfilePage() {
     </div>
   );
 }
+
