@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
+import logo from "@/assets/winfluence-logo.png.asset.json";
+
 
 export const Route = createFileRoute("/signed-out")({
   component: SignedOutPage,
