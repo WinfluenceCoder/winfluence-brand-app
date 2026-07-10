@@ -159,7 +159,7 @@ function ProfilePage() {
       if (!logoUrl) setLogoError(t("validation.required"));
     },
   );
-  void onSubmit;
+  
 
   return (
     <div className="p-8 max-w-3xl">
