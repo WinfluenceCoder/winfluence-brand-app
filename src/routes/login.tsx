@@ -97,7 +97,7 @@ function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4">
       <div className="w-full max-w-md rounded-xl border bg-card p-8 shadow-sm">
         <div className="text-center mb-6">
-          <div className="text-2xl font-bold text-primary tracking-tight">winfluence</div>
+          <img src={logo.url} alt="winfluence" className="h-8 w-auto mx-auto" />
           <h1 className="mt-3 text-xl font-semibold">
             {mode === "login" && t("auth.welcome")}
             {mode === "register" && t("auth.registerTitle")}
