@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignedOutRouteImport } from './routes/signed-out'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -16,6 +17,11 @@ import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedSecurityRouteImport } from './routes/_authenticated/security'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 
+const SignedOutRoute = SignedOutRouteImport.update({
+  id: '/signed-out',
+  path: '/signed-out',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
@@ -50,12 +56,14 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/signed-out': typeof SignedOutRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/security': typeof AuthenticatedSecurityRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/signed-out': typeof SignedOutRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/security': typeof AuthenticatedSecurityRoute
   '/': typeof AuthenticatedIndexRoute
@@ -65,20 +73,34 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/signed-out': typeof SignedOutRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/security': typeof AuthenticatedSecurityRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/reset-password' | '/profile' | '/security'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/reset-password'
+    | '/signed-out'
+    | '/profile'
+    | '/security'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/reset-password' | '/profile' | '/security' | '/'
+  to:
+    | '/login'
+    | '/reset-password'
+    | '/signed-out'
+    | '/profile'
+    | '/security'
+    | '/'
   id:
     | '__root__'
     | '/_authenticated'
     | '/login'
     | '/reset-password'
+    | '/signed-out'
     | '/_authenticated/profile'
     | '/_authenticated/security'
     | '/_authenticated/'
@@ -88,10 +110,18 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SignedOutRoute: typeof SignedOutRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/signed-out': {
+      id: '/signed-out'
+      path: '/signed-out'
+      fullPath: '/signed-out'
+      preLoaderRoute: typeof SignedOutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset-password': {
       id: '/reset-password'
       path: '/reset-password'
@@ -156,6 +186,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SignedOutRoute: SignedOutRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
