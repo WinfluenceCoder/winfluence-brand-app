@@ -8,9 +8,10 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { I18nextProvider } from "react-i18next";
 
 import appCss from "../styles.css?url";
-import "../i18n";
+import i18n from "../i18n";
 import { Toaster } from "@/components/ui/sonner";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
@@ -131,8 +132,10 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
-      <Toaster richColors position="top-right" />
+      <I18nextProvider i18n={i18n} defaultNS="translation">
+        <Outlet />
+        <Toaster richColors position="top-right" />
+      </I18nextProvider>
     </QueryClientProvider>
   );
 }
