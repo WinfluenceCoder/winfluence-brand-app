@@ -10,7 +10,6 @@ if (!i18n.isInitialized) {
     interpolation: { escapeValue: false },
     returnNull: false,
     react: { useSuspense: false },
-    initImmediate: false,
   });
 }
 
