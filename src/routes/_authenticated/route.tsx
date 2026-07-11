@@ -57,7 +57,7 @@ function AuthenticatedLayout() {
       <div className="flex min-h-screen w-full">
         <AppSidebar />
         <SidebarInset className="flex min-h-screen flex-col">
-          <AppHeader displayName={displayName} />
+          <AppHeader displayName={displayName} logoUrl={logoUrl} />
           <main className="flex-1">
             <Outlet />
           </main>
