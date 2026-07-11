@@ -12,6 +12,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -29,18 +31,36 @@ export const Route = createFileRoute("/_authenticated/profile")({
 const chMobileRegex = /^(?:\+41\s?|0)(?:\d{2})\s?\d{3}\s?\d{2}\s?\d{2}$/;
 
 function makeSchema(t: (k: string) => string) {
+  const urlOpt = z
+    .string()
+    .trim()
+    .optional()
+    .or(z.literal(""))
+    .refine((v) => !v || /^https?:\/\//i.test(v), t("validation.url"));
+  const intOpt = z
+    .string()
+    .trim()
+    .optional()
+    .or(z.literal(""))
+    .refine((v) => !v || /^\d+$/.test(v), t("validation.url"));
   return z.object({
     domain: z.string().trim().min(1, t("validation.required")),
     insta_url: z.string().trim().optional().or(z.literal("")),
+    brand_name: z.string().trim().optional().or(z.literal("")),
+    brand_pitch: z.string().trim().optional().or(z.literal("")),
+    hashtags: z.string().trim().optional().or(z.literal("")),
+    linkedin_url: urlOpt,
+    youtube_url: urlOpt,
+    tiktok_url: urlOpt,
+    billing_address_to: z.string().trim().optional().or(z.literal("")),
+    billing_address_street: z.string().trim().optional().or(z.literal("")),
+    billing_address_nr: intOpt,
+    billing_address_zip: intOpt,
+    billing_address_city: z.string().trim().optional().or(z.literal("")),
     first_name: z.string().trim().min(1, t("validation.required")),
     last_name: z.string().trim().min(1, t("validation.required")),
     job_title: z.string().trim().optional().or(z.literal("")),
-    user_linkedin_url: z
-      .string()
-      .trim()
-      .optional()
-      .or(z.literal(""))
-      .refine((v) => !v || /^https?:\/\//i.test(v), t("validation.url")),
+    user_linkedin_url: urlOpt,
     gender: z.enum(["female", "male", "diverse"], {
       message: t("validation.required"),
     }),
@@ -80,6 +100,19 @@ function ProfilePage() {
     defaultValues: {
       domain: brand?.domain ?? "",
       insta_url: brand?.insta_url ?? "",
+      brand_name: brand?.brand_name ?? "",
+      brand_pitch: brand?.brand_pitch ?? "",
+      hashtags: brand?.hashtags ?? "",
+      linkedin_url: brand?.linkedin_url ?? "",
+      youtube_url: brand?.youtube_url ?? "",
+      tiktok_url: brand?.tiktok_url ?? "",
+      billing_address_to: brand?.billing_address_to ?? "",
+      billing_address_street: brand?.billing_address_street ?? "",
+      billing_address_nr:
+        brand?.billing_address_nr != null ? String(brand.billing_address_nr) : "",
+      billing_address_zip:
+        brand?.billing_address_zip != null ? String(brand.billing_address_zip) : "",
+      billing_address_city: brand?.billing_address_city ?? "",
       first_name: brand?.first_name ?? "",
       last_name: brand?.last_name ?? "",
       job_title: brand?.job_title ?? "",
@@ -95,6 +128,7 @@ function ProfilePage() {
   const email = brand?.e_mail_address ?? "";
   const legalName = brand?.legal_name ?? "";
   const mwstNr = brand?.mwst_nr ?? "";
+  const status = brand?.status ?? "";
 
   const onLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -121,9 +155,6 @@ function ProfilePage() {
     }
   };
 
-
-
-
   const initials = `${brand?.first_name?.[0] ?? ""}${brand?.last_name?.[0] ?? ""}`.toUpperCase() || "?";
   const errors = form.formState.errors;
   const invalidCls = "border-destructive focus-visible:ring-destructive";
@@ -139,12 +170,29 @@ function ProfilePage() {
       try {
         await saveBrand({
           data: {
-            ...values,
+            domain: values.domain,
             insta_url: values.insta_url || null,
+            brand_name: values.brand_name || null,
+            brand_pitch: values.brand_pitch || null,
+            hashtags: values.hashtags || null,
+            linkedin_url: values.linkedin_url || null,
+            youtube_url: values.youtube_url || null,
+            tiktok_url: values.tiktok_url || null,
+            billing_address_to: values.billing_address_to || null,
+            billing_address_street: values.billing_address_street || null,
+            billing_address_nr: values.billing_address_nr
+              ? parseInt(values.billing_address_nr, 10)
+              : null,
+            billing_address_zip: values.billing_address_zip
+              ? parseInt(values.billing_address_zip, 10)
+              : null,
+            billing_address_city: values.billing_address_city || null,
+            first_name: values.first_name,
+            last_name: values.last_name,
             job_title: values.job_title || null,
             user_linkedin_url: values.user_linkedin_url || null,
+            gender: values.gender,
             mobile: values.mobile || null,
-            brand_name: brand?.brand_name ?? null,
             logo_url: logoUrl,
           },
         });
@@ -159,14 +207,18 @@ function ProfilePage() {
       if (!logoUrl) setLogoError(t("validation.required"));
     },
   );
-  
 
   return (
     <div className="p-8 max-w-3xl">
       <h1 className="text-2xl font-semibold tracking-tight">{t("profile.title")}</h1>
 
+      <div className="mt-4 flex items-center gap-2">
+        <span className="text-sm text-muted-foreground">{t("profile.status")}:</span>
+        <Badge variant="secondary">{status || "—"}</Badge>
+      </div>
+
       <form onSubmit={onSubmitWrapped} className="mt-8 space-y-10" noValidate>
-        {/* Firma */}
+        {/* Meine Firma */}
         <section className="space-y-6">
           <h2 className="text-lg font-semibold border-b pb-2">{t("profile.companySection")}</h2>
 
@@ -228,6 +280,123 @@ function ProfilePage() {
               {...form.register("insta_url")}
             />
             {errors.insta_url && <p className="text-xs text-destructive">{errors.insta_url.message}</p>}
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="billing_address_to">{t("profile.billingTo")}</Label>
+            <Input id="billing_address_to" {...form.register("billing_address_to")} />
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            <div className="grid gap-2 col-span-2">
+              <Label htmlFor="billing_address_street">{t("profile.billingStreet")}</Label>
+              <Input id="billing_address_street" {...form.register("billing_address_street")} />
+            </div>
+            <div className="grid gap-2">
+              <Label
+                htmlFor="billing_address_nr"
+                className={errors.billing_address_nr ? "text-destructive" : ""}
+              >
+                {t("profile.billingNr")}
+              </Label>
+              <Input
+                id="billing_address_nr"
+                inputMode="numeric"
+                aria-invalid={!!errors.billing_address_nr}
+                className={errors.billing_address_nr ? invalidCls : ""}
+                {...form.register("billing_address_nr")}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            <div className="grid gap-2">
+              <Label
+                htmlFor="billing_address_zip"
+                className={errors.billing_address_zip ? "text-destructive" : ""}
+              >
+                {t("profile.billingZip")}
+              </Label>
+              <Input
+                id="billing_address_zip"
+                inputMode="numeric"
+                aria-invalid={!!errors.billing_address_zip}
+                className={errors.billing_address_zip ? invalidCls : ""}
+                {...form.register("billing_address_zip")}
+              />
+            </div>
+            <div className="grid gap-2 col-span-2">
+              <Label htmlFor="billing_address_city">{t("profile.billingCity")}</Label>
+              <Input id="billing_address_city" {...form.register("billing_address_city")} />
+            </div>
+          </div>
+        </section>
+
+        {/* Meine Brand */}
+        <section className="space-y-6">
+          <h2 className="text-lg font-semibold border-b pb-2">{t("profile.brandSection")}</h2>
+
+          <div className="grid gap-2">
+            <Label htmlFor="brand_name">{t("profile.brandName")}</Label>
+            <Input id="brand_name" {...form.register("brand_name")} />
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="brand_pitch">{t("profile.brandPitch")}</Label>
+            <Textarea id="brand_pitch" rows={4} {...form.register("brand_pitch")} />
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="hashtags">{t("profile.keywords")}</Label>
+            <Input id="hashtags" {...form.register("hashtags")} />
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="linkedin_url" className={errors.linkedin_url ? "text-destructive" : ""}>
+              {t("profile.brandLinkedin")}
+            </Label>
+            <Input
+              id="linkedin_url"
+              aria-invalid={!!errors.linkedin_url}
+              className={errors.linkedin_url ? invalidCls : ""}
+              placeholder="https://linkedin.com/company/…"
+              {...form.register("linkedin_url")}
+            />
+            {errors.linkedin_url && (
+              <p className="text-xs text-destructive">{errors.linkedin_url.message}</p>
+            )}
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="youtube_url" className={errors.youtube_url ? "text-destructive" : ""}>
+              {t("profile.brandYoutube")}
+            </Label>
+            <Input
+              id="youtube_url"
+              aria-invalid={!!errors.youtube_url}
+              className={errors.youtube_url ? invalidCls : ""}
+              placeholder="https://youtube.com/@…"
+              {...form.register("youtube_url")}
+            />
+            {errors.youtube_url && (
+              <p className="text-xs text-destructive">{errors.youtube_url.message}</p>
+            )}
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="tiktok_url" className={errors.tiktok_url ? "text-destructive" : ""}>
+              {t("profile.brandTiktok")}
+            </Label>
+            <Input
+              id="tiktok_url"
+              aria-invalid={!!errors.tiktok_url}
+              className={errors.tiktok_url ? invalidCls : ""}
+              placeholder="https://tiktok.com/@…"
+              {...form.register("tiktok_url")}
+            />
+            {errors.tiktok_url && (
+              <p className="text-xs text-destructive">{errors.tiktok_url.message}</p>
+            )}
           </div>
         </section>
 
@@ -353,4 +522,3 @@ function ProfilePage() {
     </div>
   );
 }
-
