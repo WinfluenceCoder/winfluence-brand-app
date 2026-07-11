@@ -8,6 +8,34 @@ const updateSchema = z.object({
   domain: z.string().trim().min(1).max(255),
   insta_url: z.string().trim().max(255).optional().nullable(),
   brand_name: z.string().trim().max(255).optional().nullable(),
+  brand_pitch: z.string().trim().max(2000).optional().nullable(),
+  hashtags: z.string().trim().max(500).optional().nullable(),
+  linkedin_url: z
+    .string()
+    .trim()
+    .max(500)
+    .optional()
+    .nullable()
+    .refine((v) => !v || /^https?:\/\//i.test(v), { message: "url" }),
+  youtube_url: z
+    .string()
+    .trim()
+    .max(500)
+    .optional()
+    .nullable()
+    .refine((v) => !v || /^https?:\/\//i.test(v), { message: "url" }),
+  tiktok_url: z
+    .string()
+    .trim()
+    .max(500)
+    .optional()
+    .nullable()
+    .refine((v) => !v || /^https?:\/\//i.test(v), { message: "url" }),
+  billing_address_to: z.string().trim().max(255).optional().nullable(),
+  billing_address_street: z.string().trim().max(255).optional().nullable(),
+  billing_address_nr: z.number().int().nonnegative().optional().nullable(),
+  billing_address_zip: z.number().int().nonnegative().optional().nullable(),
+  billing_address_city: z.string().trim().max(255).optional().nullable(),
   first_name: z.string().trim().min(1).max(100),
   last_name: z.string().trim().min(1).max(100),
   job_title: z.string().trim().max(150).optional().nullable(),
