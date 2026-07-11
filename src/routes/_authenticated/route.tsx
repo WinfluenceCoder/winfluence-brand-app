@@ -22,23 +22,26 @@ function AuthenticatedLayout() {
   const { user } = Route.useRouteContext();
   const router = useRouter();
   const [displayName, setDisplayName] = useState<string>(user.email ?? "");
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
     (async () => {
       const { data } = await supabase
         .from("brands")
-        .select("brand_name, e_mail_address")
+        .select("brand_name, e_mail_address, logo_url")
         .eq("user_id", user.id)
         .maybeSingle();
       if (!active) return;
       const name = data?.brand_name?.trim();
       setDisplayName(name && name.length > 0 ? name : data?.e_mail_address ?? user.email ?? "");
+      setLogoUrl(data?.logo_url ?? null);
     })();
     return () => {
       active = false;
     };
   }, [user.id, user.email]);
+
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
@@ -54,7 +57,7 @@ function AuthenticatedLayout() {
       <div className="flex min-h-screen w-full">
         <AppSidebar />
         <SidebarInset className="flex min-h-screen flex-col">
-          <AppHeader displayName={displayName} />
+          <AppHeader displayName={displayName} logoUrl={logoUrl} />
           <main className="flex-1">
             <Outlet />
           </main>

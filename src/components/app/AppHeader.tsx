@@ -13,9 +13,9 @@ import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { supabase } from "@/integrations/supabase/client";
 
-type Props = { displayName: string };
+type Props = { displayName: string; logoUrl?: string | null };
 
-export function AppHeader({ displayName }: Props) {
+export function AppHeader({ displayName, logoUrl }: Props) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -54,6 +54,13 @@ export function AppHeader({ displayName }: Props) {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="gap-2 max-w-[220px]">
+            {logoUrl ? (
+              <img
+                src={logoUrl}
+                alt=""
+                className="h-6 w-6 rounded-full object-cover"
+              />
+            ) : null}
             <span className="truncate font-medium">{displayName}</span>
             <ChevronDown className="h-4 w-4 opacity-70" />
           </Button>
