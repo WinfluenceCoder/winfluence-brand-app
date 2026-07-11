@@ -110,7 +110,7 @@
     "status": "Status",
     "companySection": "Meine Firma",
     "brandSection": "Meine Brand",
-    "billingTo": "Rechnungsadresse (Ansprechpartner)",
+    "billingTo": "Rechnungsadresse (an Person)",
     "billingStreet": "Rechnungsadresse Strasse",
     "billingNr": "Hausnummer",
     "billingZip": "PLZ",
