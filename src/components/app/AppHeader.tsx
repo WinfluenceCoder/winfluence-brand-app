@@ -54,6 +54,13 @@ export function AppHeader({ displayName, logoUrl }: Props) {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="gap-2 max-w-[220px]">
+            {logoUrl ? (
+              <img
+                src={logoUrl}
+                alt=""
+                className="h-6 w-6 rounded-full object-cover"
+              />
+            ) : null}
             <span className="truncate font-medium">{displayName}</span>
             <ChevronDown className="h-4 w-4 opacity-70" />
           </Button>
