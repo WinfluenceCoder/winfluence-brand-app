@@ -98,11 +98,21 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" className="border-r">
       <SidebarHeader className="h-14 px-4 flex items-center justify-start">
-        {collapsed ? (
-          <img src={icon.url} alt="winfluence" className="h-8 w-8 rounded-full" />
-        ) : (
-          <img src={logo.url} alt="winfluence" className="h-6 w-auto" />
-        )}
+        <Link to="/" className="flex items-center justify-start">
+          {collapsed ? (
+            <img
+              src={icon.url}
+              alt="winfluence"
+              className="h-8 w-8 object-contain rounded-sm"
+            />
+          ) : (
+            <img
+              src={logo.url}
+              alt="winfluence"
+              className="h-6 w-auto object-contain"
+            />
+          )}
+        </Link>
       </SidebarHeader>
 
       <SidebarContent>
