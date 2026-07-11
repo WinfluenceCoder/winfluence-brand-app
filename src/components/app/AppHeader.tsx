@@ -13,9 +13,9 @@ import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { supabase } from "@/integrations/supabase/client";
 
-type Props = { displayName: string };
+type Props = { displayName: string; logoUrl?: string | null };
 
-export function AppHeader({ displayName }: Props) {
+export function AppHeader({ displayName, logoUrl }: Props) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
