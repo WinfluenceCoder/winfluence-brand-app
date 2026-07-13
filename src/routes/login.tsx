@@ -34,6 +34,7 @@ function LoginPage() {
   const navigate = useNavigate();
   const [mode, setMode] = useState<Mode>("login");
   const [banner, setBanner] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const schemas = makeSchemas(t);
 
@@ -128,10 +129,20 @@ function LoginPage() {
             </div>
             <div className="grid gap-2">
               <Label htmlFor="password">{t("auth.password")}</Label>
-              <Input id="password" type="password" autoComplete="current-password" {...loginForm.register("password")} />
+              <Input id="password" type={showPassword ? "text" : "password"} autoComplete="current-password" {...loginForm.register("password")} />
               {loginForm.formState.errors.password && (
                 <p className="text-xs text-destructive">{loginForm.formState.errors.password.message}</p>
               )}
+              <div className="flex items-center gap-2 pt-1">
+                <Checkbox
+                  id="show-password"
+                  checked={showPassword}
+                  onCheckedChange={(checked) => setShowPassword(Boolean(checked))}
+                />
+                <Label htmlFor="show-password" className="text-sm font-normal cursor-pointer">
+                  {t("auth.showPassword")}
+                </Label>
+              </div>
             </div>
             <Button type="submit" className="w-full" disabled={loginForm.formState.isSubmitting}>
               {t("auth.login")}
