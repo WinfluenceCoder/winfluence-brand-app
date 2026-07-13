@@ -60,7 +60,7 @@
     "logout": "Abmelden"
   },
   "nav": {
-    "home": "Startseite",
+    "home": "Dashboard",
     "campaigns": "Kampagnen",
     "campaignsNew": "Neu",
     "campaignsDrafts": "Entwürfe",
@@ -90,7 +90,7 @@
     "about": "Über Winfluence"
   },
   "home": {
-    "title": "Startseite",
+    "title": "Mein Dashboard",
     "newCampaign": "Neue Kampagne",
     "emptyTitle": "Erstelle deine erste Kampagne",
     "emptySub": "Starte in wenigen Minuten und erreiche relevante Nano- und Micro-Influencer.",
