@@ -221,6 +221,7 @@ function ProfilePage() {
             gender: values.gender,
             mobile: values.mobile || null,
             logo_url: logoUrl,
+            user_foto_url: photoUrl,
           },
         });
         toast.success(t("profile.saved"));
