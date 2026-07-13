@@ -138,6 +138,8 @@
     "jobTitle": "Job Title",
     "linkedin": "LinkedIn",
     "photo": "Foto",
+    "uploadPhoto": "Foto hochladen",
+    "photoHint": "PNG oder JPG, quadratisch empfohlen.",
     "email": "E-Mail",
     "mobile": "Mobile",
     "readonlyHint": "Dieses Feld wird zentral verwaltet und kann nicht geändert werden.",
