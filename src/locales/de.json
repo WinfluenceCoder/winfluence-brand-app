@@ -22,6 +22,7 @@
     "welcome": "Willkommen bei winfluence",
     "email": "E-Mail-Adresse",
     "password": "Passwort",
+    "showPassword": "Passwort anzeigen",
     "passwordConfirm": "Passwort bestätigen",
     "login": "Anmelden",
     "loginTitle": "Anmelden",
