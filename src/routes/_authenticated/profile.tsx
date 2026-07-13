@@ -124,6 +124,8 @@ function ProfilePage() {
 
   const [logoUrl, setLogoUrl] = useState<string | null>(brand?.logo_url ?? null);
   const [uploading, setUploading] = useState(false);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(brand?.user_foto_url ?? null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
   const email = brand?.e_mail_address ?? "";
   const legalName = brand?.legal_name ?? "";
@@ -152,6 +154,31 @@ function ProfilePage() {
       console.error(err);
     } finally {
       setUploading(false);
+    }
+  };
+
+  const onPhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingPhoto(true);
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      const uid = userData.user?.id;
+      if (!uid) throw new Error("no-user");
+      const ext = file.name.split(".").pop() ?? "png";
+      const path = `${uid}/photo-${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from("user_fotos").upload(path, file, {
+        upsert: true,
+        contentType: file.type,
+      });
+      if (error) throw error;
+      const { data: pub } = supabase.storage.from("user_fotos").getPublicUrl(path);
+      setPhotoUrl(pub.publicUrl);
+    } catch (err) {
+      toast.error(t("profile.saveError"));
+      console.error(err);
+    } finally {
+      setUploadingPhoto(false);
     }
   };
 
