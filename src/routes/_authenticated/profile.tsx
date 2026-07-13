@@ -124,6 +124,8 @@ function ProfilePage() {
 
   const [logoUrl, setLogoUrl] = useState<string | null>(brand?.logo_url ?? null);
   const [uploading, setUploading] = useState(false);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(brand?.user_foto_url ?? null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
   const email = brand?.e_mail_address ?? "";
   const legalName = brand?.legal_name ?? "";
@@ -152,6 +154,31 @@ function ProfilePage() {
       console.error(err);
     } finally {
       setUploading(false);
+    }
+  };
+
+  const onPhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingPhoto(true);
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      const uid = userData.user?.id;
+      if (!uid) throw new Error("no-user");
+      const ext = file.name.split(".").pop() ?? "png";
+      const path = `${uid}/photo-${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from("user_fotos").upload(path, file, {
+        upsert: true,
+        contentType: file.type,
+      });
+      if (error) throw error;
+      const { data: pub } = supabase.storage.from("user_fotos").getPublicUrl(path);
+      setPhotoUrl(pub.publicUrl);
+    } catch (err) {
+      toast.error(t("profile.saveError"));
+      console.error(err);
+    } finally {
+      setUploadingPhoto(false);
     }
   };
 
@@ -194,6 +221,7 @@ function ProfilePage() {
             gender: values.gender,
             mobile: values.mobile || null,
             logo_url: logoUrl,
+            user_foto_url: photoUrl,
           },
         });
         toast.success(t("profile.saved"));
@@ -478,12 +506,24 @@ function ProfilePage() {
             )}
           </div>
 
-          <div className="flex items-center gap-3">
-            <Avatar className="h-14 w-14">
-              {brand?.user_foto_url ? <AvatarImage src={brand.user_foto_url} /> : null}
-              <AvatarFallback>{initials}</AvatarFallback>
-            </Avatar>
-            <span className="text-sm text-muted-foreground">{t("profile.photo")}</span>
+          <div className="flex items-start gap-6">
+            <div className="flex flex-col items-center gap-2">
+              <div className="h-24 w-24 rounded-lg border bg-muted overflow-hidden flex items-center justify-center">
+                {photoUrl ? (
+                  <img src={photoUrl} alt="photo" className="h-full w-full object-cover" />
+                ) : (
+                  <Avatar className="h-full w-full rounded-none">
+                    <AvatarFallback className="rounded-none text-lg">{initials}</AvatarFallback>
+                  </Avatar>
+                )}
+              </div>
+              <Label className="cursor-pointer inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+                <Upload className="h-3 w-3" />
+                {uploadingPhoto ? t("common.loading") : t("profile.uploadPhoto")}
+                <input type="file" accept="image/*" className="hidden" onChange={onPhotoChange} disabled={uploadingPhoto} />
+              </Label>
+            </div>
+            <p className="text-sm text-muted-foreground mt-2">{t("profile.photoHint")}</p>
           </div>
 
           <div className="grid gap-2">
