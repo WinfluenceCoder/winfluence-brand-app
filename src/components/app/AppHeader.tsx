@@ -1,6 +1,4 @@
 import { useTranslation } from "react-i18next";
-import logo from "@/assets/winfluence-logo.png.asset.json";
-import icon from "@/assets/winfluence-icon.png.asset.json";
 import { Bell, Settings as SettingsIcon, ChevronDown, User, Shield, LogOut } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
@@ -12,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { supabase } from "@/integrations/supabase/client";
 
 type Props = { displayName: string; logoUrl?: string | null };
