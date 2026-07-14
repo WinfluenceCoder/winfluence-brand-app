@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import logo from "@/assets/winfluence-logo.png.asset.json";
+import icon from "@/assets/winfluence-icon.png.asset.json";
 import { Bell, Settings as SettingsIcon, ChevronDown, User, Shield, LogOut } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
