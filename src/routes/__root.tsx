@@ -91,10 +91,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         property: "og:description",
         content:
-          "Kampagnen mit Nano- und Micro-Influencern buchen, verwalten und auswerten.",
+          "Die Winfluence Brand App: Kampagnen mit Nano- und Micro-Influencern buchen, verwalten und auswerten.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Winfluence – Brand App" },
+      { name: "twitter:description", content: "Die Winfluence Brand App: Kampagnen mit Nano- und Micro-Influencern buchen, verwalten und auswerten." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9beba5b0-b132-457d-bf93-f7c7f6c6ecaa/id-preview-f0aacff5--40411584-0e5c-43bb-8c52-4427693f0d4a.lovable.app-1784014718050.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9beba5b0-b132-457d-bf93-f7c7f6c6ecaa/id-preview-f0aacff5--40411584-0e5c-43bb-8c52-4427693f0d4a.lovable.app-1784014718050.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
