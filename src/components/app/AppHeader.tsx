@@ -36,7 +36,7 @@ export function AppHeader({ displayName, logoUrl }: Props) {
       <SidebarTrigger />
       <Link to="/" className="flex items-center">
         <img
-          src={logo.url}
+          src={collapsed ? icon.url : logo.url}
           alt="Winfluence"
           className="h-7 w-auto object-contain"
         />
