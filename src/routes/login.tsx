@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import logo from "@/assets/winfluence-logo.png.asset.json";
+import logo from "@/assets/winfluence-logo.png";
 
 
 type Mode = "login" | "register" | "forgot";
@@ -104,7 +104,7 @@ function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4">
       <div className="w-full max-w-md rounded-xl border bg-card p-8 shadow-sm">
         <div className="text-center mb-6">
-          <img src={logo.url} alt="winfluence" className="h-8 w-auto mx-auto" />
+          <img src={logo} alt="winfluence" className="h-8 w-auto mx-auto" />
           <h1 className="mt-3 text-xl font-semibold">
             {mode === "login" && t("auth.welcome")}
             {mode === "register" && t("auth.registerTitle")}
