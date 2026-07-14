@@ -19,8 +19,6 @@ export function AppHeader({ displayName, logoUrl }: Props) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { state } = useSidebar();
-  const collapsed = state === "collapsed";
 
   const handleLogout = async () => {
     await queryClient.cancelQueries();
