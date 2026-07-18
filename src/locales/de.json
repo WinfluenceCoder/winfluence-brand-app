@@ -154,6 +154,21 @@
     "resetButton": "Passwort zurücksetzen",
     "resetSent": "Wir haben dir einen Link zum Zurücksetzen des Passworts geschickt."
   },
+  "welcome": {
+    "title": "Willkommen bei winfluence",
+    "intro": "Bitte lege ein Passwort für deinen Zugang fest.",
+    "processing": "Einladung wird verarbeitet…",
+    "invalidLink": "Der Einladungslink ist ungültig oder abgelaufen. Bitte kontaktiere das Winfluence-Team für einen neuen Link.",
+    "submit": "Passwort setzen",
+    "success": "Passwort gesetzt. Willkommen an Bord!",
+    "criteria": {
+      "length": "Mindestens 8 Zeichen",
+      "upper": "Mindestens ein Großbuchstabe",
+      "lower": "Mindestens ein Kleinbuchstabe",
+      "digit": "Mindestens eine Zahl",
+      "match": "Passwörter stimmen überein"
+    }
+  },
   "placeholders": {
     "campaignsNew": "Neue Kampagne",
     "campaignsDrafts": "Entwürfe",
