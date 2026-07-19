@@ -114,6 +114,11 @@ function LoginPage() {
       navigate({ to: "/welcome", search: { domain: status.invitedDomain } });
       return;
     }
+    const blocked = blockedStatusMessage(status.brandStatus);
+    if (blocked) {
+      toast.error(blocked);
+      return;
+    }
     const { error } = await supabase.auth.signInWithPassword(v);
     if (error) {
       toast.error(mapAuthError(error));
