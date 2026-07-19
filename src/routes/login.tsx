@@ -182,6 +182,7 @@ function LoginPage() {
               {registerForm.formState.errors.password && (
                 <p className="text-xs text-destructive">{registerForm.formState.errors.password.message}</p>
               )}
+              <p className="text-xs text-muted-foreground">{t("validation.password.hint")}</p>
             </div>
             <Button type="submit" className="w-full" disabled={registerForm.formState.isSubmitting}>
               {t("auth.register")}
