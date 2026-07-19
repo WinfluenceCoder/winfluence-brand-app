@@ -65,14 +65,19 @@ function WelcomePage() {
       const { data, error } = await supabase.functions.invoke("claim-brand", {
         body: { domain },
       });
-      const ok = !error && (data as { ok?: boolean } | null)?.ok === true;
+      console.log("claim-brand response", { data, error });
+      const payload = data as { ok?: boolean; reason?: string; message?: string } | null;
+      const ok = !error && payload?.ok === true;
       if (!ok) {
-        toast.error("Das hat leider nicht geklappt. Bitte melde dich beim Team.");
+        const reason = payload?.reason ?? error?.message ?? "unknown";
+        const message = payload?.message ? ` — ${payload.message}` : "";
+        toast.error(`Fehler: ${reason}${message}`);
         return;
       }
       setDone(true);
-    } catch {
-      toast.error("Das hat leider nicht geklappt. Bitte melde dich beim Team.");
+    } catch (e) {
+      console.error("claim-brand exception", e);
+      toast.error(`Fehler: ${(e as Error).message ?? "exception"}`);
     } finally {
       setSubmitting(false);
     }
