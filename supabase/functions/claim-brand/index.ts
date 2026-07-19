@@ -21,6 +21,11 @@ function json(body: unknown, status = 200) {
   });
 }
 
+function fail(reason: string, message?: string) {
+  console.warn("claim-brand fail", reason, message ?? "");
+  return json({ ok: false, reason, message: message ?? null });
+}
+
 function generatePassword(): string {
   const upper = "ABCDEFGHJKLMNPQRSTUVWXYZ";
   const lower = "abcdefghijkmnpqrstuvwxyz";
@@ -37,7 +42,6 @@ function generatePassword(): string {
   const required = pick(upper, 2) + pick(lower, 2) + pick(digits, 2) + pick(specials, 2);
   const rest = pick(all, 12);
   const arr = (required + rest).split("");
-  // Fisher-Yates
   for (let i = arr.length - 1; i > 0; i--) {
     const r = crypto.getRandomValues(new Uint32Array(1))[0] % (i + 1);
     [arr[i], arr[r]] = [arr[r], arr[i]];
@@ -47,15 +51,18 @@ function generatePassword(): string {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
-  if (req.method !== "POST") return json({ ok: false }, 200);
+  if (req.method !== "POST") return fail("method_not_allowed");
 
   try {
     const { domain } = (await req.json().catch(() => ({}))) as { domain?: string };
-    if (!domain || typeof domain !== "string") return json({ ok: false });
+    if (!domain || typeof domain !== "string") return fail("missing_domain");
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+    if (!supabaseUrl) return fail("env_missing", "SUPABASE_URL");
+    if (!serviceKey) return fail("env_missing", "SUPABASE_SERVICE_ROLE_KEY");
+    if (!anonKey) return fail("env_missing", "SUPABASE_ANON_KEY");
 
     const service = createClient(supabaseUrl, serviceKey, {
       auth: { persistSession: false, autoRefreshToken: false },
@@ -70,11 +77,10 @@ Deno.serve(async (req) => {
       .ilike("domain", domain.trim())
       .maybeSingle();
 
-    if (brandErr) {
-      console.warn("brand lookup failed", brandErr.message);
-      return json({ ok: false });
-    }
-    if (!brand || !brand.e_mail_address || brand.user_id) return json({ ok: false });
+    if (brandErr) return fail("brand_lookup_failed", brandErr.message);
+    if (!brand) return fail("brand_not_found");
+    if (!brand.e_mail_address) return fail("brand_missing_email");
+    if (brand.user_id) return fail("already_claimed");
 
     const email = brand.e_mail_address;
     const password = generatePassword();
@@ -86,12 +92,9 @@ Deno.serve(async (req) => {
     });
 
     if (signUpErr || !signUp?.user?.id) {
-      console.warn("signUp failed", signUpErr?.message);
-      return json({ ok: false });
+      return fail("signup_failed", signUpErr?.message ?? "no user returned");
     }
 
-    // Falls "Confirm email" deaktiviert ist, versendet signUp keine Mail.
-    // Ein zusätzlicher Reset-Link stellt sicher, dass der User einen Link erhält.
     if (!signUp.user.confirmation_sent_at) {
       const { error: resetErr } = await anon.auth.resetPasswordForEmail(email, {
         redirectTo: REDIRECT_URL,
@@ -104,14 +107,10 @@ Deno.serve(async (req) => {
       .update({ user_id: signUp.user.id })
       .eq("id", brand.id);
 
-    if (updErr) {
-      console.warn("brand link update failed", updErr.message);
-      return json({ ok: false });
-    }
+    if (updErr) return fail("link_failed", updErr.message);
 
     return json({ ok: true });
   } catch (e) {
-    console.warn("claim-brand error", (e as Error).message);
-    return json({ ok: false });
+    return fail("unexpected", (e as Error).message);
   }
 });
