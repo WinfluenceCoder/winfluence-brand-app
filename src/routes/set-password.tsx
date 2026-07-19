@@ -111,9 +111,7 @@ function SetPasswordPage() {
               {form.formState.errors.password && (
                 <p className="text-xs text-destructive">{form.formState.errors.password.message}</p>
               )}
-              <p className="text-xs text-muted-foreground">
-                Min. 12 Zeichen, Gross-/Kleinbuchstabe, Zahl und Sonderzeichen.
-              </p>
+              <p className="text-xs text-muted-foreground">{t("validation.password.hint")}</p>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="confirm">Passwort bestätigen</Label>
