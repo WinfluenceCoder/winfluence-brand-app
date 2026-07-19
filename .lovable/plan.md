@@ -1,17 +1,14 @@
 ## Ziel
 
-Zwei neue Vor-Prüfungen in Login/Register:
-
-1. **Registrieren mit bereits verknüpfter E-Mail** → Fehlermeldung + zurück auf Login-Tab.
-2. **Login oder Register mit E-Mail, für die ein `brands`-Record mit `status = 'invited'` existiert** → Weiterleitung auf `/welcome?domain=<brands.domain>`.
+Brands mit `status IN ('deleted', 'suspended')` sollen sich nicht mehr einloggen (und nicht neu registrieren) können. Stattdessen: klare Fehlermeldung, kein `signInWithPassword`-/`signUp`-Call.
 
 ## Extern in Supabase (du erledigst)
 
-Neue RPC im Projekt `rssnbsduduboxlrvpodw`:
+`get_email_status` erweitern, damit sie zusätzlich den Brand-Status zurückgibt:
 
 ```sql
 create or replace function public.get_email_status(p_email text)
-returns table (auth_exists boolean, invited_domain text)
+returns table (auth_exists boolean, invited_domain text, brand_status text)
 language plpgsql
 security definer
 set search_path = public, auth
@@ -25,46 +22,52 @@ begin
     (select b.domain from public.brands b
        where lower(b.e_mail_address) = v_email
          and b.status = 'invited'
-       limit 1) as invited_domain;
+       limit 1) as invited_domain,
+    (select b.status from public.brands b
+       where lower(b.e_mail_address) = v_email
+       order by b.created_at desc nulls last
+       limit 1) as brand_status;
 end;
 $$;
 
 grant execute on function public.get_email_status(text) to anon, authenticated;
 ```
 
-Rückgabe: genau eine Zeile mit beiden Feldern. Kein PII-Leak (nur bool + eigene Domain).
+Keine PII zusätzlich — nur der eigene Status-String.
 
-## Frontend-Umsetzung (`src/routes/login.tsx`)
+## Frontend (`src/routes/login.tsx`)
 
-Kleine Helper-Funktion `checkEmailStatus(email)` im Modul, die die RPC aufruft und `{ authExists, invitedDomain }` liefert (mit sicherem Fallback bei Netzwerkfehler: leere Werte, damit der normale Flow weiterläuft).
+`checkEmailStatus` liefert jetzt zusätzlich `brandStatus: string | null`. Typing entsprechend erweitern.
 
-### Reihenfolge in `onLogin`
-1. Zod-Validierung (unverändert).
-2. `checkEmailStatus`.
-3. Wenn `invitedDomain` → `navigate({ to: "/welcome", search: { domain: invitedDomain } })` und Toast „Bitte schließe zuerst die Einladung ab." — kein `signInWithPassword`.
-4. Sonst normaler `signInWithPassword`-Ablauf.
+### Neue Prüfreihenfolge
 
-### Reihenfolge in `onRegister`
-1. Zod-Validierung.
-2. `checkEmailStatus`.
-3. Wenn `invitedDomain` → Weiterleitung auf `/welcome?domain=…` (gleiche Behandlung wie Login).
-4. Sonst wenn `authExists` → Toast `auth.errors.emailAlreadyRegistered` + `setMode("login")` + `loginForm.setValue("email", v.email)`; kein `signUp`.
-5. Sonst normaler `signUp`-Ablauf (bestehender `user_already_exists`-Mapper bleibt als Sicherheitsnetz).
+**`onLogin`** (nach Zod, nach `checkEmailStatus`):
+1. `invitedDomain` → wie bisher: Redirect `/welcome?domain=…`.
+2. **NEU**: `brandStatus === 'deleted' || 'suspended'` → Toast `auth.errors.accountDeleted` bzw. `auth.errors.accountSuspended`, **kein** `signInWithPassword`.
+3. Sonst normaler Login.
 
-### i18n (`src/locales/de.json`)
-Neue Keys unter `auth.errors`:
-- `emailAlreadyRegistered`: „Diese E-Mail ist bereits registriert. Bitte melde dich an."
-- `pendingInvite`: „Für diese E-Mail liegt eine Einladung vor. Bitte schließe zuerst die Registrierung ab."
+**`onRegister`** (nach Zod, nach `checkEmailStatus`):
+1. `invitedDomain` → wie bisher.
+2. **NEU**: `brandStatus === 'deleted' || 'suspended'` → gleiche Toast-Meldung, **kein** `signUp`.
+3. Sonst `authExists`-Zweig wie bisher, sonst normaler `signUp`.
+
+**`onForgot`**: unverändert (kein Enumeration-Leak — Reset-Mail wird weiterhin unabhängig verschickt).
+
+### i18n (`src/locales/de.json` → `auth.errors`)
+
+- `accountDeleted`: „Dieses Konto wurde gelöscht. Bitte kontaktiere das Team, falls das ein Fehler ist."
+- `accountSuspended`: „Dieses Konto ist aktuell gesperrt. Bitte kontaktiere das Team."
 
 ## Nicht Teil dieses Plans
 
-- Kein Passwort-vergessen-Flow-Change (Behavior bleibt: Reset-Link wird auch für unbekannte E-Mail versendet, um Enumeration zu vermeiden — dort keine Vorprüfung).
-- Keine Änderung an `claim-brand` oder `welcome.tsx`.
-- Kein neuer Trigger, keine Anpassung von `handle_new_user`.
+- Kein Force-Logout für bereits eingeloggte Sessions (bei nächstem Reload greift ohnehin RLS/Serverlogik; separates Thema).
+- Keine Änderung an `welcome.tsx` oder `claim-brand`.
+- Kein Passwort-Reset-Enumeration-Change.
 
 ## Verifikation
 
-1. Register mit E-Mail eines bestehenden Auth-Users → Toast + Wechsel auf Login-Tab, E-Mail vorausgefüllt, kein `signUp`-Call im Network-Tab.
-2. Login/Register mit E-Mail einer invited Brand → Redirect auf `/welcome?domain=<domain>`, kein Auth-Call.
-3. Login mit normalem Bestandsnutzer → funktioniert wie bisher.
-4. Register mit komplett neuer E-Mail → funktioniert wie bisher (Confirm-Mail).
+1. Login mit E-Mail einer `deleted` Brand → Toast, kein Auth-Call im Network-Tab.
+2. Login mit E-Mail einer `suspended` Brand → Toast, kein Auth-Call.
+3. Register mit denselben E-Mails → gleiche Toasts, kein `signUp`.
+4. Login/Register mit `active` Brand → unverändert.
+5. Login/Register mit `invited` Brand → Redirect `/welcome` (Vorrang vor Status-Check).
