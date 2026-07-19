@@ -1,10 +1,20 @@
-## Ziel
+## Ursache
 
-Brands mit `status IN ('deleted', 'suspended')` sollen sich nicht mehr einloggen (und nicht neu registrieren) können. Stattdessen: klare Fehlermeldung, kein `signInWithPassword`-/`signUp`-Call.
+Der Fehler kommt aus der externen RPC `get_email_status`, nicht aus dem Frontend:
 
-## Extern in Supabase (du erledigst)
+```
+400  POST /rest/v1/rpc/get_email_status
+{"code":"42804","message":"structure of query does not match function result type",
+ "details":"Returned type brand_status does not match expected type text in column 3."}
+```
 
-`get_email_status` erweitern, damit sie zusätzlich den Brand-Status zurückgibt:
+Die Spalte `brands.status` ist ein Postgres-Enum-Typ namens `brand_status`. Die RPC deklariert Spalte 3 aber als `text`. Postgres castet Enums nicht implizit auf `text`, daher 42804.
+
+Folgeeffekt im UI: `checkEmailStatus` fängt den Fehler ab und gibt `{ authExists:false, invitedDomain:null, brandStatus:null }` zurück. Bei Register läuft es dann in `supabase.auth.signUp` — aber vorher zeigt vermutlich der `console.warn("get_email_status error", …)` als "leeres {}" (Supabase-Error-Objekte serialisieren mit `JSON.stringify` zu `{}`, weil die Felder non-enumerable sind). Das erklärt exakt die Meldung "Fehlermeldung leer {}".
+
+## Fix (extern in Supabase, kein Code-Change)
+
+`get_email_status` muss `b.status` auf `text` casten. Ansonsten wie im letzten Plan:
 
 ```sql
 create or replace function public.get_email_status(p_email text)
@@ -23,7 +33,7 @@ begin
        where lower(b.e_mail_address) = v_email
          and b.status = 'invited'
        limit 1) as invited_domain,
-    (select b.status from public.brands b
+    (select b.status::text from public.brands b   -- ← Cast auf text
        where lower(b.e_mail_address) = v_email
        order by b.created_at desc nulls last
        limit 1) as brand_status;
@@ -33,41 +43,15 @@ $$;
 grant execute on function public.get_email_status(text) to anon, authenticated;
 ```
 
-Keine PII zusätzlich — nur der eigene Status-String.
+Alternativ die `returns table`-Signatur auf `brand_status brand_status` ändern — Cast auf `text` ist robuster, weil das Frontend den Wert bereits als String behandelt.
 
-## Frontend (`src/routes/login.tsx`)
+## Frontend
 
-`checkEmailStatus` liefert jetzt zusätzlich `brandStatus: string | null`. Typing entsprechend erweitern.
+Keine Änderungen. Sobald die RPC-Signatur passt, funktionieren Register/Login wie im letzten Plan (Blockieren für `deleted`/`suspended`, Redirect für `invited`, sonst normaler Auth-Call).
 
-### Neue Prüfreihenfolge
+## Verifikation nach dem externen Fix
 
-**`onLogin`** (nach Zod, nach `checkEmailStatus`):
-1. `invitedDomain` → wie bisher: Redirect `/welcome?domain=…`.
-2. **NEU**: `brandStatus === 'deleted' || 'suspended'` → Toast `auth.errors.accountDeleted` bzw. `auth.errors.accountSuspended`, **kein** `signInWithPassword`.
-3. Sonst normaler Login.
-
-**`onRegister`** (nach Zod, nach `checkEmailStatus`):
-1. `invitedDomain` → wie bisher.
-2. **NEU**: `brandStatus === 'deleted' || 'suspended'` → gleiche Toast-Meldung, **kein** `signUp`.
-3. Sonst `authExists`-Zweig wie bisher, sonst normaler `signUp`.
-
-**`onForgot`**: unverändert (kein Enumeration-Leak — Reset-Mail wird weiterhin unabhängig verschickt).
-
-### i18n (`src/locales/de.json` → `auth.errors`)
-
-- `accountDeleted`: „Dieses Konto wurde gelöscht. Bitte kontaktiere das Team, falls das ein Fehler ist."
-- `accountSuspended`: „Dieses Konto ist aktuell gesperrt. Bitte kontaktiere das Team."
-
-## Nicht Teil dieses Plans
-
-- Kein Force-Logout für bereits eingeloggte Sessions (bei nächstem Reload greift ohnehin RLS/Serverlogik; separates Thema).
-- Keine Änderung an `welcome.tsx` oder `claim-brand`.
-- Kein Passwort-Reset-Enumeration-Change.
-
-## Verifikation
-
-1. Login mit E-Mail einer `deleted` Brand → Toast, kein Auth-Call im Network-Tab.
-2. Login mit E-Mail einer `suspended` Brand → Toast, kein Auth-Call.
-3. Register mit denselben E-Mails → gleiche Toasts, kein `signUp`.
-4. Login/Register mit `active` Brand → unverändert.
-5. Login/Register mit `invited` Brand → Redirect `/welcome` (Vorrang vor Status-Check).
+1. `POST /rpc/get_email_status` mit `{"p_email":"neu@example.com"}` → 200, `brand_status: null`.
+2. Register mit neuer E-Mail → `signUp` läuft durch, kein 400 mehr auf der RPC.
+3. Register/Login mit `deleted`/`suspended` Brand → Toast, kein Auth-Call.
+4. Login mit `invited` Brand → Redirect `/welcome?domain=…`.
