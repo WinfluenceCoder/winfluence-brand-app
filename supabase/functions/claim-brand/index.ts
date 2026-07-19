@@ -113,7 +113,7 @@ Deno.serve(async (req) => {
     const { data: signUp, error: signUpErr } = await anon.auth.signUp({
       email,
       password,
-      options: { emailRedirectTo: REDIRECT_URL },
+      options: { emailRedirectTo: REDIRECT_URL, data: { role: "brand" } },
     });
 
     if (signUpErr || !signUp?.user?.id) {
