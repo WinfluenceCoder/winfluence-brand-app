@@ -39,8 +39,8 @@ function ResetPasswordPage() {
 
   const schema = z
     .object({
-      password: z.string().min(8, t("validation.minPassword")),
-      confirm: z.string().min(8, t("validation.minPassword")),
+      password: makeStrongPasswordSchema(t),
+      confirm: z.string(),
     })
     .refine((v) => v.password === v.confirm, {
       path: ["confirm"],
