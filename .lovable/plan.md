@@ -1,43 +1,57 @@
-## Problem
-Logo und Icon werden über Lovable-CDN-Pointer (`/__l5e/assets-v1/…`) referenziert. Diese URLs funktionieren nur auf Lovable-Hosting, nicht auf Vercel → broken images.
+## Ziel
+Neuer Brand-Onboarding-Flow via `/welcome?domain=…`, Edge Function `claim-brand`, `/set-password`. RPC `get_welcome_info` existiert bereits in der DB.
 
-## Lösung: Assets ins Repo zurückholen und lokal bundlen
+## Umzusetzen
 
-### Schritte
+### 1. Neue öffentliche Route `src/routes/welcome.tsx`
+- Liest `domain` aus Query (via `Route.useSearch()` mit Zod-Schema).
+- Ruft `supabase.rpc('get_welcome_info', { p_domain: domain })` auf.
+- Wenn `!found || claimed` → `navigate({ to: '/login', replace: true })` (still, keine Meldung).
+- Sonst: Karten-Layout ähnlich `/login` (gleiches Logo, `bg-muted/30`), zeigt:
+  „Hallo {first_name}! {sales_rep} hat dein Dossier bereits vorbereitet. Konto mit {email_masked} anlegen?"
+- Button „Konto anlegen" → `supabase.functions.invoke('claim-brand', { body: { domain } })`.
+- Bei `ok: true`: Karte ersetzen durch Erfolgsmeldung „Wir haben dir eine Nachricht an {email_masked} geschickt." (kein Redirect).
+- Bei Fehler / `ok: false`: neutraler Toast, kein Detail-Leak.
+- Lade-/Submitting-States, Route ist NICHT unter `_authenticated/`.
 
-1. **Beide Bild-Dateien lokal wiederherstellen**
-   - `src/assets/winfluence-logo.png` (aus CDN herunterladen: `https://id-preview--40411584-0e5c-43bb-8c52-4427693f0d4a.lovable.app/__l5e/assets-v1/41391b62-ee51-4bf5-8e7a-0013efdb2f96/winfluence-logo.png`)
-   - `src/assets/winfluence-icon.png` (aus CDN herunterladen: `https://id-preview--40411584-0e5c-43bb-8c52-4427693f0d4a.lovable.app/__l5e/assets-v1/3596a6ed-4a17-4dee-85f6-e6f1f14cfef0/winfluence-icon.png`)
+### 2. Neue öffentliche Route `src/routes/set-password.tsx`
+- Kartenlayout wie `/login`.
+- On mount: `supabase.auth.getSession()`; wenn keine Session → Hinweistext „Bitte melde dich beim Team." (kein Formular).
+- Sonst: Formular mit
+  - E-Mail read-only (aus `session.user.email`),
+  - Passwort + Bestätigung (react-hook-form + zod),
+  - **Policy: min. 12 Zeichen, mind. 1 Großbuchstabe, 1 Kleinbuchstabe, 1 Zahl, 1 Sonderzeichen**; Live-Validierung; Bestätigung muss matchen.
+- Submit: `supabase.auth.updateUser({ password })`, danach `supabase.from('brands').update({ status: 'active' }).eq('user_id', session.user.id)`.
+- Erfolg: `navigate({ to: '/', replace: true })`.
+- Fehler → Toast über kleinen lokalen Auth-Error-Mapper.
 
-2. **Pointer-Dateien entfernen**
-   - `src/assets/winfluence-logo.png.asset.json` löschen
-   - `src/assets/winfluence-icon.png.asset.json` löschen
+### 3. Edge Function `supabase/functions/claim-brand/index.ts`
+- Deno-Function, `verify_jwt = false` in `supabase/config.toml`.
+- CORS-Header (OPTIONS + POST), JSON-Body `{ domain: string }`.
+- Zwei Clients:
+  - `serviceClient` mit `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY`,
+  - `anonClient` mit `SUPABASE_URL` + `SUPABASE_ANON_KEY` (nur für `signUp`).
+- Ablauf:
+  1. Brand per `serviceClient.from('brands').select('id, e_mail_address, user_id, first_name').ilike('domain', domain.trim())` laden.
+  2. Guards: keine Row / `user_id` gesetzt → `{ ok: false }`. Doppelter Auth-User wird über den `signUp`-Fehler abgefangen (kein `admin.listUsers`).
+  3. Zufälliges Passwort (16 Zeichen, min. je 1 Groß/Klein/Zahl/Sonderzeichen; via `crypto.getRandomValues`).
+  4. `anonClient.auth.signUp({ email, password, options: { emailRedirectTo: 'https://brand.winfluence.net/set-password' } })`.
+  5. Wenn kein `user.id` (Confirm-Email aus): zusätzlich `resetPasswordForEmail(email, { redirectTo: 'https://brand.winfluence.net/set-password' })`.
+  6. `serviceClient.from('brands').update({ user_id: newUserId }).eq('id', brand.id)`.
+  7. `{ ok: true }`.
+- Alle Fehlerpfade returnen `{ ok: false }` mit Status 200, Details nur in Server-Logs.
 
-3. **Imports auf klassisches Vite-Asset-Import umstellen** in
-   - `src/components/app/AppSidebar.tsx`
-   - allen weiteren Stellen, die aktuell die `.asset.json` importieren (nach kurzer Suche identifizieren)
+### 4. `supabase/config.toml`
+- Function-Eintrag für `claim-brand` mit `verify_jwt = false` hinzufügen.
 
-   Muster:
-   ```ts
-   // vorher
-   import logoAsset from "@/assets/winfluence-logo.png.asset.json";
-   <img src={logoAsset.url} />
+### 5. RLS-Hinweis (Teil 4)
+- SQL-Snippets bereitstellen (Brand darf eigenen Record via `user_id = auth.uid()` lesen/aktualisieren; Status-Update nur auf `'active'`). Ausführung durch dich im Supabase-SQL-Editor, keine Migration in diesem Projekt.
 
-   // nachher
-   import logoUrl from "@/assets/winfluence-logo.png";
-   <img src={logoUrl} />
-   ```
-   Vite bundelt das Bild dann mit Hash in `dist/assets/…` – funktioniert auf Vercel out-of-the-box.
+## Nicht Teil des Plans
+- Keine Änderung an `/login`, `/reset-password`, Sidebar.
+- Keine neuen npm-Pakete.
+- Keine Anpassung der existierenden RPC `get_welcome_info`.
 
-4. **Build verifizieren** (`bun run build`) und prüfen, dass die Bilder im `dist/`-Output landen.
-
-### Optional (empfohlen, aber separat)
-- `og:image`/`twitter:image` in `src/routes/__root.tsx` zeigen auf einen Lovable-Preview-Screenshot (`pub-….r2.dev/...`). Das lädt extern zwar auch von Vercel, ist aber kein Brand-Bild. Falls gewünscht, durch ein echtes, im Repo gebundeltes OG-Image (absolute HTTPS-URL nach Deploy) ersetzen – sag Bescheid, wenn ich das mitmachen soll.
-
-### Was NICHT geändert wird
-- Keine Backend-/Supabase-Änderungen
-- `public/favicon.png` bleibt unverändert (liegt bereits im Repo → funktioniert auf Vercel)
-- Keine Layout- oder Verhaltensänderung am Header/Sidebar
-
-## Hinweis für die Zukunft
-Solange du auf Vercel deployst, dürfen keine Lovable-CDN-Assets (`.asset.json`) verwendet werden. Bilder immer direkt in `src/assets/` oder `public/` ablegen.
+## Annahmen
+- Brand-Status nach Passwortsetzung: `'active'`.
+- Texte deutsch, inline (ohne neue i18n-Keys).

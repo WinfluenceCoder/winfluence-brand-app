@@ -1,1 +1,4 @@
 project_id = "rssnbsduduboxlrvpodw"
+
+[functions.claim-brand]
+verify_jwt = false
