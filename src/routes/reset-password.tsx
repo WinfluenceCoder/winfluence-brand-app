@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import logo from "@/assets/winfluence-logo.png";
+import { makeStrongPasswordSchema } from "@/lib/password-policy";
 
 
 export const Route = createFileRoute("/reset-password")({
@@ -38,8 +39,8 @@ function ResetPasswordPage() {
 
   const schema = z
     .object({
-      password: z.string().min(8, t("validation.minPassword")),
-      confirm: z.string().min(8, t("validation.minPassword")),
+      password: makeStrongPasswordSchema(t),
+      confirm: z.string(),
     })
     .refine((v) => v.password === v.confirm, {
       path: ["confirm"],
@@ -82,6 +83,7 @@ function ResetPasswordPage() {
               {form.formState.errors.password && (
                 <p className="text-xs text-destructive">{form.formState.errors.password.message}</p>
               )}
+              <p className="text-xs text-muted-foreground">{t("validation.password.hint")}</p>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="confirm">{t("auth.passwordConfirm")}</Label>

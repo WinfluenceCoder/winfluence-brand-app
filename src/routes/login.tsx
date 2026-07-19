@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import logo from "@/assets/winfluence-logo.png";
+import { makeStrongPasswordSchema } from "@/lib/password-policy";
 
 
 type Mode = "login" | "register" | "forgot";
@@ -28,10 +29,11 @@ function makeSchemas(t: (k: string) => string) {
     .refine((v) => !v.toLowerCase().endsWith("@winfluence.net"), {
       message: t("auth.errors.emailDomainBlocked"),
     });
-  const password = z.string().min(8, t("validation.minPassword")).max(200);
+  const loginPassword = z.string().min(8, t("validation.minPassword")).max(200);
+  const strongPassword = makeStrongPasswordSchema(t);
   return {
-    login: z.object({ email, password }),
-    register: z.object({ email, password }),
+    login: z.object({ email, password: loginPassword }),
+    register: z.object({ email, password: strongPassword }),
     forgot: z.object({ email }),
   };
 }
@@ -180,6 +182,7 @@ function LoginPage() {
               {registerForm.formState.errors.password && (
                 <p className="text-xs text-destructive">{registerForm.formState.errors.password.message}</p>
               )}
+              <p className="text-xs text-muted-foreground">{t("validation.password.hint")}</p>
             </div>
             <Button type="submit" className="w-full" disabled={registerForm.formState.isSubmitting}>
               {t("auth.register")}
