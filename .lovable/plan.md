@@ -1,57 +1,36 @@
 ## Ziel
-Neuer Brand-Onboarding-Flow via `/welcome?domain=…`, Edge Function `claim-brand`, `/set-password`. RPC `get_welcome_info` existiert bereits in der DB.
+Die Edge Function `claim-brand` soll im Repo auffindbar und korrekt für das externe Supabase-Projekt deployfertig sein.
 
-## Umzusetzen
+## Hintergrund
+Du musst den Code manuell in dein Supabase-Projekt kopieren/deployen. Laut aktuellem Projektstand existiert die Datei `supabase/functions/claim-brand/index.ts` bereits, aber du siehst sie anscheinend nicht im Dateibaum.
 
-### 1. Neue öffentliche Route `src/routes/welcome.tsx`
-- Liest `domain` aus Query (via `Route.useSearch()` mit Zod-Schema).
-- Ruft `supabase.rpc('get_welcome_info', { p_domain: domain })` auf.
-- Wenn `!found || claimed` → `navigate({ to: '/login', replace: true })` (still, keine Meldung).
-- Sonst: Karten-Layout ähnlich `/login` (gleiches Logo, `bg-muted/30`), zeigt:
-  „Hallo {first_name}! {sales_rep} hat dein Dossier bereits vorbereitet. Konto mit {email_masked} anlegen?"
-- Button „Konto anlegen" → `supabase.functions.invoke('claim-brand', { body: { domain } })`.
-- Bei `ok: true`: Karte ersetzen durch Erfolgsmeldung „Wir haben dir eine Nachricht an {email_masked} geschickt." (kein Redirect).
-- Bei Fehler / `ok: false`: neutraler Toast, kein Detail-Leak.
-- Lade-/Submitting-States, Route ist NICHT unter `_authenticated/`.
+## Plan
 
-### 2. Neue öffentliche Route `src/routes/set-password.tsx`
-- Kartenlayout wie `/login`.
-- On mount: `supabase.auth.getSession()`; wenn keine Session → Hinweistext „Bitte melde dich beim Team." (kein Formular).
-- Sonst: Formular mit
-  - E-Mail read-only (aus `session.user.email`),
-  - Passwort + Bestätigung (react-hook-form + zod),
-  - **Policy: min. 12 Zeichen, mind. 1 Großbuchstabe, 1 Kleinbuchstabe, 1 Zahl, 1 Sonderzeichen**; Live-Validierung; Bestätigung muss matchen.
-- Submit: `supabase.auth.updateUser({ password })`, danach `supabase.from('brands').update({ status: 'active' }).eq('user_id', session.user.id)`.
-- Erfolg: `navigate({ to: '/', replace: true })`.
-- Fehler → Toast über kleinen lokalen Auth-Error-Mapper.
+1. **Repo-Stand prüfen**
+   - Überprüfen, ob `supabase/functions/claim-brand/index.ts` wirklich im aktuellen Dateisystem liegt.
+   - Falls fehlend: Die Datei mit dem inhalt aus der Codebasis neu anlegen.
 
-### 3. Edge Function `supabase/functions/claim-brand/index.ts`
-- Deno-Function, `verify_jwt = false` in `supabase/config.toml`.
-- CORS-Header (OPTIONS + POST), JSON-Body `{ domain: string }`.
-- Zwei Clients:
-  - `serviceClient` mit `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY`,
-  - `anonClient` mit `SUPABASE_URL` + `SUPABASE_ANON_KEY` (nur für `signUp`).
-- Ablauf:
-  1. Brand per `serviceClient.from('brands').select('id, e_mail_address, user_id, first_name').ilike('domain', domain.trim())` laden.
-  2. Guards: keine Row / `user_id` gesetzt → `{ ok: false }`. Doppelter Auth-User wird über den `signUp`-Fehler abgefangen (kein `admin.listUsers`).
-  3. Zufälliges Passwort (16 Zeichen, min. je 1 Groß/Klein/Zahl/Sonderzeichen; via `crypto.getRandomValues`).
-  4. `anonClient.auth.signUp({ email, password, options: { emailRedirectTo: 'https://brand.winfluence.net/set-password' } })`.
-  5. Wenn kein `user.id` (Confirm-Email aus): zusätzlich `resetPasswordForEmail(email, { redirectTo: 'https://brand.winfluence.net/set-password' })`.
-  6. `serviceClient.from('brands').update({ user_id: newUserId }).eq('id', brand.id)`.
-  7. `{ ok: true }`.
-- Alle Fehlerpfade returnen `{ ok: false }` mit Status 200, Details nur in Server-Logs.
+2. **Konfiguration prüfen**
+   - Sicherstellen, dass `supabase/config.toml` den Eintrag `[functions.claim-brand] verify_jwt = false` enthält.
 
-### 4. `supabase/config.toml`
-- Function-Eintrag für `claim-brand` mit `verify_jwt = false` hinzufügen.
+3. **Deployment-Optionen aufbereiten**
+   - Dir die beiden möglichen Wege bereitstellen:
+     - **A) Supabase Dashboard (manuell):** Unter Edge Functions → New Function den Code hineinkopieren, wobei die Umgebungsvariablen (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ANON_KEY`) automatisch verfügbar sind.
+     - **B) Supabase CLI:** `supabase functions deploy claim-brand` im Projektverzeichnis ausführen.
+   - Hinweis: Der Edge Function Code wird unverändert kopiert; die `supabase/config.toml` ist für die CLI nötig, für das Dashboard nur optional.
 
-### 5. RLS-Hinweis (Teil 4)
-- SQL-Snippets bereitstellen (Brand darf eigenen Record via `user_id = auth.uid()` lesen/aktualisieren; Status-Update nur auf `'active'`). Ausführung durch dich im Supabase-SQL-Editor, keine Migration in diesem Projekt.
+4. **Code-Validierung**
+   - Kurz prüfen, ob der aktuelle Code alle Anforderungen aus dem Onboarding-Flow erfüllt:
+     - CORS-Handler für OPTIONS/POST
+     - Brand-Lookup via `service` Client
+     - Zufallspasswort-Generierung
+     - `anon.auth.signUp` mit `emailRedirectTo`
+     - Fallback `resetPasswordForEmail` falls keine confirmation-Mail versendet wird
+     - `brands.user_id` Update via service client
 
-## Nicht Teil des Plans
-- Keine Änderung an `/login`, `/reset-password`, Sidebar.
-- Keine neuen npm-Pakete.
-- Keine Anpassung der existierenden RPC `get_welcome_info`.
+## Erwartetes Ergebnis
+Du hast eine sichtbare, deployfertige `supabase/functions/claim-brand/index.ts` und klare Anweisungen, wie du sie in dein externes Supabase-Projekt bekommst.
 
-## Annahmen
-- Brand-Status nach Passwortsetzung: `'active'`.
-- Texte deutsch, inline (ohne neue i18n-Keys).
+## Nicht im Plan
+- Keine Änderung an `/welcome`, `/set-password` oder anderen Frontend-Routen.
+- Keine Lovable Cloud / keine Schema-Migration.
