@@ -73,8 +73,40 @@ function LoginPage() {
     return err?.message || t("auth.errors.generic");
   };
 
+  const checkEmailStatus = async (email: string): Promise<{ authExists: boolean; invitedDomain: string | null }> => {
+    try {
+      const { data, error } = await (supabase.rpc as unknown as (
+        fn: string,
+        args: Record<string, unknown>,
+      ) => Promise<{ data: unknown; error: { message: string } | null }>)(
+        "get_email_status",
+        { p_email: email },
+      );
+      if (error) {
+        console.warn("get_email_status error", error);
+        return { authExists: false, invitedDomain: null };
+      }
+      const row = (Array.isArray(data) ? data[0] : data) as
+        | { auth_exists?: boolean; invited_domain?: string | null }
+        | null;
+      return {
+        authExists: Boolean(row?.auth_exists),
+        invitedDomain: row?.invited_domain ?? null,
+      };
+    } catch (e) {
+      console.warn("get_email_status exception", e);
+      return { authExists: false, invitedDomain: null };
+    }
+  };
+
   const onLogin = async (v: z.infer<typeof schemas.login>) => {
     setBanner(null);
+    const status = await checkEmailStatus(v.email);
+    if (status.invitedDomain) {
+      toast.info(t("auth.errors.pendingInvite"));
+      navigate({ to: "/welcome", search: { domain: status.invitedDomain } });
+      return;
+    }
     const { error } = await supabase.auth.signInWithPassword(v);
     if (error) {
       toast.error(mapAuthError(error));
@@ -85,6 +117,18 @@ function LoginPage() {
 
   const onRegister = async (v: z.infer<typeof schemas.register>) => {
     setBanner(null);
+    const status = await checkEmailStatus(v.email);
+    if (status.invitedDomain) {
+      toast.info(t("auth.errors.pendingInvite"));
+      navigate({ to: "/welcome", search: { domain: status.invitedDomain } });
+      return;
+    }
+    if (status.authExists) {
+      toast.error(t("auth.errors.emailAlreadyRegistered"));
+      loginForm.setValue("email", v.email);
+      setMode("login");
+      return;
+    }
     const { error } = await supabase.auth.signUp({
       email: v.email,
       password: v.password,
