@@ -1,70 +1,70 @@
 ## Ziel
 
-Einheitliche Passwort-Policy überall im Frontend: **min. 12 Zeichen, Groß-, Klein-, Zahl, Sonderzeichen**. Aktuell gilt sie nur in `set-password.tsx`; `login.tsx` (Registrierung) und `reset-password.tsx` prüfen nur `min(8)`.
+Zwei neue Vor-Prüfungen in Login/Register:
 
-## Umfang
+1. **Registrieren mit bereits verknüpfter E-Mail** → Fehlermeldung + zurück auf Login-Tab.
+2. **Login oder Register mit E-Mail, für die ein `brands`-Record mit `status = 'invited'` existiert** → Weiterleitung auf `/welcome?domain=<brands.domain>`.
 
-- Betroffen für neue Passwörter (Registrierung + Passwortwechsel):
-  - `src/routes/login.tsx` — nur das **Register**-Formular
-  - `src/routes/reset-password.tsx`
-  - `src/routes/set-password.tsx` (bereits konform, wird auf gemeinsame Quelle umgestellt)
-- **Login-Formular** (`src/routes/login.tsx`) bleibt bei `min(8)`. Grund: Nutzer mit vor der Policy-Einführung erstellten Passwörtern müssen sich weiter anmelden können. Client-Validierung würde sie sonst grundlos aussperren, obwohl Supabase das Passwort akzeptiert.
-- Kein Server-/Backend-Change (Supabase-Auth-Policy wird extern verwaltet und bleibt unangetastet).
+## Extern in Supabase (du erledigst)
 
-## Umsetzung
+Neue RPC im Projekt `rssnbsduduboxlrvpodw`:
 
-### 1. Gemeinsames Schema + Übersetzungen
+```sql
+create or replace function public.get_email_status(p_email text)
+returns table (auth_exists boolean, invited_domain text)
+language plpgsql
+security definer
+set search_path = public, auth
+as $$
+declare
+  v_email text := lower(trim(p_email));
+begin
+  return query
+  select
+    exists (select 1 from auth.users u where lower(u.email) = v_email) as auth_exists,
+    (select b.domain from public.brands b
+       where lower(b.e_mail_address) = v_email
+         and b.status = 'invited'
+       limit 1) as invited_domain;
+end;
+$$;
 
-Neue Datei `src/lib/password-policy.ts` mit Factory `makeStrongPasswordSchema(t)`, die ein Zod-Schema baut:
+grant execute on function public.get_email_status(text) to anon, authenticated;
 ```
-z.string()
-  .min(12, t("validation.password.minLength"))
-  .max(200)
-  .regex(/[A-Z]/, t("validation.password.upper"))
-  .regex(/[a-z]/, t("validation.password.lower"))
-  .regex(/[0-9]/, t("validation.password.digit"))
-  .regex(/[^A-Za-z0-9]/, t("validation.password.symbol"))
-```
-Vorteil: Eine Quelle für alle Formulare mit i18n-Fehlermeldungen.
 
-Zusätzlich exportiert die Datei eine Konstante `PASSWORD_POLICY_HINT_KEY = "validation.password.hint"` für den anzuzeigenden Hinweistext unter dem Passwort-Feld.
+Rückgabe: genau eine Zeile mit beiden Feldern. Kein PII-Leak (nur bool + eigene Domain).
 
-### 2. `src/locales/de.json` erweitern
+## Frontend-Umsetzung (`src/routes/login.tsx`)
 
-Unter `validation` neue Sektion `password` ergänzen:
-- `minLength`: „Mindestens 12 Zeichen."
-- `upper`: „Mindestens ein Grossbuchstabe."
-- `lower`: „Mindestens ein Kleinbuchstabe."
-- `digit`: „Mindestens eine Zahl."
-- `symbol`: „Mindestens ein Sonderzeichen."
-- `hint`: „Mindestens 12 Zeichen, mit Gross-/Kleinbuchstaben, Zahl und Sonderzeichen."
+Kleine Helper-Funktion `checkEmailStatus(email)` im Modul, die die RPC aufruft und `{ authExists, invitedDomain }` liefert (mit sicherem Fallback bei Netzwerkfehler: leere Werte, damit der normale Flow weiterläuft).
 
-### 3. `src/routes/login.tsx`
+### Reihenfolge in `onLogin`
+1. Zod-Validierung (unverändert).
+2. `checkEmailStatus`.
+3. Wenn `invitedDomain` → `navigate({ to: "/welcome", search: { domain: invitedDomain } })` und Toast „Bitte schließe zuerst die Einladung ab." — kein `signInWithPassword`.
+4. Sonst normaler `signInWithPassword`-Ablauf.
 
-- Login-Schema behält `min(8)` (bewusst milde, s. Umfang).
-- Register-Schema nutzt `makeStrongPasswordSchema(t)`.
-- Unter dem Passwort-Feld im Register-Tab kurzen Policy-Hinweis (`t("validation.password.hint")`) einblenden.
+### Reihenfolge in `onRegister`
+1. Zod-Validierung.
+2. `checkEmailStatus`.
+3. Wenn `invitedDomain` → Weiterleitung auf `/welcome?domain=…` (gleiche Behandlung wie Login).
+4. Sonst wenn `authExists` → Toast `auth.errors.emailAlreadyRegistered` + `setMode("login")` + `loginForm.setValue("email", v.email)`; kein `signUp`.
+5. Sonst normaler `signUp`-Ablauf (bestehender `user_already_exists`-Mapper bleibt als Sicherheitsnetz).
 
-### 4. `src/routes/reset-password.tsx`
-
-- `password` und `confirm` nutzen `makeStrongPasswordSchema(t)` (für `confirm` reicht `z.string()` — Vergleich passiert per `.refine`).
-- Policy-Hinweis unter dem neuen Passwort-Feld einblenden.
-
-### 5. `src/routes/set-password.tsx`
-
-- Lokales `passwordSchema` durch `makeStrongPasswordSchema(t)` ersetzen (identische Regeln, i18n statt hartcodierter deutscher Strings).
-- Bestehenden Hinweistext auf `t("validation.password.hint")` umstellen.
-
-## Verifikation
-
-Für jedes betroffene Formular manuell:
-1. `abc12345` → wird abgelehnt (zu kurz, fehlende Klassen).
-2. `Abcdefghijk1` (11 Zeichen, kein Sonderzeichen) → abgelehnt (min. 12 + Sonderzeichen).
-3. `Abcdefghijk1!` (12 Zeichen, alle Klassen) → akzeptiert.
-4. Login-Tab: bestehendes 8-stelliges Passwort funktioniert weiter.
+### i18n (`src/locales/de.json`)
+Neue Keys unter `auth.errors`:
+- `emailAlreadyRegistered`: „Diese E-Mail ist bereits registriert. Bitte melde dich an."
+- `pendingInvite`: „Für diese E-Mail liegt eine Einladung vor. Bitte schließe zuerst die Registrierung ab."
 
 ## Nicht Teil dieses Plans
 
-- Keine Änderung am Supabase-Passwortlimit (`min_password_length`, `password_required_characters`, HIBP) — bleibt extern konfigurierbar.
-- Kein visuelles Passwort-Stärke-Meter.
-- Kein Zwang, bestehende schwache Passwörter zu ersetzen.
+- Kein Passwort-vergessen-Flow-Change (Behavior bleibt: Reset-Link wird auch für unbekannte E-Mail versendet, um Enumeration zu vermeiden — dort keine Vorprüfung).
+- Keine Änderung an `claim-brand` oder `welcome.tsx`.
+- Kein neuer Trigger, keine Anpassung von `handle_new_user`.
+
+## Verifikation
+
+1. Register mit E-Mail eines bestehenden Auth-Users → Toast + Wechsel auf Login-Tab, E-Mail vorausgefüllt, kein `signUp`-Call im Network-Tab.
+2. Login/Register mit E-Mail einer invited Brand → Redirect auf `/welcome?domain=<domain>`, kein Auth-Call.
+3. Login mit normalem Bestandsnutzer → funktioniert wie bisher.
+4. Register mit komplett neuer E-Mail → funktioniert wie bisher (Confirm-Mail).
