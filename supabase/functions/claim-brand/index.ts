@@ -73,16 +73,26 @@ Deno.serve(async (req) => {
 
     const { data: brand, error: brandErr } = await service
       .from("brands")
-      .select("id, e_mail_address, user_id")
+      .select("id, e_mail_address")
       .ilike("domain", domain.trim())
       .maybeSingle();
 
     if (brandErr) return fail("brand_lookup_failed", brandErr.message);
     if (!brand) return fail("brand_not_found");
     if (!brand.e_mail_address) return fail("brand_missing_email");
-    if (brand.user_id) return fail("already_claimed");
 
     const email = brand.e_mail_address;
+
+    const { data: existingUser, error: authErr } = await service
+      .schema("auth")
+      .from("users")
+      .select("id")
+      .ilike("email", email)
+      .maybeSingle();
+
+    if (authErr) return fail("auth_lookup_failed", authErr.message);
+    if (existingUser) return fail("already_claimed");
+
     const password = generatePassword();
 
     const { data: signUp, error: signUpErr } = await anon.auth.signUp({
