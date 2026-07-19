@@ -37,7 +37,13 @@ function WelcomePage() {
         navigate({ to: "/login", replace: true });
         return;
       }
-      const { data, error } = await supabase.rpc("get_welcome_info", { p_domain: domain });
+      const { data, error } = await (supabase.rpc as unknown as (
+        fn: string,
+        args: Record<string, unknown>,
+      ) => Promise<{ data: unknown; error: { message: string } | null }>)(
+        "get_welcome_info",
+        { p_domain: domain },
+      );
       if (cancelled) return;
       const row = (Array.isArray(data) ? data[0] : data) as WelcomeInfo | null;
       if (error || !row || !row.found || row.claimed) {
