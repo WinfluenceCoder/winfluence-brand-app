@@ -20,7 +20,14 @@ export const Route = createFileRoute("/login")({
 });
 
 function makeSchemas(t: (k: string) => string) {
-  const email = z.string().trim().email(t("validation.email")).max(255);
+  const email = z
+    .string()
+    .trim()
+    .email(t("validation.email"))
+    .max(255)
+    .refine((v) => !v.toLowerCase().endsWith("@winfluence.net"), {
+      message: t("auth.errors.emailDomainBlocked"),
+    });
   const password = z.string().min(8, t("validation.minPassword")).max(200);
   return {
     login: z.object({ email, password }),
