@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -9,31 +10,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import logo from "@/assets/winfluence-logo.png";
+import { makeStrongPasswordSchema } from "@/lib/password-policy";
 
 export const Route = createFileRoute("/set-password")({
   component: SetPasswordPage,
 });
-
-const passwordSchema = z
-  .string()
-  .min(12, "Mindestens 12 Zeichen")
-  .max(200)
-  .regex(/[A-Z]/, "Mindestens ein Grossbuchstabe")
-  .regex(/[a-z]/, "Mindestens ein Kleinbuchstabe")
-  .regex(/[0-9]/, "Mindestens eine Zahl")
-  .regex(/[^A-Za-z0-9]/, "Mindestens ein Sonderzeichen");
-
-const schema = z
-  .object({
-    password: passwordSchema,
-    confirm: z.string(),
-  })
-  .refine((v) => v.password === v.confirm, {
-    path: ["confirm"],
-    message: "Passwörter stimmen nicht überein",
-  });
-
-type FormValues = z.infer<typeof schema>;
 
 function mapAuthError(err?: { message?: string | null; code?: string | null } | null) {
   const msg = (err?.message ?? "").toLowerCase();
@@ -43,15 +24,30 @@ function mapAuthError(err?: { message?: string | null; code?: string | null } | 
 }
 
 function SetPasswordPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [checking, setChecking] = useState(true);
   const [email, setEmail] = useState<string | null>(null);
+
+  const schema = z
+    .object({
+      password: makeStrongPasswordSchema(t),
+      confirm: z.string(),
+    })
+    .refine((v) => v.password === v.confirm, {
+      path: ["confirm"],
+      message: "Passwörter stimmen nicht überein",
+    });
+
+  type FormValues = z.infer<typeof schema>;
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { password: "", confirm: "" },
     mode: "onChange",
   });
+
+
 
   useEffect(() => {
     let cancelled = false;
