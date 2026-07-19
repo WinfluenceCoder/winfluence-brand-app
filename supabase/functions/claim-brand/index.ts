@@ -83,15 +83,30 @@ Deno.serve(async (req) => {
 
     const email = brand.e_mail_address;
 
-    const { data: existingUser, error: authErr } = await service
-      .schema("auth")
-      .from("users")
-      .select("id")
-      .ilike("email", email)
-      .maybeSingle();
+    const { data: existingUser, error: authErr } = await (async () => {
+      const url = `${supabaseUrl}/auth/v1/admin/users?filter=${encodeURIComponent(email)}`;
+      const res = await fetch(url, {
+        headers: {
+          apikey: serviceKey,
+          Authorization: `Bearer ${serviceKey}`,
+        },
+      });
+      if (!res.ok) {
+        return { data: null, error: { message: `HTTP ${res.status}` } };
+      }
+      const body = (await res.json()) as {
+        users?: Array<{ email?: string | null }>;
+      };
+      const normalized = email.trim().toLowerCase();
+      const match = (body.users ?? []).find(
+        (u) => (u.email ?? "").toLowerCase() === normalized,
+      );
+      return { data: match ?? null, error: null as { message: string } | null };
+    })();
 
     if (authErr) return fail("auth_lookup_failed", authErr.message);
     if (existingUser) return fail("already_claimed");
+
 
     const password = generatePassword();
 

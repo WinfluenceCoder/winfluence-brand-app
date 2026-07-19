@@ -1,40 +1,34 @@
 ## Diagnose
 
-`brands.user_id` ist bei jedem Datensatz vorbelegt (Moderator-ID) — die Spalte sagt daher **nichts** darüber aus, ob eine Brand bereits geclaimt wurde. Die aktuelle Prüfung in `claim-brand`
-
-```ts
-if (brand.user_id) return fail("already_claimed");
-```
-
-ist deshalb falsch. Korrekte Semantik: „geclaimt" = es existiert in `auth.users` ein User mit der Brand-E-Mail.
+`service.schema("auth").from("users")` schlägt fehl mit `Invalid schema: auth` — der supabase-js Client erlaubt nur Schemas, die in der PostgREST-Konfiguration (`db-schemas`) exponiert sind. Das Auth-Schema ist bewusst nicht über die Data-API erreichbar, auch nicht mit Service-Role-Key.
 
 ## Fix in `supabase/functions/claim-brand/index.ts`
 
-1. `brands`-Select um `user_id` reduzieren (nicht mehr benötigt für die Claim-Prüfung); nur noch `id, e_mail_address` lesen.
-2. Nach dem Brand-Lookup direkt gegen `auth.users` prüfen — Service-Role darf das Auth-Schema abfragen:
+Statt PostgREST direkt die **GoTrue-Admin-REST-API** anfragen — die ist mit Service-Role-Key zugänglich und liefert User nach E-Mail:
 
-   ```ts
-   const { data: existingUser, error: authErr } = await service
-     .schema("auth")
-     .from("users")
-     .select("id")
-     .ilike("email", email)
-     .maybeSingle();
+```ts
+const url = `${supabaseUrl}/auth/v1/admin/users?filter=${encodeURIComponent(email)}`;
+const res = await fetch(url, {
+  headers: {
+    apikey: serviceKey,
+    Authorization: `Bearer ${serviceKey}`,
+  },
+});
+if (!res.ok) return fail("auth_lookup_failed", `HTTP ${res.status}`);
+const body = (await res.json()) as { users?: Array<{ email?: string | null }> };
+const normalized = email.trim().toLowerCase();
+const exists = (body.users ?? []).some(
+  (u) => (u.email ?? "").toLowerCase() === normalized,
+);
+if (exists) return fail("already_claimed");
+```
 
-   if (authErr) return fail("auth_lookup_failed", authErr.message);
-   if (existingUser) return fail("already_claimed");
-   ```
-3. `signUp` wie bisher; anschließendes `brands`-Update auf `user_id = signUp.user.id` bleibt unverändert (überschreibt die Moderator-ID).
+Der `filter`-Parameter macht bei GoTrue eine partielle Suche über E-Mail — deshalb der exakte Vergleich danach, damit „foo@bar.com" nicht auf „xfoo@bar.com" matcht.
 
-Kein Verhalten am Frontend anpassen — die bestehenden `reason`-Codes bleiben stabil (`already_claimed`, `signup_failed`, `link_failed`, …).
-
-## Danach
-
-1. Function extern neu deployen (`supabase functions deploy claim-brand`).
-2. Test mit `testdomain3.ch` (kein Auth-User vorhanden) → erwartet: „Fast geschafft!"-Ansicht.
-3. Zweiter Klick / bereits registrierte Brand → erwartet Toast `Fehler: already_claimed`.
+Rest der Function (signUp, brands-Update) bleibt unverändert.
 
 ## Nicht Teil dieses Plans
 
-- Frontend (`welcome.tsx`) bleibt unverändert.
-- Kein Reset der Moderator-`user_id` in bestehenden Zeilen nötig — das Update beim erfolgreichen Claim überschreibt sie.
+- Keine SQL-/Schema-Änderungen extern.
+- Kein Frontend-Change.
+- Nach dem Umbau: extern `supabase functions deploy claim-brand`, dann Retry auf `/welcome?domain=testdomain3.ch`.
