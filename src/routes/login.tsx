@@ -135,6 +135,11 @@ function LoginPage() {
       navigate({ to: "/welcome", search: { domain: status.invitedDomain } });
       return;
     }
+    const blocked = blockedStatusMessage(status.brandStatus);
+    if (blocked) {
+      toast.error(blocked);
+      return;
+    }
     if (status.authExists) {
       toast.error(t("auth.errors.emailAlreadyRegistered"));
       loginForm.setValue("email", v.email);
