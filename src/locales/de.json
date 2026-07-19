@@ -59,7 +59,9 @@
       "emailInvalid": "Diese E-Mail-Adresse ist ungültig.",
       "emailDomainBlocked": "E-Mail-Adressen mit der Domain @winfluence.net sind in dieser App nicht erlaubt.",
       "rateLimit": "Zu viele Versuche. Bitte warte kurz und versuche es erneut.",
-      "recoverySessionMissing": "Der Link ist ungültig oder abgelaufen. Bitte fordere einen neuen an."
+      "recoverySessionMissing": "Der Link ist ungültig oder abgelaufen. Bitte fordere einen neuen an.",
+      "emailAlreadyRegistered": "Diese E-Mail ist bereits registriert. Bitte melde dich an.",
+      "pendingInvite": "Für diese E-Mail liegt eine Einladung vor. Bitte schließe zuerst die Registrierung ab."
     }
   },
   "header": {
