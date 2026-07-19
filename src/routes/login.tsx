@@ -73,7 +73,7 @@ function LoginPage() {
     return err?.message || t("auth.errors.generic");
   };
 
-  const checkEmailStatus = async (email: string): Promise<{ authExists: boolean; invitedDomain: string | null }> => {
+  const checkEmailStatus = async (email: string): Promise<{ authExists: boolean; invitedDomain: string | null; brandStatus: string | null }> => {
     try {
       const { data, error } = await (supabase.rpc as unknown as (
         fn: string,
@@ -84,19 +84,26 @@ function LoginPage() {
       );
       if (error) {
         console.warn("get_email_status error", error);
-        return { authExists: false, invitedDomain: null };
+        return { authExists: false, invitedDomain: null, brandStatus: null };
       }
       const row = (Array.isArray(data) ? data[0] : data) as
-        | { auth_exists?: boolean; invited_domain?: string | null }
+        | { auth_exists?: boolean; invited_domain?: string | null; brand_status?: string | null }
         | null;
       return {
         authExists: Boolean(row?.auth_exists),
         invitedDomain: row?.invited_domain ?? null,
+        brandStatus: row?.brand_status ?? null,
       };
     } catch (e) {
       console.warn("get_email_status exception", e);
-      return { authExists: false, invitedDomain: null };
+      return { authExists: false, invitedDomain: null, brandStatus: null };
     }
+  };
+
+  const blockedStatusMessage = (status: string | null): string | null => {
+    if (status === "deleted") return t("auth.errors.accountDeleted");
+    if (status === "suspended") return t("auth.errors.accountSuspended");
+    return null;
   };
 
   const onLogin = async (v: z.infer<typeof schemas.login>) => {
@@ -105,6 +112,11 @@ function LoginPage() {
     if (status.invitedDomain) {
       toast.info(t("auth.errors.pendingInvite"));
       navigate({ to: "/welcome", search: { domain: status.invitedDomain } });
+      return;
+    }
+    const blocked = blockedStatusMessage(status.brandStatus);
+    if (blocked) {
+      toast.error(blocked);
       return;
     }
     const { error } = await supabase.auth.signInWithPassword(v);
@@ -121,6 +133,11 @@ function LoginPage() {
     if (status.invitedDomain) {
       toast.info(t("auth.errors.pendingInvite"));
       navigate({ to: "/welcome", search: { domain: status.invitedDomain } });
+      return;
+    }
+    const blocked = blockedStatusMessage(status.brandStatus);
+    if (blocked) {
+      toast.error(blocked);
       return;
     }
     if (status.authExists) {

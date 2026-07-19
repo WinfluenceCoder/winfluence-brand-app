@@ -61,7 +61,9 @@
       "rateLimit": "Zu viele Versuche. Bitte warte kurz und versuche es erneut.",
       "recoverySessionMissing": "Der Link ist ungültig oder abgelaufen. Bitte fordere einen neuen an.",
       "emailAlreadyRegistered": "Diese E-Mail ist bereits registriert. Bitte melde dich an.",
-      "pendingInvite": "Für diese E-Mail liegt eine Einladung vor. Bitte schließe zuerst die Registrierung ab."
+      "pendingInvite": "Für diese E-Mail liegt eine Einladung vor. Bitte schließe zuerst die Registrierung ab.",
+      "accountDeleted": "Dieses Konto wurde gelöscht. Bitte kontaktiere das Team, falls das ein Fehler ist.",
+      "accountSuspended": "Dieses Konto ist aktuell gesperrt. Bitte kontaktiere das Team."
     }
   },
   "header": {
