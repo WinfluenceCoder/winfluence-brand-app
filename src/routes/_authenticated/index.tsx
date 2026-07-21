@@ -31,7 +31,7 @@ function useMyCampaigns() {
       if (!brand) return [];
       const { data, error } = await supabase
         .from("campaigns")
-        .select("id, name, status, start, ende, budget")
+        .select("id, title, status, start, ende, budget")
         .eq("brand_id", brand.id)
         .in("status", activeStatuses as unknown as string[])
         .order("created_at", { ascending: false });
