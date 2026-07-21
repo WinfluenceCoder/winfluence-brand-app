@@ -105,7 +105,8 @@
     "about": "Über Winfluence"
   },
   "home": {
-    "title": "Meine Kampagnen",
+    "title": "Mein Dashboard",
+    "campaignsTitle": "Meine Kampagnen",
     "newCampaign": "Neue Kampagne",
     "emptyTitle": "Erstelle deine erste Kampagne",
     "emptySub": "Starte in wenigen Minuten und erreiche relevante Nano- und Micro-Influencer.",
