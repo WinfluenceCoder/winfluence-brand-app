@@ -118,6 +118,13 @@ function fromLocal(v: string): string | null {
   return d.toISOString();
 }
 
+function formatThousands(v: string | number | null | undefined): string {
+  if (v === null || v === undefined || v === "") return "";
+  const n = typeof v === "number" ? v : parseInt(String(v).replace(/\D/g, ""), 10);
+  if (!Number.isFinite(n)) return "";
+  return new Intl.NumberFormat("de-CH").format(n);
+}
+
 type Initial = Partial<FormValues> & { id?: number };
 
 export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initial?: Initial }) {
@@ -344,7 +351,11 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
                 id="budget"
                 inputMode="numeric"
                 placeholder={t("campaignForm.placeholders.budget")}
-                {...form.register("budget")}
+                value={formatThousands(form.watch("budget"))}
+                onChange={(e) => {
+                  const raw = e.target.value.replace(/\D/g, "");
+                  form.setValue("budget", raw, { shouldDirty: true, shouldValidate: true });
+                }}
                 className={cn(errors.budget && invalidCls)}
               />
               {fieldError("budget") && <p className="mt-1 text-sm text-destructive">{fieldError("budget")}</p>}
