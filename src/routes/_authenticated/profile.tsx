@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter, useNavigate } from "@tanstack/react-router";
 import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useForm } from "react-hook-form";
@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Upload, User as UserIcon } from "lucide-react";
+import { ChevronLeft, Upload, User as UserIcon } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
@@ -78,6 +78,8 @@ type FormValues = z.infer<ReturnType<typeof makeSchema>>;
 function ProfilePage() {
   const { t } = useTranslation();
   const qc = useQueryClient();
+  const router = useRouter();
+  const navigate = useNavigate({ from: "/_authenticated/profile" });
   const fetchBrand = useServerFn(getMyBrand);
   const saveBrand = useServerFn(updateMyBrand);
 
@@ -226,6 +228,7 @@ function ProfilePage() {
         });
         toast.success(t("profile.saved"));
         await qc.invalidateQueries({ queryKey: ["my-brand"] });
+        navigate({ to: "/" });
       } catch (err) {
         console.error(err);
         toast.error(t("profile.saveError"));
@@ -238,6 +241,15 @@ function ProfilePage() {
 
   return (
     <div className="p-8 max-w-3xl">
+      <button
+        type="button"
+        onClick={() => router.history.back()}
+        className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <ChevronLeft className="h-4 w-4" />
+        {t("common.back")}
+      </button>
+
       <h1 className="text-2xl font-semibold tracking-tight">{t("profile.title")}</h1>
 
       <div className="mt-4 flex items-center gap-2">
