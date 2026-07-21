@@ -118,6 +118,13 @@ function fromLocal(v: string): string | null {
   return d.toISOString();
 }
 
+function formatThousands(v: string | number | null | undefined): string {
+  if (v === null || v === undefined || v === "") return "";
+  const n = typeof v === "number" ? v : parseInt(String(v).replace(/\D/g, ""), 10);
+  if (!Number.isFinite(n)) return "";
+  return new Intl.NumberFormat("de-CH").format(n);
+}
+
 type Initial = Partial<FormValues> & { id?: number };
 
 export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initial?: Initial }) {
