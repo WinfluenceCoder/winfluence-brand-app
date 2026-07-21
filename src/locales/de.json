@@ -187,5 +187,82 @@
     "messagesPersonal": "Persönliche Nachrichten",
     "messagesSystem": "System-Nachrichten",
     "settings": "Einstellungen"
+  },
+  "campaignForm": {
+    "newTitle": "Neue Kampagne",
+    "editTitle": "Kampagne bearbeiten",
+    "created": "Kampagne wurde erstellt.",
+    "updated": "Kampagne wurde aktualisiert.",
+    "saveError": "Kampagne konnte nicht gespeichert werden.",
+    "uploadError": "Upload fehlgeschlagen.",
+    "uploadButton": "Bild hochladen",
+    "discardTitle": "Änderungen verwerfen?",
+    "discardBody": "Deine ungespeicherten Änderungen gehen verloren.",
+    "discardConfirm": "Verwerfen",
+    "sections": {
+      "brand": "Titel, Brand & Produkt",
+      "content": "Inhalt & Briefing",
+      "influencer": "Influencer & Post",
+      "barter": "Barter"
+    },
+    "labels": {
+      "title": "Titel",
+      "brand_name": "Brand-Name",
+      "brand_logo_url": "Brand-Logo",
+      "product": "Produkt",
+      "briefing": "Briefing",
+      "campaign_visual_url": "Kampagnen-Visual",
+      "goal": "Ziel",
+      "targetgroup": "Zielgruppe",
+      "key_message": "Key Message",
+      "budget": "Budget (CHF)",
+      "start": "Start",
+      "ende": "Ende",
+      "hashtags": "Hashtags",
+      "link_list": "Links",
+      "requirements": "Anforderungen an Influencer",
+      "post_type": "Post-Typ",
+      "type": "Kampagnen-Typ",
+      "target_url": "Ziel-URL",
+      "coupon": "Coupon",
+      "apply_till": "Bewerbung bis",
+      "barter_desc": "Barter-Beschreibung",
+      "barter_order_url": "Barter Bestell-URL",
+      "barter_order_coupon": "Barter Gutscheincode",
+      "barter_value": "Barter Warenwert (CHF)"
+    },
+    "hints": {
+      "brand_logo_url": "Brand-Logo hochladen",
+      "campaign_visual_url": "Kampagnen-Visual hochladen (JPG oder PNG)"
+    },
+    "placeholders": {
+      "title": "Kampagnen-Titel, z.B. «Sommer-Launch 2026»",
+      "product": "Produkt oder Dienstleistung, die beworben wird",
+      "type": "Kampagnen-Typ wählen",
+      "goal": "Was soll die Kampagne erreichen? z.B. Markenbekanntheit steigern, Abverkauf fördern",
+      "targetgroup": "Zielgruppe, z.B. «Frauen 25–40, sportaffin, DACH-Raum»",
+      "key_message": "Die zentrale Botschaft, die jeder Post transportieren soll",
+      "briefing": "Detailliertes Briefing für Creator: Inhalte, Tonalität, Do's & Don'ts",
+      "hashtags": "Hashtags, z.B. «#winfluence #sommerlaunch»",
+      "link_list": "Links mit weiterführenden Informationen, durch Komma getrennt",
+      "post_type": "Gewünschte Art des Posts, z.B. «Reel, Story, Feed-Post, …» und ggf. Kanal, z.B. «Instagram, TikTok, YouTube, …»",
+      "requirements": "Idealprofil des Influencers, z.B. Thematische Ausrichtung, Region, Sprache, Plattform, Mindest-Follower, …",
+      "target_url": "Ziel-URL, die Influencers verlinken sollen, z.B. «https://…»",
+      "coupon": "Rabattcode für Follower, z.B. «SOMMER20»",
+      "barter_order_url": "Link zur Bestellseite für das Barter-Produkt, z.B. «https://…»",
+      "barter_order_coupon": "Gutscheincode für die Gratis-Bestellung des Creators",
+      "budget": "Budget in CHF, z.B. «500»",
+      "barter_value": "Warenwert des Barter-Produkts in CHF, z.B. «120»",
+      "barter_desc": "Beschreibung der Barter-Leistung, z.B. «1× Produkt-Set gratis»",
+      "apply_till": "Ablauf Bewerbungsfrist",
+      "start": "Frühester Zeitpunkt für den Post",
+      "ende": "Spätester Zeitpunkt für den Post"
+    },
+    "errors": {
+      "integer": "Bitte eine ganze Zahl ≥ 0 eingeben.",
+      "endAfterStart": "Das Ende muss nach dem Start liegen.",
+      "applyBeforeStart": "Die Bewerbungsfrist muss vor dem Start liegen."
+    }
   }
 }
+

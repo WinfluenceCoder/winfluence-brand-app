@@ -35,6 +35,7 @@ import { Route as AuthenticatedCampaignsCompletedRouteImport } from './routes/_a
 import { Route as AuthenticatedCampaignsArchiveRouteImport } from './routes/_authenticated/campaigns.archive'
 import { Route as AuthenticatedAnalyticsInfluencersRouteImport } from './routes/_authenticated/analytics.influencers'
 import { Route as AuthenticatedAnalyticsCampaignsRouteImport } from './routes/_authenticated/analytics.campaigns'
+import { Route as AuthenticatedCampaignsIdEditRouteImport } from './routes/_authenticated/campaigns.$id.edit'
 
 const WelcomeRoute = WelcomeRouteImport.update({
   id: '/welcome',
@@ -181,6 +182,12 @@ const AuthenticatedAnalyticsCampaignsRoute =
     path: '/analytics/campaigns',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCampaignsIdEditRoute =
+  AuthenticatedCampaignsIdEditRouteImport.update({
+    id: '/campaigns/$id/edit',
+    path: '/campaigns/$id/edit',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
@@ -208,6 +215,7 @@ export interface FileRoutesByFullPath {
   '/messages/notifications': typeof AuthenticatedMessagesNotificationsRoute
   '/messages/personal': typeof AuthenticatedMessagesPersonalRoute
   '/messages/system': typeof AuthenticatedMessagesSystemRoute
+  '/campaigns/$id/edit': typeof AuthenticatedCampaignsIdEditRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -235,6 +243,7 @@ export interface FileRoutesByTo {
   '/messages/notifications': typeof AuthenticatedMessagesNotificationsRoute
   '/messages/personal': typeof AuthenticatedMessagesPersonalRoute
   '/messages/system': typeof AuthenticatedMessagesSystemRoute
+  '/campaigns/$id/edit': typeof AuthenticatedCampaignsIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -264,6 +273,7 @@ export interface FileRoutesById {
   '/_authenticated/messages/notifications': typeof AuthenticatedMessagesNotificationsRoute
   '/_authenticated/messages/personal': typeof AuthenticatedMessagesPersonalRoute
   '/_authenticated/messages/system': typeof AuthenticatedMessagesSystemRoute
+  '/_authenticated/campaigns/$id/edit': typeof AuthenticatedCampaignsIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -293,6 +303,7 @@ export interface FileRouteTypes {
     | '/messages/notifications'
     | '/messages/personal'
     | '/messages/system'
+    | '/campaigns/$id/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -320,6 +331,7 @@ export interface FileRouteTypes {
     | '/messages/notifications'
     | '/messages/personal'
     | '/messages/system'
+    | '/campaigns/$id/edit'
   id:
     | '__root__'
     | '/_authenticated'
@@ -348,6 +360,7 @@ export interface FileRouteTypes {
     | '/_authenticated/messages/notifications'
     | '/_authenticated/messages/personal'
     | '/_authenticated/messages/system'
+    | '/_authenticated/campaigns/$id/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -543,6 +556,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAnalyticsCampaignsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/campaigns/$id/edit': {
+      id: '/_authenticated/campaigns/$id/edit'
+      path: '/campaigns/$id/edit'
+      fullPath: '/campaigns/$id/edit'
+      preLoaderRoute: typeof AuthenticatedCampaignsIdEditRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -567,6 +587,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMessagesNotificationsRoute: typeof AuthenticatedMessagesNotificationsRoute
   AuthenticatedMessagesPersonalRoute: typeof AuthenticatedMessagesPersonalRoute
   AuthenticatedMessagesSystemRoute: typeof AuthenticatedMessagesSystemRoute
+  AuthenticatedCampaignsIdEditRoute: typeof AuthenticatedCampaignsIdEditRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -593,6 +614,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedMessagesNotificationsRoute,
   AuthenticatedMessagesPersonalRoute: AuthenticatedMessagesPersonalRoute,
   AuthenticatedMessagesSystemRoute: AuthenticatedMessagesSystemRoute,
+  AuthenticatedCampaignsIdEditRoute: AuthenticatedCampaignsIdEditRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -609,13 +631,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
