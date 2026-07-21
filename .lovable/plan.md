@@ -1,57 +1,54 @@
-## Ursache
+## Befund
 
-Der Fehler kommt aus der externen RPC `get_email_status`, nicht aus dem Frontend:
+Der sichtbare Fehler kommt nicht mehr von `get_email_status`, sondern vom Auth-Signup selbst:
 
-```
-400  POST /rest/v1/rpc/get_email_status
-{"code":"42804","message":"structure of query does not match function result type",
- "details":"Returned type brand_status does not match expected type text in column 3."}
+```text
+POST /auth/v1/signup ... 500 Internal Server Error
 ```
 
-Die Spalte `brands.status` ist ein Postgres-Enum-Typ namens `brand_status`. Die RPC deklariert Spalte 3 aber als `text`. Postgres castet Enums nicht implizit auf `text`, daher 42804.
+Das bedeutet: Supabase Auth versucht den neuen User anzulegen, aber beim Speichern läuft eine Datenbank-Operation fehl — sehr wahrscheinlich der bestehende `on_auth_user_created` / `handle_new_user()` Trigger, der beim Erstellen eines Auth-Users automatisch in `public.brands` schreibt oder aktualisiert.
 
-Folgeeffekt im UI: `checkEmailStatus` fängt den Fehler ab und gibt `{ authExists:false, invitedDomain:null, brandStatus:null }` zurück. Bei Register läuft es dann in `supabase.auth.signUp` — aber vorher zeigt vermutlich der `console.warn("get_email_status error", …)` als "leeres {}" (Supabase-Error-Objekte serialisieren mit `JSON.stringify` zu `{}`, weil die Felder non-enumerable sind). Das erklärt exakt die Meldung "Fehlermeldung leer {}".
+Der `brand.winfluence.net.png` 404 kommt von 1Password/Rich Icons und ist unabhängig.
 
-## Fix (extern in Supabase, kein Code-Change)
+## Plan
 
-`get_email_status` muss `b.status` auf `text` casten. Ansonsten wie im letzten Plan:
+1. **Externen Trigger fixen**
+   - `public.handle_new_user()` so anpassen, dass Self-Registration robust funktioniert.
+   - Für neue Brand-Registrierungen darf der Trigger nicht blind einen `brands`-Datensatz einfügen, wenn Pflichtspalten, Constraints oder bestehende Brand-Logik das verhindern.
+   - Der Trigger sollte stattdessen:
+     - E-Mail normalisieren
+     - vorhandenen Brand per `e_mail_address` aktualisieren, falls vorhanden
+     - nur falls kein Brand existiert, einen minimal gültigen Brand-Datensatz anlegen
+     - Konflikte auf `user_id`, `e_mail_address` und `domain` sauber behandeln
+
+2. **Konkretes SQL für Supabase liefern**
+   - Ich erstelle dir ein sicheres `CREATE OR REPLACE FUNCTION public.handle_new_user()` SQL-Snippet zum manuellen Ausführen in deinem externen Supabase-Projekt.
+   - Keine Lovable Cloud, keine neue Datenbank, keine Schema-Änderung außer der bestehenden Trigger-Funktion.
+
+3. **Frontend-Fehlermeldung verbessern**
+   - In `/login` soll bei `signUp`-Fehlern mit leerem `{}` oder `Database error saving new user` eine verständliche Meldung erscheinen, z.B.:
+     - „Registrierung konnte nicht abgeschlossen werden. Bitte kontaktiere das Team.“
+   - Zusätzlich optional `console.warn` mit `message`, `code`, `status`, damit künftige Fehler nicht mehr leer wirken.
+
+4. **Verifikation**
+   - Danach testen mit einer neuen E-Mail ohne bestehenden Auth-User.
+   - Erwartung:
+     - `get_email_status` → 200
+     - `auth/v1/signup` → 200 oder Bestätigungs-Mail ausgelöst
+     - keine leere Toast-Meldung mehr
+
+## Technische Details
+
+Die wichtigste externe Prüfung ist diese Query in Supabase:
 
 ```sql
-create or replace function public.get_email_status(p_email text)
-returns table (auth_exists boolean, invited_domain text, brand_status text)
-language plpgsql
-security definer
-set search_path = public, auth
-as $$
-declare
-  v_email text := lower(trim(p_email));
-begin
-  return query
-  select
-    exists (select 1 from auth.users u where lower(u.email) = v_email) as auth_exists,
-    (select b.domain from public.brands b
-       where lower(b.e_mail_address) = v_email
-         and b.status = 'invited'
-       limit 1) as invited_domain,
-    (select b.status::text from public.brands b   -- ← Cast auf text
-       where lower(b.e_mail_address) = v_email
-       order by b.created_at desc nulls last
-       limit 1) as brand_status;
-end;
-$$;
-
-grant execute on function public.get_email_status(text) to anon, authenticated;
+select
+  n.nspname as schema,
+  p.proname,
+  pg_get_functiondef(p.oid) as definition
+from pg_proc p
+join pg_namespace n on n.oid = p.pronamespace
+where p.proname = 'handle_new_user';
 ```
 
-Alternativ die `returns table`-Signatur auf `brand_status brand_status` ändern — Cast auf `text` ist robuster, weil das Frontend den Wert bereits als String behandelt.
-
-## Frontend
-
-Keine Änderungen. Sobald die RPC-Signatur passt, funktionieren Register/Login wie im letzten Plan (Blockieren für `deleted`/`suspended`, Redirect für `invited`, sonst normaler Auth-Call).
-
-## Verifikation nach dem externen Fix
-
-1. `POST /rpc/get_email_status` mit `{"p_email":"neu@example.com"}` → 200, `brand_status: null`.
-2. Register mit neuer E-Mail → `signUp` läuft durch, kein 400 mehr auf der RPC.
-3. Register/Login mit `deleted`/`suspended` Brand → Toast, kein Auth-Call.
-4. Login mit `invited` Brand → Redirect `/welcome?domain=…`.
+Falls der Trigger aktuell wieder ein `INSERT INTO public.brands (...)` ohne vollständige Pflichtfelder macht, ist das der wahrscheinliche Grund für `Database error saving new user`.
