@@ -344,7 +344,11 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
                 id="budget"
                 inputMode="numeric"
                 placeholder={t("campaignForm.placeholders.budget")}
-                {...form.register("budget")}
+                value={formatThousands(form.watch("budget"))}
+                onChange={(e) => {
+                  const raw = e.target.value.replace(/\D/g, "");
+                  form.setValue("budget", raw, { shouldDirty: true, shouldValidate: true });
+                }}
                 className={cn(errors.budget && invalidCls)}
               />
               {fieldError("budget") && <p className="mt-1 text-sm text-destructive">{fieldError("budget")}</p>}
