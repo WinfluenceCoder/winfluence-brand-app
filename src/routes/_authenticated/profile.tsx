@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChevronLeft, Upload, User as UserIcon } from "lucide-react";
+import { PhotoCropDialog } from "@/components/app/PhotoCropDialog";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
@@ -583,6 +584,20 @@ function ProfilePage() {
           </span>
         </div>
       </form>
+      <PhotoCropDialog
+        open={logoDialogOpen}
+        onOpenChange={setLogoDialogOpen}
+        uploading={uploading}
+        onCropped={onLogoCropped}
+        maxOutput={512}
+      />
+      <PhotoCropDialog
+        open={photoDialogOpen}
+        onOpenChange={setPhotoDialogOpen}
+        uploading={uploadingPhoto}
+        onCropped={onPhotoCropped}
+        maxOutput={512}
+      />
     </div>
   );
 }
