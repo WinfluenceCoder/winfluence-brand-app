@@ -1,10 +1,11 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PhotoCropDialog } from "@/components/app/PhotoCropDialog";
 
 type Props = {
   bucket: string;
@@ -13,36 +14,44 @@ type Props = {
   prefix?: string;
   hintKey: string;
   error?: string | null;
+  maxOutput: number;
+  aspect?: number;
 };
 
-export function ImageUploadField({ bucket, value, onChange, prefix = "img", hintKey, error }: Props) {
+export function ImageUploadField({
+  bucket,
+  value,
+  onChange,
+  prefix = "img",
+  hintKey,
+  error,
+  maxOutput,
+  aspect = 1,
+}: Props) {
   const { t } = useTranslation();
   const [uploading, setUploading] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [open, setOpen] = useState(false);
 
-  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleCropped = async (blob: Blob) => {
     setUploading(true);
     try {
       const { data: userData } = await supabase.auth.getUser();
       const uid = userData.user?.id;
       if (!uid) throw new Error("no-user");
-      const ext = file.name.split(".").pop() ?? "png";
-      const path = `${uid}/${prefix}-${Date.now()}.${ext}`;
-      const { error: upErr } = await supabase.storage.from(bucket).upload(path, file, {
+      const path = `${uid}/${prefix}-${Date.now()}.webp`;
+      const { error: upErr } = await supabase.storage.from(bucket).upload(path, blob, {
         upsert: true,
-        contentType: file.type,
+        contentType: "image/webp",
       });
       if (upErr) throw upErr;
       const { data: pub } = supabase.storage.from(bucket).getPublicUrl(path);
       onChange(pub.publicUrl);
+      setOpen(false);
     } catch (err) {
       console.error(err);
       toast.error(t("campaignForm.uploadError"));
     } finally {
       setUploading(false);
-      if (inputRef.current) inputRef.current.value = "";
     }
   };
 
@@ -61,23 +70,23 @@ export function ImageUploadField({ bucket, value, onChange, prefix = "img", hint
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => inputRef.current?.click()}
+            onClick={() => setOpen(true)}
             disabled={uploading}
           >
             {uploading ? t("common.loading") : t("campaignForm.uploadButton")}
           </Button>
-          <input
-            ref={inputRef}
-            type="file"
-            accept="image/png,image/jpeg"
-            className="hidden"
-            onChange={handleFile}
-            disabled={uploading}
-          />
           <p className="mt-2 text-xs text-muted-foreground">{t(hintKey)}</p>
         </div>
       </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
+      <PhotoCropDialog
+        open={open}
+        onOpenChange={setOpen}
+        uploading={uploading}
+        onCropped={handleCropped}
+        maxOutput={maxOutput}
+        aspect={aspect}
+      />
     </div>
   );
 }
