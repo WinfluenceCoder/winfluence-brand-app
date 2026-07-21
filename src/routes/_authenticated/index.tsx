@@ -124,15 +124,16 @@ function HomePage() {
 
   return (
     <div className="p-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight">{t("home.title")}</h1>
-        <Button asChild>
-          <Link to="/campaigns/new">
-            <Plus className="h-4 w-4 mr-1" /> {t("home.newCampaign")}
-          </Link>
-        </Button>
-      </div>
+      <h1 className="text-2xl font-semibold tracking-tight">{t("home.title")}</h1>
       <Card className="mt-6">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
+          <CardTitle>{t("home.campaignsTitle")}</CardTitle>
+          <Button asChild>
+            <Link to="/campaigns/new">
+              <Plus className="h-4 w-4 mr-1" /> {t("home.newCampaign")}
+            </Link>
+          </Button>
+        </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
