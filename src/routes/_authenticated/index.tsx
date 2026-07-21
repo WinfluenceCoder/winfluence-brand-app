@@ -147,7 +147,13 @@ function HomePage() {
             </TableHeader>
             <TableBody>
               {data.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow
+                  key={row.id}
+                  className="cursor-pointer"
+                  onClick={() =>
+                    router.navigate({ to: "/campaigns/$id/edit", params: { id: String(row.id) } })
+                  }
+                >
                   <TableCell className="font-medium">{row.title}</TableCell>
                   <TableCell>
                     <Badge variant={statusVariant(row.status)}>{statusLabel(t, row.status)}</Badge>
@@ -159,6 +165,7 @@ function HomePage() {
                   </TableCell>
                 </TableRow>
               ))}
+
             </TableBody>
           </Table>
         </CardContent>

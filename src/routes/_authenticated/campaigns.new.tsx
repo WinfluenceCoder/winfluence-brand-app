@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Placeholder } from "@/components/app/Placeholder";
+import { CampaignForm } from "@/components/app/CampaignForm";
 
 export const Route = createFileRoute("/_authenticated/campaigns/new")({
-  component: () => <Placeholder titleKey="placeholders.campaignsNew" />,
+  component: () => <CampaignForm mode="create" />,
 });
