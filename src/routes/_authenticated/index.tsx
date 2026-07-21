@@ -28,6 +28,7 @@ type CampaignRow = {
   start: string | null;
   ende: string | null;
   budget: number | null;
+  campaign_visual_url: string | null;
 };
 
 function useMyCampaigns() {
@@ -41,11 +42,12 @@ function useMyCampaigns() {
       if (!brand) return [] as CampaignRow[];
       const { data, error } = await supabase
         .from("campaigns")
-        .select("id, title, status, start, ende, budget")
+        .select("id, title, status, start, ende, budget, campaign_visual_url")
         .eq("brand_id", brand.id)
         .in("status", activeStatuses as unknown as string[])
         .order("created_at", { ascending: false })
         .returns<CampaignRow[]>();
+
       if (error) throw new Error(error.message);
       return data ?? [];
     },
