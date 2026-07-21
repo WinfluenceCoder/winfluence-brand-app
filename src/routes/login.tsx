@@ -16,6 +16,13 @@ import { makeStrongPasswordSchema } from "@/lib/password-policy";
 
 type Mode = "login" | "register" | "forgot";
 
+type AuthErrorDetails = {
+  message: string;
+  code: string;
+  status: string;
+  name: string;
+};
+
 export const Route = createFileRoute("/login")({
   component: LoginPage,
 });
@@ -60,17 +67,36 @@ function LoginPage() {
     defaultValues: { email: "" },
   });
 
-  const mapAuthError = (err?: { message?: string | null; code?: string | null } | null) => {
-    const msg = (err?.message ?? "").toLowerCase();
-    const code = (err?.code ?? "").toLowerCase();
+  const getAuthErrorDetails = (err: unknown): AuthErrorDetails => {
+    const readField = (field: "message" | "code" | "status" | "name") => {
+      if (!err || typeof err !== "object" || !(field in err)) return "";
+      const value = (err as Record<string, unknown>)[field];
+      return typeof value === "string" || typeof value === "number" ? String(value) : "";
+    };
+
+    const fallbackMessage = err instanceof Error ? err.message : typeof err === "string" ? err : "";
+
+    return {
+      message: readField("message") || fallbackMessage,
+      code: readField("code"),
+      status: readField("status"),
+      name: readField("name"),
+    };
+  };
+
+  const mapAuthError = (err?: unknown) => {
+    const details = getAuthErrorDetails(err);
+    const msg = details.message.toLowerCase();
+    const code = details.code.toLowerCase();
     if (code === "weak_password" || msg.includes("weak") || msg.includes("pwned")) return t("auth.errors.weakPassword");
     if (code === "user_already_exists" || msg.includes("already registered") || msg.includes("user already")) return t("auth.errors.userExists");
     if (code === "email_address_invalid" || msg.includes("invalid email") || msg.includes("email address") && msg.includes("invalid")) return t("auth.errors.emailInvalid");
     if (code === "over_email_send_rate_limit" || msg.includes("rate limit") || msg.includes("too many")) return t("auth.errors.rateLimit");
+    if (code === "unexpected_failure" || msg.includes("database error saving new user") || msg.includes("error saving new user")) return t("auth.errors.signupDatabaseError");
     if (msg.includes("invalid login") || msg.includes("invalid credentials")) return t("auth.errors.invalidCredentials");
     if (msg.includes("email not confirmed")) return t("auth.errors.emailNotConfirmed");
     if (msg.includes("network") || msg.includes("fetch")) return t("auth.errors.network");
-    return err?.message || t("auth.errors.generic");
+    return details.message || t("auth.errors.generic");
   };
 
   const checkEmailStatus = async (email: string): Promise<{ authExists: boolean; invitedDomain: string | null; brandStatus: string | null }> => {
@@ -152,6 +178,7 @@ function LoginPage() {
       options: { emailRedirectTo: `${window.location.origin}/` },
     });
     if (error) {
+      console.warn("signUp error", getAuthErrorDetails(error));
       toast.error(mapAuthError(error));
       return;
     }
