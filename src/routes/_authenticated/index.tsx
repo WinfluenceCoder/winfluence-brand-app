@@ -132,34 +132,36 @@ function HomePage() {
           </Link>
         </Button>
       </div>
-      <div className="mt-6 rounded-lg border bg-card">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>{t("home.tableName")}</TableHead>
-              <TableHead>{t("home.tableStatus")}</TableHead>
-              <TableHead>{t("home.tableStart")}</TableHead>
-              <TableHead>{t("home.tableEnd")}</TableHead>
-              <TableHead className="text-right">{t("home.tableBudget")}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data.map((row) => (
-              <TableRow key={row.id}>
-                <TableCell className="font-medium">{row.title}</TableCell>
-                <TableCell>
-                  <Badge variant={statusVariant(row.status)}>{statusLabel(t, row.status)}</Badge>
-                </TableCell>
-                <TableCell>{formatDate(row.start)}</TableCell>
-                <TableCell>{formatDate(row.ende)}</TableCell>
-                <TableCell className="text-right tabular-nums">
-                  {row.budget != null ? `CHF ${row.budget.toLocaleString("de-CH")}` : "–"}
-                </TableCell>
+      <Card className="mt-6">
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t("home.tableName")}</TableHead>
+                <TableHead>{t("home.tableStatus")}</TableHead>
+                <TableHead>{t("home.tableStart")}</TableHead>
+                <TableHead>{t("home.tableEnd")}</TableHead>
+                <TableHead className="text-right">{t("home.tableBudget")}</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+            </TableHeader>
+            <TableBody>
+              {data.map((row) => (
+                <TableRow key={row.id}>
+                  <TableCell className="font-medium">{row.title}</TableCell>
+                  <TableCell>
+                    <Badge variant={statusVariant(row.status)}>{statusLabel(t, row.status)}</Badge>
+                  </TableCell>
+                  <TableCell>{formatDate(row.start)}</TableCell>
+                  <TableCell>{formatDate(row.ende)}</TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {row.budget != null ? `CHF ${row.budget.toLocaleString("de-CH")}` : "–"}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 }
