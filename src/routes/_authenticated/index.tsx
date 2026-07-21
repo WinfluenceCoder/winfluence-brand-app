@@ -135,7 +135,7 @@ function HomePage() {
           <TableBody>
             {data.map((row) => (
               <TableRow key={row.id}>
-                <TableCell className="font-medium">{row.name}</TableCell>
+                <TableCell className="font-medium">{row.title}</TableCell>
                 <TableCell>
                   <Badge variant={statusVariant(row.status)}>{statusLabel(t, row.status)}</Badge>
                 </TableCell>
