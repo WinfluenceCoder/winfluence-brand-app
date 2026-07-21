@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ChevronLeft } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -233,6 +234,16 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
 
   return (
     <form onSubmit={onSubmit} className="mx-auto max-w-4xl space-y-6 p-8">
+      {mode === "edit" && (
+        <button
+          type="button"
+          onClick={() => router.history.back()}
+          className="mb-2 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          {t("common.back")}
+        </button>
+      )}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">
           {mode === "edit" ? t("campaignForm.editTitle") : t("campaignForm.newTitle")}
