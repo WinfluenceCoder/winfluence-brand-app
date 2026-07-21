@@ -280,6 +280,7 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
               onChange={(url) => form.setValue("brand_logo_url", url ?? "", { shouldDirty: true, shouldValidate: true })}
               hintKey="campaignForm.hints.brand_logo_url"
               error={fieldError("brand_logo_url")}
+              maxOutput={512}
             />
           </div>
           <div>
@@ -321,6 +322,7 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
               onChange={(url) => form.setValue("campaign_visual_url", url ?? "", { shouldDirty: true, shouldValidate: true })}
               hintKey="campaignForm.hints.campaign_visual_url"
               error={fieldError("campaign_visual_url")}
+              maxOutput={1024}
             />
           </div>
           <div>
