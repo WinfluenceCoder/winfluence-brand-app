@@ -240,6 +240,15 @@ function ProfilePage() {
 
   return (
     <div className="p-8 max-w-3xl">
+      <button
+        type="button"
+        onClick={() => router.history.back()}
+        className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <ChevronLeft className="h-4 w-4" />
+        {t("common.back")}
+      </button>
+
       <h1 className="text-2xl font-semibold tracking-tight">{t("profile.title")}</h1>
 
       <div className="mt-4 flex items-center gap-2">
