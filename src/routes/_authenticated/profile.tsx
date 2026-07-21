@@ -535,11 +535,17 @@ function ProfilePage() {
                   </Avatar>
                 )}
               </div>
-              <Label className="cursor-pointer inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+              <Button
+                type="button"
+                variant="link"
+                size="sm"
+                className="h-auto p-0 gap-1 text-xs font-medium text-primary"
+                onClick={() => setPhotoDialogOpen(true)}
+                disabled={uploadingPhoto}
+              >
                 <Upload className="h-3 w-3" />
                 {uploadingPhoto ? t("common.loading") : t("profile.uploadPhoto")}
-                <input type="file" accept="image/*" className="hidden" onChange={onPhotoChange} disabled={uploadingPhoto} />
-              </Label>
+              </Button>
             </div>
             <p className="text-sm text-muted-foreground mt-2">{t("profile.photoHint")}</p>
           </div>
