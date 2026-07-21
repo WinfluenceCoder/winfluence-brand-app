@@ -190,7 +190,7 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
         type: values.type,
         target_url: values.target_url || null,
         coupon: values.coupon || null,
-        apply_till: fromLocal(values.apply_till),
+        apply_till: fromLocal(values.apply_till ?? ""),
         barter_desc: values.barter_desc || null,
         barter_order_url: values.barter_order_url || null,
         barter_order_coupon: values.barter_order_coupon || null,
