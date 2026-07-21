@@ -20,6 +20,15 @@ export const Route = createFileRoute("/_authenticated/")({
   component: HomePage,
 });
 
+type CampaignRow = {
+  id: number;
+  title: string | null;
+  status: string | null;
+  start: string | null;
+  ende: string | null;
+  budget: number | null;
+};
+
 function useMyCampaigns() {
   return useSuspenseQuery({
     queryKey: ["home", "campaigns"],
@@ -28,13 +37,14 @@ function useMyCampaigns() {
         .from("brands")
         .select("id")
         .maybeSingle();
-      if (!brand) return [];
+      if (!brand) return [] as CampaignRow[];
       const { data, error } = await supabase
         .from("campaigns")
-        .select("id, name, status, start, ende, budget")
+        .select("id, title, status, start, ende, budget")
         .eq("brand_id", brand.id)
         .in("status", activeStatuses as unknown as string[])
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .returns<CampaignRow[]>();
       if (error) throw new Error(error.message);
       return data ?? [];
     },
@@ -135,7 +145,7 @@ function HomePage() {
           <TableBody>
             {data.map((row) => (
               <TableRow key={row.id}>
-                <TableCell className="font-medium">{row.name}</TableCell>
+                <TableCell className="font-medium">{row.title}</TableCell>
                 <TableCell>
                   <Badge variant={statusVariant(row.status)}>{statusLabel(t, row.status)}</Badge>
                 </TableCell>
