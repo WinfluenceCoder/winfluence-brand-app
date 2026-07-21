@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChevronLeft, Upload, User as UserIcon } from "lucide-react";
+import { PhotoCropDialog } from "@/components/app/PhotoCropDialog";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
@@ -134,23 +135,24 @@ function ProfilePage() {
   const mwstNr = brand?.mwst_nr ?? "";
   const status = brand?.status ?? "";
 
-  const onLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const [logoDialogOpen, setLogoDialogOpen] = useState(false);
+  const [photoDialogOpen, setPhotoDialogOpen] = useState(false);
+
+  const onLogoCropped = async (blob: Blob) => {
     setUploading(true);
     try {
       const { data: userData } = await supabase.auth.getUser();
       const uid = userData.user?.id;
       if (!uid) throw new Error("no-user");
-      const ext = file.name.split(".").pop() ?? "png";
-      const path = `${uid}/logo-${Date.now()}.${ext}`;
-      const { error } = await supabase.storage.from("brand-logos").upload(path, file, {
+      const path = `${uid}/logo-${Date.now()}.webp`;
+      const { error } = await supabase.storage.from("brand-logos").upload(path, blob, {
         upsert: true,
-        contentType: file.type,
+        contentType: "image/webp",
       });
       if (error) throw error;
       const { data: pub } = supabase.storage.from("brand-logos").getPublicUrl(path);
       setLogoUrl(pub.publicUrl);
+      setLogoDialogOpen(false);
     } catch (err) {
       toast.error(t("profile.saveError"));
       console.error(err);
@@ -159,23 +161,21 @@ function ProfilePage() {
     }
   };
 
-  const onPhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const onPhotoCropped = async (blob: Blob) => {
     setUploadingPhoto(true);
     try {
       const { data: userData } = await supabase.auth.getUser();
       const uid = userData.user?.id;
       if (!uid) throw new Error("no-user");
-      const ext = file.name.split(".").pop() ?? "png";
-      const path = `${uid}/photo-${Date.now()}.${ext}`;
-      const { error } = await supabase.storage.from("user_fotos").upload(path, file, {
+      const path = `${uid}/photo-${Date.now()}.webp`;
+      const { error } = await supabase.storage.from("user_fotos").upload(path, blob, {
         upsert: true,
-        contentType: file.type,
+        contentType: "image/webp",
       });
       if (error) throw error;
       const { data: pub } = supabase.storage.from("user_fotos").getPublicUrl(path);
       setPhotoUrl(pub.publicUrl);
+      setPhotoDialogOpen(false);
     } catch (err) {
       toast.error(t("profile.saveError"));
       console.error(err);
@@ -183,6 +183,7 @@ function ProfilePage() {
       setUploadingPhoto(false);
     }
   };
+
 
   const initials = `${brand?.first_name?.[0] ?? ""}${brand?.last_name?.[0] ?? ""}`.toUpperCase() || "?";
   const errors = form.formState.errors;
@@ -275,11 +276,17 @@ function ProfilePage() {
                   <UserIcon className="h-8 w-8 text-muted-foreground" />
                 )}
               </div>
-              <Label className="cursor-pointer inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+              <Button
+                type="button"
+                variant="link"
+                size="sm"
+                className="h-auto p-0 gap-1 text-xs font-medium text-primary"
+                onClick={() => setLogoDialogOpen(true)}
+                disabled={uploading}
+              >
                 <Upload className="h-3 w-3" />
                 {uploading ? t("common.loading") : t("profile.uploadLogo")}
-                <input type="file" accept="image/*" className="hidden" onChange={onLogoChange} disabled={uploading} />
-              </Label>
+              </Button>
               {logoError && <p className="text-xs text-destructive">{logoError}</p>}
             </div>
             <p className="text-sm text-muted-foreground mt-2">{t("profile.logoHint")}</p>
@@ -529,11 +536,17 @@ function ProfilePage() {
                   </Avatar>
                 )}
               </div>
-              <Label className="cursor-pointer inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+              <Button
+                type="button"
+                variant="link"
+                size="sm"
+                className="h-auto p-0 gap-1 text-xs font-medium text-primary"
+                onClick={() => setPhotoDialogOpen(true)}
+                disabled={uploadingPhoto}
+              >
                 <Upload className="h-3 w-3" />
                 {uploadingPhoto ? t("common.loading") : t("profile.uploadPhoto")}
-                <input type="file" accept="image/*" className="hidden" onChange={onPhotoChange} disabled={uploadingPhoto} />
-              </Label>
+              </Button>
             </div>
             <p className="text-sm text-muted-foreground mt-2">{t("profile.photoHint")}</p>
           </div>
@@ -571,6 +584,20 @@ function ProfilePage() {
           </span>
         </div>
       </form>
+      <PhotoCropDialog
+        open={logoDialogOpen}
+        onOpenChange={setLogoDialogOpen}
+        uploading={uploading}
+        onCropped={onLogoCropped}
+        maxOutput={512}
+      />
+      <PhotoCropDialog
+        open={photoDialogOpen}
+        onOpenChange={setPhotoDialogOpen}
+        uploading={uploadingPhoto}
+        onCropped={onPhotoCropped}
+        maxOutput={512}
+      />
     </div>
   );
 }

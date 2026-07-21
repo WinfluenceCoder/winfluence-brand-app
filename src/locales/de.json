@@ -10,6 +10,17 @@
     "close": "Schliessen",
     "back": "Zurück"
   },
+  "photoCrop": {
+    "title": "Bild zuschneiden",
+    "dropzone": "Bild hierhin ziehen oder klicken zum Auswählen",
+    "formats": "JPG, PNG oder WebP – max. 5 MB",
+    "zoom": "Zoom",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "invalidType": "Ungültiges Dateiformat. Erlaubt: JPG, PNG, WebP.",
+    "tooLarge": "Datei ist zu gross (max. 5 MB).",
+    "uploadError": "Bild konnte nicht verarbeitet werden."
+  },
   "validation": {
     "required": "Dieses Feld ist erforderlich.",
     "email": "Bitte gib eine gültige E-Mail-Adresse ein.",
