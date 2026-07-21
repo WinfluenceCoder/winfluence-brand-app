@@ -140,6 +140,7 @@ function HomePage() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-16"></TableHead>
                 <TableHead>{t("home.tableName")}</TableHead>
                 <TableHead>{t("home.tableStatus")}</TableHead>
                 <TableHead>{t("home.tableStart")}</TableHead>
@@ -156,6 +157,19 @@ function HomePage() {
                     router.navigate({ to: "/campaigns/$id/edit", params: { id: String(row.id) } })
                   }
                 >
+                  <TableCell>
+                    {row.campaign_visual_url ? (
+                      <img
+                        src={row.campaign_visual_url}
+                        alt=""
+                        className="h-12 w-12 rounded-md object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-12 w-12 items-center justify-center rounded-md bg-muted">
+                        <Megaphone className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                    )}
+                  </TableCell>
                   <TableCell className="font-medium">{row.title}</TableCell>
                   <TableCell>
                     <Badge variant={statusVariant(row.status)}>{statusLabel(t, row.status)}</Badge>
@@ -167,6 +181,7 @@ function HomePage() {
                   </TableCell>
                 </TableRow>
               ))}
+
 
             </TableBody>
           </Table>
