@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Card, CardContent } from "@/components/ui/card";
 import { Plus, Megaphone } from "lucide-react";
 
 const activeStatuses = ["draft", "published", "running", "expired", "ended"] as const;
