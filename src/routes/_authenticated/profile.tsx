@@ -228,6 +228,7 @@ function ProfilePage() {
         });
         toast.success(t("profile.saved"));
         await qc.invalidateQueries({ queryKey: ["my-brand"] });
+        navigate({ to: "/" });
       } catch (err) {
         console.error(err);
         toast.error(t("profile.saveError"));
