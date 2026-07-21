@@ -20,6 +20,15 @@ export const Route = createFileRoute("/_authenticated/")({
   component: HomePage,
 });
 
+type CampaignRow = {
+  id: number;
+  title: string | null;
+  status: string | null;
+  start: string | null;
+  ende: string | null;
+  budget: number | null;
+};
+
 function useMyCampaigns() {
   return useSuspenseQuery({
     queryKey: ["home", "campaigns"],
@@ -28,13 +37,14 @@ function useMyCampaigns() {
         .from("brands")
         .select("id")
         .maybeSingle();
-      if (!brand) return [];
+      if (!brand) return [] as CampaignRow[];
       const { data, error } = await supabase
         .from("campaigns")
         .select("id, title, status, start, ende, budget")
         .eq("brand_id", brand.id)
         .in("status", activeStatuses as unknown as string[])
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .returns<CampaignRow[]>();
       if (error) throw new Error(error.message);
       return data ?? [];
     },
