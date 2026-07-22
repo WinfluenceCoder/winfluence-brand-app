@@ -275,6 +275,7 @@ function ProfilePage() {
             domain: values.domain,
             insta_url: values.insta_url || null,
             brand_name: values.brand_name || null,
+            industry: values.industry,
             brand_pitch: values.brand_pitch || null,
             hashtags: values.hashtags || null,
             linkedin_url: values.linkedin_url || null,
