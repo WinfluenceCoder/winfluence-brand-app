@@ -73,6 +73,7 @@ function makeSchema(t: (k: string) => string) {
     domain: z.string().trim().min(1, t("validation.required")),
     insta_url: z.string().trim().optional().or(z.literal("")),
     brand_name: z.string().trim().optional().or(z.literal("")),
+    industry: z.enum(INDUSTRY_OPTIONS).nullable(),
     brand_pitch: z.string().trim().optional().or(z.literal("")),
     hashtags: z.string().trim().optional().or(z.literal("")),
     linkedin_url: urlOpt,
