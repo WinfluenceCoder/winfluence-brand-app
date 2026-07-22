@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { Plus, Megaphone } from "lucide-react";
 
 const activeStatuses = ["draft", "published", "running", "expired", "ended"] as const;
@@ -50,6 +51,20 @@ function useMyCampaigns() {
 
       if (error) throw new Error(error.message);
       return data ?? [];
+    },
+  });
+}
+
+function useProfileQuality() {
+  return useSuspenseQuery({
+    queryKey: ["home", "profileQuality"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("brands")
+        .select("profile_quality")
+        .maybeSingle<{ profile_quality: number | null }>();
+      if (error) throw new Error(error.message);
+      return data?.profile_quality ?? 1;
     },
   });
 }
