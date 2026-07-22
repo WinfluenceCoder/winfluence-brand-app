@@ -177,6 +177,7 @@
     "lastName": "Nachname",
     "jobTitle": "Job Title",
     "linkedin": "LinkedIn",
+    "openLink": "Link öffnen",
     "photo": "Foto",
     "uploadPhoto": "Foto hochladen",
     "photoHint": "PNG oder JPG, quadratisch empfohlen.",
