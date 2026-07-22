@@ -148,6 +148,10 @@
     "billingZip": "PLZ",
     "billingCity": "Ort",
     "brandName": "Brand Name",
+    "brand": {
+      "industry": "Branche",
+      "industryPlaceholder": "Branche auswählen"
+    },
     "brandPitch": "Elevator Pitch",
     "keywords": "Keywords",
     "brandLinkedin": "LinkedIn Profil",
