@@ -22,8 +22,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ChevronLeft, Upload, User as UserIcon } from "lucide-react";
+import { ChevronLeft, Upload, User as UserIcon, CheckCircle2 } from "lucide-react";
 import { PhotoCropDialog } from "@/components/app/PhotoCropDialog";
+import { Progress } from "@/components/ui/progress";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
