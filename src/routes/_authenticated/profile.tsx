@@ -216,6 +216,44 @@ function ProfilePage() {
     }
   };
 
+  const onBannerCropped = async (blob: Blob) => {
+    setUploadingBanner(true);
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      const uid = userData.user?.id;
+      if (!uid) throw new Error("no-user");
+      const path = `${uid}/banner-${Date.now()}.webp`;
+      const { error } = await supabase.storage.from("brand-banners").upload(path, blob, {
+        upsert: true,
+        contentType: "image/webp",
+      });
+      if (error) throw error;
+      const { data: pub } = supabase.storage.from("brand-banners").getPublicUrl(path);
+      setBannerUrl(pub.publicUrl);
+      setBannerDialogOpen(false);
+    } catch (err) {
+      toast.error(t("profile.saveError"));
+      console.error(err);
+    } finally {
+      setUploadingBanner(false);
+    }
+  };
+
+  const onBannerRemove = async () => {
+    if (!bannerUrl) return;
+    try {
+      const marker = "/brand-banners/";
+      const idx = bannerUrl.indexOf(marker);
+      if (idx >= 0) {
+        const path = bannerUrl.substring(idx + marker.length);
+        await supabase.storage.from("brand-banners").remove([path]);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+    setBannerUrl(null);
+  };
+
 
   const initials = `${brand?.first_name?.[0] ?? ""}${brand?.last_name?.[0] ?? ""}`.toUpperCase() || "?";
   const errors = form.formState.errors;
