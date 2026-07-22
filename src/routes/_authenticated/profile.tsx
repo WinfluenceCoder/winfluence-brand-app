@@ -130,6 +130,7 @@ function ProfilePage() {
       domain: brand?.domain ?? "",
       insta_url: brand?.insta_url ?? "",
       brand_name: brand?.brand_name ?? "",
+      industry: ((brand as { industry?: string | null } | null)?.industry ?? null) as Industry | null,
       brand_pitch: brand?.brand_pitch ?? "",
       hashtags: brand?.hashtags ?? "",
       linkedin_url: brand?.linkedin_url ?? "",
