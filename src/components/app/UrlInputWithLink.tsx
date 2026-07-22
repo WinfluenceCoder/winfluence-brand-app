@@ -8,7 +8,6 @@ export function UrlInputWithLink({ className, ...inputProps }: React.InputHTMLAt
   const { t } = useTranslation();
   const value = (inputProps.value as string | undefined) || "";
   const canOpen = !!value && /^https?:\/\//i.test(value);
-  console.log({ value, canOpen, inputProps });
 
   return (
     <div className="flex items-center gap-2">
