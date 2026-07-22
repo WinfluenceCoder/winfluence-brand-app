@@ -156,6 +156,11 @@ function ProfilePage() {
   const [uploading, setUploading] = useState(false);
   const [photoUrl, setPhotoUrl] = useState<string | null>(brand?.user_foto_url ?? null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [bannerUrl, setBannerUrl] = useState<string | null>(
+    (brand as { banner_url?: string | null } | null)?.banner_url ?? null,
+  );
+  const [uploadingBanner, setUploadingBanner] = useState(false);
+  const [bannerDialogOpen, setBannerDialogOpen] = useState(false);
 
   const email = brand?.e_mail_address ?? "";
   const legalName = brand?.legal_name ?? "";
@@ -211,6 +216,44 @@ function ProfilePage() {
     }
   };
 
+  const onBannerCropped = async (blob: Blob) => {
+    setUploadingBanner(true);
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      const uid = userData.user?.id;
+      if (!uid) throw new Error("no-user");
+      const path = `${uid}/banner-${Date.now()}.webp`;
+      const { error } = await supabase.storage.from("brand-banners").upload(path, blob, {
+        upsert: true,
+        contentType: "image/webp",
+      });
+      if (error) throw error;
+      const { data: pub } = supabase.storage.from("brand-banners").getPublicUrl(path);
+      setBannerUrl(pub.publicUrl);
+      setBannerDialogOpen(false);
+    } catch (err) {
+      toast.error(t("profile.saveError"));
+      console.error(err);
+    } finally {
+      setUploadingBanner(false);
+    }
+  };
+
+  const onBannerRemove = async () => {
+    if (!bannerUrl) return;
+    try {
+      const marker = "/brand-banners/";
+      const idx = bannerUrl.indexOf(marker);
+      if (idx >= 0) {
+        const path = bannerUrl.substring(idx + marker.length);
+        await supabase.storage.from("brand-banners").remove([path]);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+    setBannerUrl(null);
+  };
+
 
   const initials = `${brand?.first_name?.[0] ?? ""}${brand?.last_name?.[0] ?? ""}`.toUpperCase() || "?";
   const errors = form.formState.errors;
@@ -223,6 +266,7 @@ function ProfilePage() {
 
   const companyFields = [
     logoUrl,
+    bannerUrl,
     legalName,
     mwstNr,
     watched.domain,
@@ -299,6 +343,7 @@ function ProfilePage() {
             mobile: values.mobile || null,
             logo_url: logoUrl,
             user_foto_url: photoUrl,
+            banner_url: bannerUrl,
           },
         });
         toast.success(t("profile.saved"));
@@ -376,6 +421,43 @@ function ProfilePage() {
             </div>
             <p className="text-sm text-muted-foreground mt-2">{t("profile.logoHint")}</p>
           </div>
+
+          <div className="flex items-start gap-6">
+            <div className="flex flex-col items-center gap-2">
+              <div className="h-24 w-24 rounded-lg border bg-muted overflow-hidden flex items-center justify-center">
+                {bannerUrl ? (
+                  <img src={bannerUrl} alt="banner" className="h-full w-full object-cover" />
+                ) : (
+                  <UserIcon className="h-8 w-8 text-muted-foreground" />
+                )}
+              </div>
+              <Button
+                type="button"
+                variant="link"
+                size="sm"
+                className="h-auto p-0 gap-1 text-xs font-medium text-primary"
+                onClick={() => setBannerDialogOpen(true)}
+                disabled={uploadingBanner}
+              >
+                <Upload className="h-3 w-3" />
+                {uploadingBanner ? t("common.loading") : t("profile.uploadBanner")}
+              </Button>
+              {bannerUrl && (
+                <Button
+                  type="button"
+                  variant="link"
+                  size="sm"
+                  className="h-auto p-0 text-xs font-medium text-muted-foreground"
+                  onClick={onBannerRemove}
+                  disabled={uploadingBanner}
+                >
+                  {t("profile.removeBanner")}
+                </Button>
+              )}
+            </div>
+            <p className="text-sm text-muted-foreground mt-2">{t("profile.bannerHint")}</p>
+          </div>
+
 
           <div className="grid gap-2">
             <Label>{t("profile.legalName")}</Label>
@@ -714,6 +796,13 @@ function ProfilePage() {
         uploading={uploadingPhoto}
         onCropped={onPhotoCropped}
         maxOutput={512}
+      />
+      <PhotoCropDialog
+        open={bannerDialogOpen}
+        onOpenChange={setBannerDialogOpen}
+        uploading={uploadingBanner}
+        onCropped={onBannerCropped}
+        maxOutput={1024}
       />
     </div>
   );

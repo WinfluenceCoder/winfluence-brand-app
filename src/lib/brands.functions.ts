@@ -80,6 +80,7 @@ const updateSchema = z.object({
     .refine((v) => !v || chMobileRegex.test(v), { message: "mobileCH" }),
   logo_url: z.string().trim().max(1000).optional().nullable(),
   user_foto_url: z.string().trim().max(1000).optional().nullable(),
+  banner_url: z.string().trim().max(1000).optional().nullable(),
 });
 
 export type BrandUpdateInput = z.infer<typeof updateSchema>;
