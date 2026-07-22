@@ -493,6 +493,7 @@ function ProfilePage() {
               className={errors.insta_url ? invalidCls : ""}
               placeholder="@brand"
               {...form.register("insta_url")}
+              value={form.watch("insta_url")}
             />
             {errors.insta_url && <p className="text-xs text-destructive">{errors.insta_url.message}</p>}
           </div>
@@ -605,6 +606,7 @@ function ProfilePage() {
               className={errors.linkedin_url ? invalidCls : ""}
               placeholder="https://linkedin.com/company/…"
               {...form.register("linkedin_url")}
+              value={form.watch("linkedin_url")}
             />
             {errors.linkedin_url && (
               <p className="text-xs text-destructive">{errors.linkedin_url.message}</p>
@@ -621,6 +623,7 @@ function ProfilePage() {
               className={errors.youtube_url ? invalidCls : ""}
               placeholder="https://youtube.com/@…"
               {...form.register("youtube_url")}
+              value={form.watch("youtube_url")}
             />
             {errors.youtube_url && (
               <p className="text-xs text-destructive">{errors.youtube_url.message}</p>
@@ -637,6 +640,7 @@ function ProfilePage() {
               className={errors.tiktok_url ? invalidCls : ""}
               placeholder="https://tiktok.com/@…"
               {...form.register("tiktok_url")}
+              value={form.watch("tiktok_url")}
             />
             {errors.tiktok_url && (
               <p className="text-xs text-destructive">{errors.tiktok_url.message}</p>
@@ -719,6 +723,7 @@ function ProfilePage() {
               className={errors.user_linkedin_url ? invalidCls : ""}
               placeholder="https://linkedin.com/in/…"
               {...form.register("user_linkedin_url")}
+              value={form.watch("user_linkedin_url")}
             />
             {errors.user_linkedin_url && (
               <p className="text-xs text-destructive">{errors.user_linkedin_url.message}</p>
