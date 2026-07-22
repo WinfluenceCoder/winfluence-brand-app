@@ -8,7 +8,8 @@
     "yes": "Ja",
     "no": "Nein",
     "close": "Schliessen",
-    "back": "Zurück"
+    "back": "Zurück",
+    "noSelection": "Keine Angabe"
   },
   "photoCrop": {
     "title": "Bild zuschneiden",
@@ -147,6 +148,10 @@
     "billingZip": "PLZ",
     "billingCity": "Ort",
     "brandName": "Brand Name",
+    "brand": {
+      "industry": "Branche",
+      "industryPlaceholder": "Branche auswählen"
+    },
     "brandPitch": "Elevator Pitch",
     "keywords": "Keywords",
     "brandLinkedin": "LinkedIn Profil",
@@ -277,7 +282,29 @@
       "integer": "Bitte eine ganze Zahl ≥ 0 eingeben.",
       "endAfterStart": "Das Ende muss nach dem Start liegen.",
       "applyBeforeStart": "Die Bewerbungsfrist muss vor dem Start liegen."
-    }
+  },
+  "industry": {
+    "beauty_cosmetics": "Beauty & Kosmetik",
+    "fashion_accessories": "Mode & Accessoires",
+    "lifestyle": "Lifestyle",
+    "food_beverages": "Food & Getränke",
+    "fitness_health": "Fitness & Gesundheit",
+    "travel_tourism": "Reisen & Tourismus",
+    "gaming": "Gaming",
+    "tech_consumer_electronics": "Technologie & Consumer Electronics",
+    "entertainment": "Unterhaltung",
+    "finance": "Finanzen (Finfluencer)",
+    "automotive": "Automotive",
+    "home_interior": "Home & Interior",
+    "parenting_family": "Eltern & Familie",
+    "education_career": "Bildung & Karriere",
+    "sustainability": "Nachhaltigkeit",
+    "pets": "Haustiere",
+    "art_photography": "Kunst & Fotografie",
+    "luxury": "Luxus",
+    "real_estate": "Immobilien",
+    "b2b_business": "B2B & Business"
   }
+}
 }
 

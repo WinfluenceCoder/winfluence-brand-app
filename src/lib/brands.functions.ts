@@ -8,6 +8,31 @@ const updateSchema = z.object({
   domain: z.string().trim().min(1).max(255),
   insta_url: z.string().trim().max(255).optional().nullable(),
   brand_name: z.string().trim().max(255).optional().nullable(),
+  industry: z
+    .enum([
+      "beauty_cosmetics",
+      "fashion_accessories",
+      "lifestyle",
+      "food_beverages",
+      "fitness_health",
+      "travel_tourism",
+      "gaming",
+      "tech_consumer_electronics",
+      "entertainment",
+      "finance",
+      "automotive",
+      "home_interior",
+      "parenting_family",
+      "education_career",
+      "sustainability",
+      "pets",
+      "art_photography",
+      "luxury",
+      "real_estate",
+      "b2b_business",
+    ])
+    .nullable()
+    .optional(),
   brand_pitch: z.string().trim().max(2000).optional().nullable(),
   hashtags: z.string().trim().max(500).optional().nullable(),
   linkedin_url: z
@@ -96,7 +121,7 @@ export const updateMyBrand = createServerFn({ method: "POST" })
     };
     const { data: row, error } = await context.supabase
       .from("brands")
-      .update(patch)
+      .update(patch as never)
       .eq("user_id", context.userId)
       .select("*")
       .single();

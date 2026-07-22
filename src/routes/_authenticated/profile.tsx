@@ -1,7 +1,7 @@
 import { createFileRoute, useRouter, useNavigate } from "@tanstack/react-router";
 import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
@@ -32,6 +32,30 @@ export const Route = createFileRoute("/_authenticated/profile")({
 
 const chMobileRegex = /^(?:\+41\s?|0)(?:\d{2})\s?\d{3}\s?\d{2}\s?\d{2}$/;
 
+const INDUSTRY_OPTIONS = [
+  "beauty_cosmetics",
+  "fashion_accessories",
+  "lifestyle",
+  "food_beverages",
+  "fitness_health",
+  "travel_tourism",
+  "gaming",
+  "tech_consumer_electronics",
+  "entertainment",
+  "finance",
+  "automotive",
+  "home_interior",
+  "parenting_family",
+  "education_career",
+  "sustainability",
+  "pets",
+  "art_photography",
+  "luxury",
+  "real_estate",
+  "b2b_business",
+] as const;
+type Industry = (typeof INDUSTRY_OPTIONS)[number];
+
 function makeSchema(t: (k: string) => string) {
   const urlOpt = z
     .string()
@@ -49,6 +73,7 @@ function makeSchema(t: (k: string) => string) {
     domain: z.string().trim().min(1, t("validation.required")),
     insta_url: z.string().trim().optional().or(z.literal("")),
     brand_name: z.string().trim().optional().or(z.literal("")),
+    industry: z.enum(INDUSTRY_OPTIONS).nullable(),
     brand_pitch: z.string().trim().optional().or(z.literal("")),
     hashtags: z.string().trim().optional().or(z.literal("")),
     linkedin_url: urlOpt,
@@ -105,6 +130,7 @@ function ProfilePage() {
       domain: brand?.domain ?? "",
       insta_url: brand?.insta_url ?? "",
       brand_name: brand?.brand_name ?? "",
+      industry: ((brand as { industry?: string | null } | null)?.industry ?? null) as Industry | null,
       brand_pitch: brand?.brand_pitch ?? "",
       hashtags: brand?.hashtags ?? "",
       linkedin_url: brand?.linkedin_url ?? "",
@@ -249,6 +275,7 @@ function ProfilePage() {
             domain: values.domain,
             insta_url: values.insta_url || null,
             brand_name: values.brand_name || null,
+            industry: values.industry,
             brand_pitch: values.brand_pitch || null,
             hashtags: values.hashtags || null,
             linkedin_url: values.linkedin_url || null,
@@ -446,6 +473,32 @@ function ProfilePage() {
           <div className="grid gap-2">
             <Label htmlFor="brand_name">{t("profile.brandName")}</Label>
             <Input id="brand_name" {...form.register("brand_name")} />
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="industry">{t("profile.brand.industry")}</Label>
+            <Controller
+              control={form.control}
+              name="industry"
+              render={({ field }) => (
+                <Select
+                  value={field.value ?? "none"}
+                  onValueChange={(v) => field.onChange(v === "none" ? null : v)}
+                >
+                  <SelectTrigger id="industry">
+                    <SelectValue placeholder={t("profile.brand.industryPlaceholder")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">{t("common.noSelection")}</SelectItem>
+                    {INDUSTRY_OPTIONS.map((slug) => (
+                      <SelectItem key={slug} value={slug}>
+                        {t(`industry.${slug}`)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
           </div>
 
           <div className="grid gap-2">
