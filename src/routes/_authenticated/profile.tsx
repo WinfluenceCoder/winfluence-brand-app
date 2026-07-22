@@ -22,8 +22,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ChevronLeft, Upload, User as UserIcon } from "lucide-react";
+import { ChevronLeft, Upload, User as UserIcon, CheckCircle2 } from "lucide-react";
 import { PhotoCropDialog } from "@/components/app/PhotoCropDialog";
+import { Progress } from "@/components/ui/progress";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
@@ -190,6 +191,51 @@ function ProfilePage() {
   const invalidCls = "border-destructive focus-visible:ring-destructive";
   const [logoError, setLogoError] = useState<string | null>(null);
 
+  const watched = form.watch();
+  const filled = (v: unknown) =>
+    v !== null && v !== undefined && !(typeof v === "string" && v.trim() === "");
+
+  const companyFields = [
+    logoUrl,
+    legalName,
+    mwstNr,
+    watched.domain,
+    watched.insta_url,
+    watched.billing_address_to,
+    watched.billing_address_street,
+    watched.billing_address_nr,
+    watched.billing_address_zip,
+    watched.billing_address_city,
+  ];
+  const brandFields = [
+    watched.brand_name,
+    watched.brand_pitch,
+    watched.hashtags,
+    watched.linkedin_url,
+    watched.youtube_url,
+    watched.tiktok_url,
+  ];
+  const contactFields = [
+    watched.first_name,
+    watched.last_name,
+    watched.job_title,
+    watched.user_linkedin_url,
+    watched.gender,
+    watched.mobile,
+    photoUrl,
+  ];
+  const companyComplete = companyFields.every(filled);
+  const brandComplete = brandFields.every(filled);
+  const contactComplete = contactFields.every(filled);
+
+  const allFields = [...companyFields, ...brandFields, ...contactFields];
+  const filledCount = allFields.filter(filled).length;
+  const completeness = Math.min(
+    100,
+    Math.max(1, Math.round((filledCount / allFields.length) * 100)),
+  );
+
+
   const onSubmitWrapped = form.handleSubmit(
     async (values) => {
       if (!logoUrl) {
@@ -253,6 +299,14 @@ function ProfilePage() {
 
       <h1 className="text-2xl font-semibold tracking-tight">{t("profile.title")}</h1>
 
+      <div className="mt-4 flex w-full items-center gap-4">
+        <span className="text-sm font-medium whitespace-nowrap">
+          {t("profile.completeness")}
+        </span>
+        <Progress value={completeness} className="flex-1" />
+        <span className="text-sm tabular-nums w-12 text-right">{completeness} %</span>
+      </div>
+
       <div className="mt-4 flex items-center gap-2">
         <span className="text-sm text-muted-foreground">{t("profile.status")}:</span>
         <Badge variant="secondary">{status || "—"}</Badge>
@@ -261,7 +315,10 @@ function ProfilePage() {
       <form onSubmit={onSubmitWrapped} className="mt-8 space-y-10" noValidate>
         {/* Meine Firma */}
         <section className="space-y-6">
-          <h2 className="text-lg font-semibold border-b pb-2">{t("profile.companySection")}</h2>
+          <h2 className="text-lg font-semibold border-b pb-2 flex items-center gap-2">
+            <span>{t("profile.companySection")}</span>
+            {companyComplete && <CheckCircle2 className="h-5 w-5 text-green-600" />}
+          </h2>
 
           <div className="flex items-start gap-6">
             <div className="flex flex-col items-center gap-2">
@@ -381,7 +438,10 @@ function ProfilePage() {
 
         {/* Meine Brand */}
         <section className="space-y-6">
-          <h2 className="text-lg font-semibold border-b pb-2">{t("profile.brandSection")}</h2>
+          <h2 className="text-lg font-semibold border-b pb-2 flex items-center gap-2">
+            <span>{t("profile.brandSection")}</span>
+            {brandComplete && <CheckCircle2 className="h-5 w-5 text-green-600" />}
+          </h2>
 
           <div className="grid gap-2">
             <Label htmlFor="brand_name">{t("profile.brandName")}</Label>
@@ -449,7 +509,10 @@ function ProfilePage() {
 
         {/* Ansprechperson */}
         <section className="space-y-6">
-          <h2 className="text-lg font-semibold border-b pb-2">{t("profile.contactSection")}</h2>
+          <h2 className="text-lg font-semibold border-b pb-2 flex items-center gap-2">
+            <span>{t("profile.contactSection")}</span>
+            {contactComplete && <CheckCircle2 className="h-5 w-5 text-green-600" />}
+          </h2>
 
           <div className="grid gap-2">
             <Label className={errors.gender ? "text-destructive" : ""}>{t("profile.gender")}</Label>
