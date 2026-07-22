@@ -103,9 +103,11 @@ export const updateMyBrand = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
 
     let colCount = Object.keys(row ?? {}).length;
-    const { data: rpcCount, error: rpcError } = await context.supabase.rpc(
-      "get_brands_column_count",
-    );
+    const { data: rpcCount, error: rpcError } = await (
+      context.supabase.rpc as unknown as (
+        fn: string,
+      ) => Promise<{ data: number | null; error: { message: string } | null }>
+    )("get_brands_column_count");
     if (!rpcError && typeof rpcCount === "number" && rpcCount > 0) {
       colCount = rpcCount;
     }
@@ -114,7 +116,7 @@ export const updateMyBrand = createServerFn({ method: "POST" })
 
     const { data: updated, error: qErr } = await context.supabase
       .from("brands")
-      .update({ profile_quality: quality })
+      .update({ profile_quality: quality } as never)
       .eq("user_id", context.userId)
       .select("*")
       .single();
