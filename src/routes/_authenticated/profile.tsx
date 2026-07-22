@@ -343,6 +343,7 @@ function ProfilePage() {
             mobile: values.mobile || null,
             logo_url: logoUrl,
             user_foto_url: photoUrl,
+            banner_url: bannerUrl,
           },
         });
         toast.success(t("profile.saved"));
