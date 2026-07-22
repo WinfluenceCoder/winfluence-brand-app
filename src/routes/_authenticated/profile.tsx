@@ -487,7 +487,7 @@ function ProfilePage() {
             <Label htmlFor="insta_url" className={errors.insta_url ? "text-destructive" : ""}>
               {t("profile.instaHandle")}
             </Label>
-            <Input
+            <UrlInputWithLink
               id="insta_url"
               aria-invalid={!!errors.insta_url}
               className={errors.insta_url ? invalidCls : ""}
@@ -599,7 +599,7 @@ function ProfilePage() {
             <Label htmlFor="linkedin_url" className={errors.linkedin_url ? "text-destructive" : ""}>
               {t("profile.brandLinkedin")}
             </Label>
-            <Input
+            <UrlInputWithLink
               id="linkedin_url"
               aria-invalid={!!errors.linkedin_url}
               className={errors.linkedin_url ? invalidCls : ""}
@@ -615,7 +615,7 @@ function ProfilePage() {
             <Label htmlFor="youtube_url" className={errors.youtube_url ? "text-destructive" : ""}>
               {t("profile.brandYoutube")}
             </Label>
-            <Input
+            <UrlInputWithLink
               id="youtube_url"
               aria-invalid={!!errors.youtube_url}
               className={errors.youtube_url ? invalidCls : ""}
@@ -631,7 +631,7 @@ function ProfilePage() {
             <Label htmlFor="tiktok_url" className={errors.tiktok_url ? "text-destructive" : ""}>
               {t("profile.brandTiktok")}
             </Label>
-            <Input
+            <UrlInputWithLink
               id="tiktok_url"
               aria-invalid={!!errors.tiktok_url}
               className={errors.tiktok_url ? invalidCls : ""}
@@ -713,7 +713,7 @@ function ProfilePage() {
             <Label htmlFor="user_linkedin_url" className={errors.user_linkedin_url ? "text-destructive" : ""}>
               {t("profile.linkedin")}
             </Label>
-            <Input
+            <UrlInputWithLink
               id="user_linkedin_url"
               aria-invalid={!!errors.user_linkedin_url}
               className={errors.user_linkedin_url ? invalidCls : ""}
