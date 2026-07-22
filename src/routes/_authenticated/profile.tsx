@@ -299,6 +299,14 @@ function ProfilePage() {
 
       <h1 className="text-2xl font-semibold tracking-tight">{t("profile.title")}</h1>
 
+      <div className="mt-4 flex w-full items-center gap-4">
+        <span className="text-sm font-medium whitespace-nowrap">
+          {t("profile.completeness")}
+        </span>
+        <Progress value={completeness} className="flex-1" />
+        <span className="text-sm tabular-nums w-12 text-right">{completeness} %</span>
+      </div>
+
       <div className="mt-4 flex items-center gap-2">
         <span className="text-sm text-muted-foreground">{t("profile.status")}:</span>
         <Badge variant="secondary">{status || "—"}</Badge>
@@ -307,7 +315,10 @@ function ProfilePage() {
       <form onSubmit={onSubmitWrapped} className="mt-8 space-y-10" noValidate>
         {/* Meine Firma */}
         <section className="space-y-6">
-          <h2 className="text-lg font-semibold border-b pb-2">{t("profile.companySection")}</h2>
+          <h2 className="text-lg font-semibold border-b pb-2 flex items-center gap-2">
+            <span>{t("profile.companySection")}</span>
+            {companyComplete && <CheckCircle2 className="h-5 w-5 text-green-600" />}
+          </h2>
 
           <div className="flex items-start gap-6">
             <div className="flex flex-col items-center gap-2">
