@@ -121,7 +121,7 @@ export const updateMyBrand = createServerFn({ method: "POST" })
     };
     const { data: row, error } = await context.supabase
       .from("brands")
-      .update(patch)
+      .update(patch as never)
       .eq("user_id", context.userId)
       .select("*")
       .single();
