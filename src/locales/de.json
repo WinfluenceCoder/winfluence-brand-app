@@ -8,7 +8,8 @@
     "yes": "Ja",
     "no": "Nein",
     "close": "Schliessen",
-    "back": "Zurück"
+    "back": "Zurück",
+    "noSelection": "Keine Angabe"
   },
   "photoCrop": {
     "title": "Bild zuschneiden",
