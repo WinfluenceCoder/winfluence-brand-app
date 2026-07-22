@@ -117,6 +117,9 @@
   },
   "home": {
     "title": "Mein Dashboard",
+    "welcome": "Willkommen bei Winfluence! Vervollständige dein Brand-Profil, damit Influencer dich besser einschätzen können.",
+    "profileLabel": "Mein Profil:",
+    "completeProfile": "Profil vervollständigen",
     "campaignsTitle": "Meine Kampagnen",
     "newCampaign": "Neue Kampagne",
     "emptyTitle": "Erstelle deine erste Kampagne",
