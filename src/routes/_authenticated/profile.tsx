@@ -235,6 +235,7 @@ function ProfilePage() {
   ];
   const brandFields = [
     watched.brand_name,
+    watched.industry,
     watched.brand_pitch,
     watched.hashtags,
     watched.linkedin_url,
