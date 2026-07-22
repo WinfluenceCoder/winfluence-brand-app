@@ -509,7 +509,10 @@ function ProfilePage() {
 
         {/* Ansprechperson */}
         <section className="space-y-6">
-          <h2 className="text-lg font-semibold border-b pb-2">{t("profile.contactSection")}</h2>
+          <h2 className="text-lg font-semibold border-b pb-2 flex items-center gap-2">
+            <span>{t("profile.contactSection")}</span>
+            {contactComplete && <CheckCircle2 className="h-5 w-5 text-green-600" />}
+          </h2>
 
           <div className="grid gap-2">
             <Label className={errors.gender ? "text-destructive" : ""}>{t("profile.gender")}</Label>
