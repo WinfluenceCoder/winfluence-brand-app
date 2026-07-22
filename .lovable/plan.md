@@ -1,30 +1,55 @@
 ## Ziel
-Auf `/profile` die Profil-Vollständigkeit anzeigen und pro Abschnitt visuell markieren, ob alle Felder ausgefüllt sind.
+Neues optionales Feld „Branche“ (`brands.industry`, Postgres-Enum, nullable) in `/profile` unter „Meine Brand“ direkt unter „Brand Name“.
 
-## Änderungen in `src/routes/_authenticated/profile.tsx`
+## Änderungen
 
-### 1) Fortschrittsbalken zwischen „Mein Profil" und „Status"
-Neuen Block direkt nach `<h1>` und vor dem Status-Badge einfügen:
-- Label „Vollständigkeit"
-- `<Progress>` (bereits im Projekt) mit `value = clamp(brand?.profile_quality ?? 1, 1, 100)`, `flex-1`
-- Prozent-Text (`{v} %`), tabular-nums
-- Layout: `flex items-center gap-4 w-full mt-4`
-- Wert wird live aus `form.watch()` + `logoUrl`/`photoUrl` neu berechnet, damit sich der Balken beim Ausfüllen aktualisiert (Formel wie in `computeProfileQuality`: nicht-leere Felder / Gesamtzahl aller getrackten Felder × 100, gerundet, clamp 1..100). Als Nenner wird die Anzahl der im Formular getrackten Felder verwendet (stabile Client-Näherung); nach dem Speichern zeigt das Dashboard weiterhin den serverseitig berechneten Wert.
+### 1. `src/locales/de.json`
+- Neuer Block `"industry"` mit allen 20 Slugs (Reihenfolge wie in Vorgabe).
+- Neue Keys:
+  - `profile.brand.industry` → „Branche“
+  - `profile.brand.industryPlaceholder` → „Branche auswählen“
+  - `common.noSelection` → „Keine Angabe“ (falls noch nicht vorhanden)
 
-### 2) Grünes Check-Icon pro Abschnitts-Titel
-Pro Abschnitt eine „complete"-Bedingung (alle Pflicht- + Profilfelder des Abschnitts nicht leer). `<h2>` wird zu Flex-Container; wenn `complete === true`, wird rechts neben dem Titel ein grünes `<CheckCircle2 />` (lucide-react, `text-green-600`, `h-5 w-5`) gerendert.
+### 2. Zod-Schema (in `src/routes/_authenticated/profile.tsx`)
+Feld `industry: z.enum([...20 Slugs in fixer Reihenfolge]).nullable()` ergänzen. Konstante `INDUSTRY_OPTIONS: readonly string[]` einmalig oben in der Datei definieren und sowohl im Schema als auch im Rendern verwenden (keine alphabetische Sortierung).
 
-Abschnitts-Definitionen:
-- **Meine Firma** (`companySection`): `logoUrl`, `legal_name` (readonly, aus brand), `mwst_nr` (readonly), `domain`, `insta_url`, `billing_address_to`, `billing_address_street`, `billing_address_nr`, `billing_address_zip`, `billing_address_city`.
-- **Meine Brand** (`brandSection`): `brand_name`, `brand_pitch`, `hashtags`, `linkedin_url`, `youtube_url`, `tiktok_url`.
-- **Ansprechperson** (`contactSection`): `first_name`, `last_name`, `job_title`, `user_linkedin_url`, `gender`, `mobile`, `photoUrl`.
+### 3. Formular-Rendering
+Direkt nach dem `brand_name`-Block (Zeile 449) einen neuen Block einfügen. Da die Sektion aktuell `Label` + `form.register` verwendet (kein FormField-Wrapper), wird Radix Select via `Controller` aus `react-hook-form` eingebunden — im gleichen `grid gap-2`-Layout wie die Nachbarfelder:
 
-Die Werte kommen live aus `form.watch()` bzw. den lokalen States `logoUrl`/`photoUrl` sowie den readonly-Brand-Feldern. „Ausgefüllt" = nicht `null`/`undefined` und nach `trim()` nicht leer.
+```tsx
+<div className="grid gap-2">
+  <Label htmlFor="industry">{t("profile.brand.industry")}</Label>
+  <Controller
+    control={form.control}
+    name="industry"
+    render={({ field }) => (
+      <Select
+        value={field.value ?? "none"}
+        onValueChange={(v) => field.onChange(v === "none" ? null : v)}
+      >
+        <SelectTrigger id="industry">
+          <SelectValue placeholder={t("profile.brand.industryPlaceholder")} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="none">{t("common.noSelection")}</SelectItem>
+          {INDUSTRY_OPTIONS.map((slug) => (
+            <SelectItem key={slug} value={slug}>{t(`industry.${slug}`)}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    )}
+  />
+</div>
+```
 
-### 3) i18n
-Neuer Key `profile.completeness` = „Vollständigkeit" in `src/locales/de.json`.
+Imports ergänzen: `Controller` aus `react-hook-form`, `Select*` aus `@/components/ui/select` (falls noch nicht importiert).
 
-## Technische Notizen
-- Keine Backend-Änderungen, keine Schema-Änderungen.
-- `Progress` und `CheckCircle2` sind bereits verfügbar (`@/components/ui/progress`, `lucide-react`).
-- Reine Präsentations-/Frontend-Änderung.
+### 4. Laden & Speichern
+- `defaultValues` / Form-Reset erhält `industry: brand.industry ?? null` aus dem bestehenden Load-Flow.
+- Beim Submit wird `values.industry` (bereits `string | null`) unverändert in das Update-Objekt für den bestehenden `updateMyBrand`-Mutationsflow übernommen.
+- Sentinel `'none'` erscheint nie im Persist-Pfad (im `onValueChange` bereits zu `null` konvertiert).
+
+## Nicht-Ziele
+- Keine Datenbank-/Schema-Änderungen.
+- Kein Lovable Cloud, kein `supabase--enable`.
+- Keine Änderung an der Vollständigkeits-Berechnung/Green-Check-Logik der Brand-Sektion (Feld bleibt optional und beeinflusst `brandComplete` nicht).
