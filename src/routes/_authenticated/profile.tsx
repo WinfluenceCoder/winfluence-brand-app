@@ -797,6 +797,13 @@ function ProfilePage() {
         onCropped={onPhotoCropped}
         maxOutput={512}
       />
+      <PhotoCropDialog
+        open={bannerDialogOpen}
+        onOpenChange={setBannerDialogOpen}
+        uploading={uploadingBanner}
+        onCropped={onBannerCropped}
+        maxOutput={1024}
+      />
     </div>
   );
 }
