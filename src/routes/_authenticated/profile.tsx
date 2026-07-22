@@ -476,6 +476,32 @@ function ProfilePage() {
           </div>
 
           <div className="grid gap-2">
+            <Label htmlFor="industry">{t("profile.brand.industry")}</Label>
+            <Controller
+              control={form.control}
+              name="industry"
+              render={({ field }) => (
+                <Select
+                  value={field.value ?? "none"}
+                  onValueChange={(v) => field.onChange(v === "none" ? null : v)}
+                >
+                  <SelectTrigger id="industry">
+                    <SelectValue placeholder={t("profile.brand.industryPlaceholder")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">{t("common.noSelection")}</SelectItem>
+                    {INDUSTRY_OPTIONS.map((slug) => (
+                      <SelectItem key={slug} value={slug}>
+                        {t(`industry.${slug}`)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
+
+          <div className="grid gap-2">
             <Label htmlFor="brand_pitch">{t("profile.brandPitch")}</Label>
             <Textarea id="brand_pitch" rows={4} {...form.register("brand_pitch")} />
           </div>
