@@ -422,6 +422,43 @@ function ProfilePage() {
             <p className="text-sm text-muted-foreground mt-2">{t("profile.logoHint")}</p>
           </div>
 
+          <div className="flex items-start gap-6">
+            <div className="flex flex-col items-center gap-2">
+              <div className="h-24 w-24 rounded-lg border bg-muted overflow-hidden flex items-center justify-center">
+                {bannerUrl ? (
+                  <img src={bannerUrl} alt="banner" className="h-full w-full object-cover" />
+                ) : (
+                  <UserIcon className="h-8 w-8 text-muted-foreground" />
+                )}
+              </div>
+              <Button
+                type="button"
+                variant="link"
+                size="sm"
+                className="h-auto p-0 gap-1 text-xs font-medium text-primary"
+                onClick={() => setBannerDialogOpen(true)}
+                disabled={uploadingBanner}
+              >
+                <Upload className="h-3 w-3" />
+                {uploadingBanner ? t("common.loading") : t("profile.uploadBanner")}
+              </Button>
+              {bannerUrl && (
+                <Button
+                  type="button"
+                  variant="link"
+                  size="sm"
+                  className="h-auto p-0 text-xs font-medium text-muted-foreground"
+                  onClick={onBannerRemove}
+                  disabled={uploadingBanner}
+                >
+                  {t("profile.removeBanner")}
+                </Button>
+              )}
+            </div>
+            <p className="text-sm text-muted-foreground mt-2">{t("profile.bannerHint")}</p>
+          </div>
+
+
           <div className="grid gap-2">
             <Label>{t("profile.legalName")}</Label>
             <Input value={legalName} disabled title={t("profile.readonlyHint")} />
