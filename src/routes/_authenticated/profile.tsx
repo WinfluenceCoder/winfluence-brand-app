@@ -24,6 +24,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChevronLeft, Upload, User as UserIcon, CheckCircle2 } from "lucide-react";
 import { PhotoCropDialog } from "@/components/app/PhotoCropDialog";
+import { UrlInputWithLink } from "@/components/app/UrlInputWithLink";
 import { Progress } from "@/components/ui/progress";
 
 export const Route = createFileRoute("/_authenticated/profile")({
@@ -486,12 +487,13 @@ function ProfilePage() {
             <Label htmlFor="insta_url" className={errors.insta_url ? "text-destructive" : ""}>
               {t("profile.instaHandle")}
             </Label>
-            <Input
+            <UrlInputWithLink
               id="insta_url"
               aria-invalid={!!errors.insta_url}
               className={errors.insta_url ? invalidCls : ""}
               placeholder="@brand"
               {...form.register("insta_url")}
+              value={form.watch("insta_url")}
             />
             {errors.insta_url && <p className="text-xs text-destructive">{errors.insta_url.message}</p>}
           </div>
@@ -598,12 +600,13 @@ function ProfilePage() {
             <Label htmlFor="linkedin_url" className={errors.linkedin_url ? "text-destructive" : ""}>
               {t("profile.brandLinkedin")}
             </Label>
-            <Input
+            <UrlInputWithLink
               id="linkedin_url"
               aria-invalid={!!errors.linkedin_url}
               className={errors.linkedin_url ? invalidCls : ""}
               placeholder="https://linkedin.com/company/…"
               {...form.register("linkedin_url")}
+              value={form.watch("linkedin_url")}
             />
             {errors.linkedin_url && (
               <p className="text-xs text-destructive">{errors.linkedin_url.message}</p>
@@ -614,12 +617,13 @@ function ProfilePage() {
             <Label htmlFor="youtube_url" className={errors.youtube_url ? "text-destructive" : ""}>
               {t("profile.brandYoutube")}
             </Label>
-            <Input
+            <UrlInputWithLink
               id="youtube_url"
               aria-invalid={!!errors.youtube_url}
               className={errors.youtube_url ? invalidCls : ""}
               placeholder="https://youtube.com/@…"
               {...form.register("youtube_url")}
+              value={form.watch("youtube_url")}
             />
             {errors.youtube_url && (
               <p className="text-xs text-destructive">{errors.youtube_url.message}</p>
@@ -630,12 +634,13 @@ function ProfilePage() {
             <Label htmlFor="tiktok_url" className={errors.tiktok_url ? "text-destructive" : ""}>
               {t("profile.brandTiktok")}
             </Label>
-            <Input
+            <UrlInputWithLink
               id="tiktok_url"
               aria-invalid={!!errors.tiktok_url}
               className={errors.tiktok_url ? invalidCls : ""}
               placeholder="https://tiktok.com/@…"
               {...form.register("tiktok_url")}
+              value={form.watch("tiktok_url")}
             />
             {errors.tiktok_url && (
               <p className="text-xs text-destructive">{errors.tiktok_url.message}</p>
@@ -712,12 +717,13 @@ function ProfilePage() {
             <Label htmlFor="user_linkedin_url" className={errors.user_linkedin_url ? "text-destructive" : ""}>
               {t("profile.linkedin")}
             </Label>
-            <Input
+            <UrlInputWithLink
               id="user_linkedin_url"
               aria-invalid={!!errors.user_linkedin_url}
               className={errors.user_linkedin_url ? invalidCls : ""}
               placeholder="https://linkedin.com/in/…"
               {...form.register("user_linkedin_url")}
+              value={form.watch("user_linkedin_url")}
             />
             {errors.user_linkedin_url && (
               <p className="text-xs text-destructive">{errors.user_linkedin_url.message}</p>

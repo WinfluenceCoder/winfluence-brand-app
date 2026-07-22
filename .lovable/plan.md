@@ -1,29 +1,36 @@
-## Banner-Upload im Profil ("Meine Firma")
+Ziel: In `/profile` wird rechts neben jedem URL-Feld ein "Link out"-Icon angezeigt. Bei Klick öffnet sich die eingegebene URL in einem neuen Tab/Fenster. Das Icon ist disabled, wenn das Feld leer ist oder keine gültige URL (beginnend mit `http://` oder `https://`) enthält.
 
-Neues optionales Banner-Feld direkt unterhalb des Logo-Feldes, analog zum Logo-Flow, mit 1024×1024-Crop, Upload in den bestehenden Bucket `brand-banners` und Persistenz in `brands.banner_url`. Keine Schema-Änderungen, kein Cloud-Aktivieren.
+Betroffene Felder:
+- `linkedin_url`
+- `insta_url`
+- `youtube_url`
+- `tiktok_url`
+- `user_linkedin_url`
 
-### 1. `src/lib/brands.functions.ts`
-- Zod-Schema `updateSchema` um `banner_url: z.string().trim().max(1000).optional().nullable()` erweitern.
-- Feld im `patch`-Update mit übergeben (fällt bereits über `...rest` durch, sobald es im Schema steht).
+Änderungen:
 
-### 2. `src/routes/_authenticated/profile.tsx`
-- Neuer State `bannerUrl` (initial `brand?.banner_url ?? null`), `uploadingBanner`, `bannerDialogOpen`.
-- Handler `onBannerCropped(blob)`: Upload nach `brand-banners/{uid}/banner-{ts}.webp` (upsert, content-type `image/webp`), Public URL setzen, Dialog schließen. Fehlerbehandlung analog zu Logo.
-- Handler `onBannerRemove()`: aus URL den Pfad ableiten (Segment nach `/brand-banners/`), `supabase.storage.from("brand-banners").remove([path])` aufrufen (Fehler nur loggen), `bannerUrl` auf `null` setzen.
-- UI direkt unter dem Logo-Block: gleiche Struktur wie Logo (Vorschau-Kachel im 16:9- oder Banner-typischen Rahmen, Upload-Link "Banner hochladen", Hint-Text). Zusätzlich sichtbarer "Entfernen"-Link, wenn `bannerUrl` gesetzt.
-- `PhotoCropDialog` mit `aspect={1}`, `maxOutput={1024}`, `open={bannerDialogOpen}`, `onCropped={onBannerCropped}`.
-- Kein Pflichtfeld: keine Validierungsfehler, kein `setBannerError`.
-- `companyFields`-Array um `bannerUrl` erweitern, sodass Sektion "Meine Firma" nur bei gesetztem Banner als vollständig gilt und in `completeness` einfließt.
-- Im `onSubmitWrapped` das Feld `banner_url: bannerUrl` an `saveBrand({ data: ... })` mitgeben.
-- Falls die generierten Supabase-Typen `banner_url` noch nicht kennen, gleicher Cast-Ansatz wie bei `industry` (`as { banner_url?: string | null } | null` beim Lesen).
+1. **Neue Hilfskomponente `UrlInputWithLink`** in `src/components/app/UrlInputWithLink.tsx`:
+   - Props: `id`, `value`, `error`, `placeholder`, `registration` (oder `field`-Props für react-hook-form), `aria-invalid`, `className`.
+   - Rendert ein `Input` plus einen `Button` (Icon-Button) mit `variant="ghost"` und `size="icon"` direkt rechts daneben im selben flex-Container.
+   - Icon: `ExternalLink` aus `lucide-react`.
+   - OnClick: `window.open(value, "_blank", "noopener,noreferrer")`.
+   - Disabled-Zustand: `disabled={!value || !/^https?:\/\//i.test(value)}`.
+   - Barrierefreiheit: `aria-label="Link öffnen"`, `type="button"`, damit das Formular nicht abgeschickt wird.
 
-### 3. `src/locales/de.json`
-- Neue Keys unter `profile`:
-  - `banner`: "Banner"
-  - `uploadBanner`: "Banner hochladen"
-  - `bannerHint`: Hinweis-Text (Empfehlung 1024×1024, optional).
-  - `removeBanner`: "Banner entfernen"
+2. **Integration in `src/routes/_authenticated/profile.tsx`**:
+   - Import von `UrlInputWithLink` hinzufügen.
+   - Die fünf URL-Eingabefelder (`linkedin_url`, `insta_url`, `youtube_url`, `tiktok_url`, `user_linkedin_url`) ersetzen durch die neue Komponente.
+   - Fehler- und Label-Darstellung bleibt unverändert; das Icon-Button-Layout wird innerhalb der bestehenden `grid gap-2`-Wrapper eingebettet.
+   - Für `insta_url`: Da das Feld derzeit `@brand` als Placeholder hat und schemalose URL-Validierung besitzt, wird das Icon weiterhin nur bei einer vollständigen `http(s)://`-URL aktiviert. Die Anforderung "keine gültige URL" bleibt damit konsistent.
 
-### Nicht Teil des Changes
-- Keine SQL-Migration, kein Bucket-Anlegen, keine RLS-Policy-Änderungen (bereits vorhanden).
-- Keine Änderungen an anderen Formularen oder am Dashboard.
+3. **Lokalisierung**:
+   - Neuer Key `profile.openLink` mit dem Wert "Link öffnen" in `src/locales/de.json` hinzufügen, damit das `aria-label` übersetzt bleibt.
+
+4. **Validierung**:
+   - Es wird keine zusätzliche Validierungslogik eingeführt. Die URL-Prüfung im Icon verwendet denselben einfachen Regex (`/^https?:\/\//i`), der auch im Zod-Schema (`urlOpt`) für die meisten URL-Felder genutzt wird.
+
+Technische Details:
+- Kein Backend- oder Schema-Change.
+- Keine Cloud-Funktionalität.
+- Styling mit Tailwind-Utility-Klassen; Icon-Button verwendet die bestehenden `Button`-Varianten.
+- Die Komponente bleibt client-seitig und wird in der SSR-Route wie alle anderen Formularfelder lazy-hydratisiert.
