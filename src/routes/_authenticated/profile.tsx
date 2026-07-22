@@ -438,7 +438,10 @@ function ProfilePage() {
 
         {/* Meine Brand */}
         <section className="space-y-6">
-          <h2 className="text-lg font-semibold border-b pb-2">{t("profile.brandSection")}</h2>
+          <h2 className="text-lg font-semibold border-b pb-2 flex items-center gap-2">
+            <span>{t("profile.brandSection")}</span>
+            {brandComplete && <CheckCircle2 className="h-5 w-5 text-green-600" />}
+          </h2>
 
           <div className="grid gap-2">
             <Label htmlFor="brand_name">{t("profile.brandName")}</Label>
