@@ -156,6 +156,11 @@ function ProfilePage() {
   const [uploading, setUploading] = useState(false);
   const [photoUrl, setPhotoUrl] = useState<string | null>(brand?.user_foto_url ?? null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [bannerUrl, setBannerUrl] = useState<string | null>(
+    (brand as { banner_url?: string | null } | null)?.banner_url ?? null,
+  );
+  const [uploadingBanner, setUploadingBanner] = useState(false);
+  const [bannerDialogOpen, setBannerDialogOpen] = useState(false);
 
   const email = brand?.e_mail_address ?? "";
   const legalName = brand?.legal_name ?? "";
