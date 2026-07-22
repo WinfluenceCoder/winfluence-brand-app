@@ -282,6 +282,7 @@
       "integer": "Bitte eine ganze Zahl ≥ 0 eingeben.",
       "endAfterStart": "Das Ende muss nach dem Start liegen.",
       "applyBeforeStart": "Die Bewerbungsfrist muss vor dem Start liegen."
+    }
   },
   "industry": {
     "beauty_cosmetics": "Beauty & Kosmetik",
@@ -306,5 +307,5 @@
     "b2b_business": "B2B & Business"
   }
 }
-}
+
 
