@@ -266,6 +266,7 @@ function ProfilePage() {
 
   const companyFields = [
     logoUrl,
+    bannerUrl,
     legalName,
     mwstNr,
     watched.domain,
