@@ -191,6 +191,51 @@ function ProfilePage() {
   const invalidCls = "border-destructive focus-visible:ring-destructive";
   const [logoError, setLogoError] = useState<string | null>(null);
 
+  const watched = form.watch();
+  const filled = (v: unknown) =>
+    v !== null && v !== undefined && !(typeof v === "string" && v.trim() === "");
+
+  const companyFields = [
+    logoUrl,
+    legalName,
+    mwstNr,
+    watched.domain,
+    watched.insta_url,
+    watched.billing_address_to,
+    watched.billing_address_street,
+    watched.billing_address_nr,
+    watched.billing_address_zip,
+    watched.billing_address_city,
+  ];
+  const brandFields = [
+    watched.brand_name,
+    watched.brand_pitch,
+    watched.hashtags,
+    watched.linkedin_url,
+    watched.youtube_url,
+    watched.tiktok_url,
+  ];
+  const contactFields = [
+    watched.first_name,
+    watched.last_name,
+    watched.job_title,
+    watched.user_linkedin_url,
+    watched.gender,
+    watched.mobile,
+    photoUrl,
+  ];
+  const companyComplete = companyFields.every(filled);
+  const brandComplete = brandFields.every(filled);
+  const contactComplete = contactFields.every(filled);
+
+  const allFields = [...companyFields, ...brandFields, ...contactFields];
+  const filledCount = allFields.filter(filled).length;
+  const completeness = Math.min(
+    100,
+    Math.max(1, Math.round((filledCount / allFields.length) * 100)),
+  );
+
+
   const onSubmitWrapped = form.handleSubmit(
     async (values) => {
       if (!logoUrl) {
