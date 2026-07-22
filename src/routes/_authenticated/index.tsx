@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { Plus, Megaphone } from "lucide-react";
 
 const activeStatuses = ["draft", "published", "running", "expired", "ended"] as const;
@@ -50,6 +51,20 @@ function useMyCampaigns() {
 
       if (error) throw new Error(error.message);
       return data ?? [];
+    },
+  });
+}
+
+function useProfileQuality() {
+  return useSuspenseQuery({
+    queryKey: ["home", "profileQuality"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("brands")
+        .select("profile_quality")
+        .maybeSingle<{ profile_quality: number | null }>();
+      if (error) throw new Error(error.message);
+      return data?.profile_quality ?? 1;
     },
   });
 }
@@ -95,6 +110,30 @@ function statusVariant(s: string | null): "default" | "secondary" | "outline" | 
   }
 }
 
+function ProfileProgress() {
+  const { t } = useTranslation();
+  const { data: quality } = useProfileQuality();
+  const v = Math.min(100, Math.max(1, quality ?? 1));
+  if (v >= 100) return null;
+  return (
+    <div className="mt-4 space-y-3">
+      {v < 80 ? (
+        <p className="text-sm text-muted-foreground">{t("home.welcome")}</p>
+      ) : null}
+      <div className="flex w-full items-center gap-4">
+        <span className="text-sm font-medium whitespace-nowrap">
+          {t("home.profileLabel")}
+        </span>
+        <Progress value={v} className="flex-1" />
+        <span className="text-sm tabular-nums w-12 text-right">{v} %</span>
+        <Button asChild size="sm" variant="outline">
+          <Link to="/profile">{t("home.completeProfile")}</Link>
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 function HomePage() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -104,6 +143,7 @@ function HomePage() {
     return (
       <div className="p-8">
         <h1 className="text-2xl font-semibold tracking-tight">{t("home.title")}</h1>
+        <ProfileProgress />
         <button
           type="button"
           onClick={() => router.navigate({ to: "/campaigns/new" })}
@@ -127,6 +167,8 @@ function HomePage() {
   return (
     <div className="p-8">
       <h1 className="text-2xl font-semibold tracking-tight">{t("home.title")}</h1>
+      <ProfileProgress />
+
       <Card className="mt-6">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle>{t("home.campaignsTitle")}</CardTitle>

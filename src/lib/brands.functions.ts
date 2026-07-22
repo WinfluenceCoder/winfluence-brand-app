@@ -71,6 +71,19 @@ export const getMyBrand = createServerFn({ method: "GET" })
     return data;
   });
 
+function computeProfileQuality(row: Record<string, unknown>, colCount: number): number {
+  if (!colCount || colCount <= 0) return 1;
+  let n = 0;
+  for (const key of Object.keys(row)) {
+    const v = row[key];
+    if (v === null || v === undefined) continue;
+    if (typeof v === "string" && v.trim() === "") continue;
+    n += 1;
+  }
+  const v = Math.round((n / colCount) * 100);
+  return Math.min(100, Math.max(1, v));
+}
+
 export const updateMyBrand = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => updateSchema.parse(data))
@@ -88,5 +101,25 @@ export const updateMyBrand = createServerFn({ method: "POST" })
       .select("*")
       .single();
     if (error) throw new Error(error.message);
-    return row;
+
+    let colCount = Object.keys(row ?? {}).length;
+    const { data: rpcCount, error: rpcError } = await (
+      context.supabase.rpc as unknown as (
+        fn: string,
+      ) => Promise<{ data: number | null; error: { message: string } | null }>
+    )("get_brands_column_count");
+    if (!rpcError && typeof rpcCount === "number" && rpcCount > 0) {
+      colCount = rpcCount;
+    }
+
+    const quality = computeProfileQuality(row as Record<string, unknown>, colCount);
+
+    const { data: updated, error: qErr } = await context.supabase
+      .from("brands")
+      .update({ profile_quality: quality } as never)
+      .eq("user_id", context.userId)
+      .select("*")
+      .single();
+    if (qErr) throw new Error(qErr.message);
+    return updated;
   });
