@@ -32,6 +32,30 @@ export const Route = createFileRoute("/_authenticated/profile")({
 
 const chMobileRegex = /^(?:\+41\s?|0)(?:\d{2})\s?\d{3}\s?\d{2}\s?\d{2}$/;
 
+const INDUSTRY_OPTIONS = [
+  "beauty_cosmetics",
+  "fashion_accessories",
+  "lifestyle",
+  "food_beverages",
+  "fitness_health",
+  "travel_tourism",
+  "gaming",
+  "tech_consumer_electronics",
+  "entertainment",
+  "finance",
+  "automotive",
+  "home_interior",
+  "parenting_family",
+  "education_career",
+  "sustainability",
+  "pets",
+  "art_photography",
+  "luxury",
+  "real_estate",
+  "b2b_business",
+] as const;
+type Industry = (typeof INDUSTRY_OPTIONS)[number];
+
 function makeSchema(t: (k: string) => string) {
   const urlOpt = z
     .string()
