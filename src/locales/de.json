@@ -138,6 +138,7 @@
   "profile": {
     "title": "Mein Profil",
     "status": "Status",
+    "completeness": "Vollständigkeit",
     "companySection": "Meine Firma",
     "brandSection": "Meine Brand",
     "billingTo": "Rechnungsadresse (an Person)",
