@@ -10,7 +10,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { CampaignListRow } from "@/lib/campaigns-list";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { CAMPAIGN_STATUSES, type CampaignListRow } from "@/lib/campaigns-list";
 
 export function formatDate(iso: string | null) {
   if (!iso) return "–";
