@@ -175,8 +175,30 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
   });
 
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const errors = form.formState.errors;
   const invalidCls = "border-destructive focus-visible:ring-destructive";
+
+  const deletability = useQuery({
+    queryKey: ["campaign-deletability", initial?.id],
+    queryFn: () => fetchDeletability({ data: { id: initial!.id! } }),
+    enabled: mode === "edit" && !!initial?.id,
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: () => remove({ data: { id: initial!.id! } }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["home", "campaigns"] });
+      toast.success(t("campaignForm.deleted"));
+      router.navigate({ to: "/" });
+    },
+    onError: (e: unknown) => {
+      const msg = e instanceof Error ? e.message : "";
+      if (msg === "not-deletable-status") toast.error(t("campaignForm.deleteErrorStatus"));
+      else if (msg === "has-collabs") toast.error(t("campaignForm.deleteErrorCollabs"));
+      else toast.error(t("campaignForm.deleteError"));
+    },
+  });
 
   const mutation = useMutation({
     mutationFn: async (values: FormValues) => {
