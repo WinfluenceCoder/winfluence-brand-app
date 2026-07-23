@@ -115,3 +115,65 @@ export const updateCampaign = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return row;
   });
+
+async function loadOwnedCampaign(
+  ctx: { supabase: ReturnType<typeof Object>; userId: string } | any,
+  id: number,
+) {
+  const { data: brand, error: bErr } = await ctx.supabase
+    .from("brands")
+    .select("id")
+    .eq("user_id", ctx.userId)
+    .maybeSingle();
+  if (bErr) throw new Error(bErr.message);
+  if (!brand) throw new Error("no-brand");
+  const { data: row, error } = await ctx.supabase
+    .from("campaigns")
+    .select("id, status, brand_id")
+    .eq("id", id)
+    .eq("brand_id", brand.id)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!row) throw new Error("not-found");
+  return { brand, row };
+}
+
+export const getCampaignDeletability = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => z.object({ id: z.number().int() }).parse(data))
+  .handler(async ({ context, data }) => {
+    const { row } = await loadOwnedCampaign(context, data.id);
+    if (row.status !== "draft") {
+      return { canDelete: false, reason: "status" as const };
+    }
+    const { count, error } = await context.supabase
+      .from("collabs")
+      .select("id", { count: "exact", head: true })
+      .eq("campaign_id", data.id);
+    if (error) throw new Error(error.message);
+    if ((count ?? 0) > 0) {
+      return { canDelete: false, reason: "collabs" as const };
+    }
+    return { canDelete: true };
+  });
+
+export const deleteCampaign = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => z.object({ id: z.number().int() }).parse(data))
+  .handler(async ({ context, data }) => {
+    const { brand, row } = await loadOwnedCampaign(context, data.id);
+    if (row.status !== "draft") throw new Error("not-deletable-status");
+    const { count, error: cErr } = await context.supabase
+      .from("collabs")
+      .select("id", { count: "exact", head: true })
+      .eq("campaign_id", data.id);
+    if (cErr) throw new Error(cErr.message);
+    if ((count ?? 0) > 0) throw new Error("has-collabs");
+    const { error } = await context.supabase
+      .from("campaigns")
+      .delete()
+      .eq("id", data.id)
+      .eq("brand_id", brand.id);
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
