@@ -1,63 +1,63 @@
 ## Ziel
-Auf `/campaigns/:id/edit` einen Delete-Button hinzufügen und Button-Bereich neu anordnen. Harte Löschung nur wenn Status = `draft` und keine verknüpften `collabs` existieren.
+Sidebar-Submenü „Kampagnen" anpassen: „Entwürfe" auf Route `/campaigns/draft` umbenennen, „Abgeschlossene" auf `/campaigns/ended`, neuer Eintrag „Genehmigte" (`/campaigns/approved`), „Archiv" auf `/campaigns/archived`. Nur Sidebar, Routen und Platzhalter-Seiten — keine Backend-Logik.
 
 ## Änderungen
 
-### 1. `src/lib/campaigns.functions.ts`
-- Neue Server Function `getCampaignDeletability({ id })`:
-  - Auth-Middleware, Brand des Users laden, Ownership prüfen.
-  - Liest `status` aus `campaigns` und `count` aus `collabs` mit `campaign_id = id`.
-  - Rückgabe: `{ canDelete: boolean, reason?: 'status' | 'collabs' }`.
-- Neue Server Function `deleteCampaign({ id })`:
-  - Auth-Middleware, Brand-Ownership prüfen.
-  - Server-seitige Re-Validierung: `status === 'draft'` und `collabs`-Count = 0, sonst Error (`not-deletable-status` / `has-collabs`).
-  - `delete()` auf `campaigns` mit `id` + `brand_id`-Filter.
-  - Rückgabe `{ ok: true }`.
+### 1. Routen umbenennen / neu anlegen (`src/routes/_authenticated/`)
+- `campaigns.drafts.tsx` → `campaigns.draft.tsx`, `createFileRoute("/_authenticated/campaigns/draft")`.
+- `campaigns.completed.tsx` → `campaigns.ended.tsx`, `createFileRoute("/_authenticated/campaigns/ended")`.
+- `campaigns.archive.tsx` → `campaigns.archived.tsx`, `createFileRoute("/_authenticated/campaigns/archived")`.
+- Neu: `campaigns.approved.tsx` mit `Placeholder titleKey="placeholders.campaignsApproved"`.
 
-### 2. `src/components/app/CampaignForm.tsx`
-- Button-Zeile: von `justify-end` auf `flex items-center gap-3` (left-aligned).
-- Reihenfolge: **Speichern** (primary) → **Abbrechen** (outline) → **Kampagne löschen** (`variant="destructive"`).
-- Delete-Button nur bei `mode === 'edit'` UND `getCampaignDeletability`-Query liefert `canDelete === true` (via `useQuery`).
-- OnClick öffnet `AlertDialog` (shadcn) mit Warntext; Bestätigung ruft `deleteCampaign` per `useMutation`:
-  - onSuccess: Toast, `queryClient.invalidateQueries(["home","campaigns"])`, `router.navigate({ to: "/" })`.
-  - onError: Toast mit übersetzter Fehlermeldung.
+### 2. `src/components/app/AppSidebar.tsx`
+Kampagnen-Items neu ordnen:
+1. Neu (`/campaigns/new`)
+2. Entwürfe (`/campaigns/draft`) — Key `nav.campaignsDraft`
+3. Publizierte (`/campaigns/published`)
+4. Laufende (`/campaigns/running`)
+5. Abgelaufene (`/campaigns/expired`)
+6. Abgeschlossene (`/campaigns/ended`) — Key `nav.campaignsEnded`
+7. Genehmigte (`/campaigns/approved`) — Key `nav.campaignsApproved` *(neu)*
+8. Archiv (`/campaigns/archived`) — Key `nav.campaignsArchived`
 
-### 3. `src/locales/de.json` — neue Keys unter `campaignForm`
-- `deleteButton`: „Kampagne löschen"
-- `deleteConfirmTitle`: „Kampagne löschen?"
-- `deleteConfirmBody`: „Diese Aktion kann nicht rückgängig gemacht werden."
-- `deleteConfirm`: „Endgültig löschen"
-- `deleted`: „Kampagne gelöscht"
-- `deleteError`: „Löschen fehlgeschlagen"
+### 3. `src/locales/de.json`
+- `nav.campaignsDrafts` → `nav.campaignsDraft` („Entwürfe")
+- `nav.campaignsCompleted` → `nav.campaignsEnded` („Abgeschlossene")
+- `nav.campaignsArchive` → `nav.campaignsArchived` („Archiv")
+- Neu: `nav.campaignsApproved` = „Genehmigte"
+- Analog in `placeholders`: `campaignsDrafts` → `campaignsDraft`, `campaignsCompleted` → `campaignsEnded`, `campaignsArchive` → `campaignsArchived`, neu `campaignsApproved` = „Genehmigte Kampagnen".
 
-### 4. SQL für externe Supabase-DB — RLS DELETE-Policy
-Ablage als Referenz-Snippet unter `.lovable/external-supabase-campaigns-delete-policy.sql`. **Nicht automatisch ausgeführt** — muss der User im externen Supabase-Projekt (`rssnbsduduboxlrvpodw`) manuell laufen lassen, da wir keine Schema-Änderungen aus Lovable heraus vornehmen.
+### 4. `routeTree.gen.ts`
+Nicht editieren — wird beim nächsten Build automatisch regeneriert.
 
-```sql
--- Erlaubt einem Brand-Owner, eigene Kampagnen zu löschen.
--- Die Server Function 'deleteCampaign' erzwingt zusätzlich status='draft'
--- und das Fehlen verknüpfter collabs; die Policy muss diese Fachlogik
--- nicht duplizieren, sollte aber Ownership hart einschränken.
+## Komplettes Sidebar-Menü nach der Überarbeitung
 
-DROP POLICY IF EXISTS "brand_owner_delete_campaigns" ON public.campaigns;
-
-CREATE POLICY "brand_owner_delete_campaigns"
-ON public.campaigns
-FOR DELETE
-TO authenticated
-USING (
-  brand_id IN (
-    SELECT id FROM public.brands WHERE user_id = auth.uid()
-  )
-);
-
--- Sicherstellen, dass authenticated überhaupt DELETE-Recht auf die Tabelle hat
-GRANT DELETE ON public.campaigns TO authenticated;
+```text
+Home                          /
+Kampagnen
+  ├─ Neu                      /campaigns/new
+  ├─ Entwürfe                 /campaigns/draft        (umbenannt)
+  ├─ Publizierte              /campaigns/published
+  ├─ Laufende                 /campaigns/running
+  ├─ Abgelaufene              /campaigns/expired
+  ├─ Abgeschlossene           /campaigns/ended        (umbenannt)
+  ├─ Genehmigte               /campaigns/approved     (neu)
+  └─ Archiv                   /campaigns/archived     (umbenannt)
+Influencer
+  ├─ Suche                    /influencers/search
+  ├─ Aktuelle                 /influencers/current
+  ├─ Beauftragte              /influencers/hired
+  └─ Favoriten                /influencers/favorites
+Analytics
+  ├─ Kampagnen                /analytics/campaigns
+  └─ Influencer               /analytics/influencers
+Nachrichten
+  ├─ Benachrichtigungen       /messages/notifications
+  ├─ Persönlich               /messages/personal
+  └─ System                   /messages/system
+Einstellungen                 /settings
 ```
 
-Hinweis: Falls bereits eine allgemeinere Owner-Policy `FOR ALL` existiert, ist die separate DELETE-Policy optional — dann reicht das `GRANT DELETE`. Der User entscheidet nach Sichtung der bestehenden Policies.
-
 ## Nicht enthalten
-- Kein Soft-Delete, keine Status-Änderungen.
-- Keine Änderungen an `collabs` oder anderen Routen.
-- Keine automatische DB-Migration — SQL wird nur bereitgestellt.
+- Keine Backend-/DB-Änderungen, keine neuen Listen-Queries.
+- Alte Routen `/campaigns/drafts`, `/campaigns/completed`, `/campaigns/archive` werden entfernt (keine Redirects).
