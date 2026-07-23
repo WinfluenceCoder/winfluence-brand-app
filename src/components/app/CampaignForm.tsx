@@ -135,6 +135,8 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
   const fetchBrand = useServerFn(getMyBrand);
   const create = useServerFn(createCampaign);
   const update = useServerFn(updateCampaign);
+  const remove = useServerFn(deleteCampaign);
+  const fetchDeletability = useServerFn(getCampaignDeletability);
 
   const { data: brand } = useSuspenseQuery({
     queryKey: ["my-brand"],
