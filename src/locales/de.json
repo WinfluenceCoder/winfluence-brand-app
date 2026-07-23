@@ -195,15 +195,23 @@
     "resetButton": "Passwort zurücksetzen",
     "resetSent": "Wir haben dir einen Link zum Zurücksetzen des Passworts geschickt."
   },
+  "campaignsList": {
+    "title": "Kampagnen",
+    "filterAll": "Alle Stati",
+    "status": {
+      "draft": "Entwurf",
+      "published": "Publiziert",
+      "running": "Laufend",
+      "expired": "Abgelaufen",
+      "ended": "Abgeschlossen",
+      "approved": "Genehmigt",
+      "archived": "Archiviert"
+    },
+    "emptyForFilter": "Keine Kampagnen mit diesem Status.",
+    "showAll": "Alle anzeigen"
+  },
   "placeholders": {
     "campaignsNew": "Neue Kampagne",
-    "campaignsDraft": "Entwürfe",
-    "campaignsPublished": "Publizierte Kampagnen",
-    "campaignsRunning": "Laufende Kampagnen",
-    "campaignsExpired": "Abgelaufene Kampagnen",
-    "campaignsEnded": "Abgeschlossene Kampagnen",
-    "campaignsApproved": "Genehmigte Kampagnen",
-    "campaignsArchived": "Archiv",
     "influencersSearch": "Influencer suchen",
     "influencersCurrent": "Aktuelle Influencer",
     "influencersHired": "Beauftragte Influencer",
