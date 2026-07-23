@@ -4,12 +4,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
-import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { getMyBrand } from "@/lib/brands.functions";
-import { createCampaign, updateCampaign } from "@/lib/campaigns.functions";
+import { createCampaign, deleteCampaign, getCampaignDeletability, updateCampaign } from "@/lib/campaigns.functions";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -135,6 +135,8 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
   const fetchBrand = useServerFn(getMyBrand);
   const create = useServerFn(createCampaign);
   const update = useServerFn(updateCampaign);
+  const remove = useServerFn(deleteCampaign);
+  const fetchDeletability = useServerFn(getCampaignDeletability);
 
   const { data: brand } = useSuspenseQuery({
     queryKey: ["my-brand"],
@@ -173,8 +175,30 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
   });
 
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const errors = form.formState.errors;
   const invalidCls = "border-destructive focus-visible:ring-destructive";
+
+  const deletability = useQuery({
+    queryKey: ["campaign-deletability", initial?.id],
+    queryFn: () => fetchDeletability({ data: { id: initial!.id! } }),
+    enabled: mode === "edit" && !!initial?.id,
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: () => remove({ data: { id: initial!.id! } }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["home", "campaigns"] });
+      toast.success(t("campaignForm.deleted"));
+      router.navigate({ to: "/" });
+    },
+    onError: (e: unknown) => {
+      const msg = e instanceof Error ? e.message : "";
+      if (msg === "not-deletable-status") toast.error(t("campaignForm.deleteErrorStatus"));
+      else if (msg === "has-collabs") toast.error(t("campaignForm.deleteErrorCollabs"));
+      else toast.error(t("campaignForm.deleteError"));
+    },
+  });
 
   const mutation = useMutation({
     mutationFn: async (values: FormValues) => {
@@ -538,13 +562,23 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
         </CardContent>
       </Card>
 
-      <div className="flex items-center justify-end gap-3">
-        <Button type="button" variant="outline" onClick={handleCancel} disabled={mutation.isPending}>
-          {t("common.cancel")}
-        </Button>
+      <div className="flex flex-wrap items-center gap-3">
         <Button type="submit" disabled={mutation.isPending}>
           {mutation.isPending ? t("common.loading") : t("common.save")}
         </Button>
+        <Button type="button" variant="outline" onClick={handleCancel} disabled={mutation.isPending}>
+          {t("common.cancel")}
+        </Button>
+        {mode === "edit" && deletability.data?.canDelete && (
+          <Button
+            type="button"
+            variant="destructive"
+            onClick={() => setDeleteOpen(true)}
+            disabled={deleteMutation.isPending}
+          >
+            {t("campaignForm.deleteButton")}
+          </Button>
+        )}
       </div>
 
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
@@ -561,6 +595,25 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("campaignForm.deleteConfirmTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("campaignForm.deleteConfirmBody")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => deleteMutation.mutate()}
+            >
+              {t("campaignForm.deleteConfirm")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
     </form>
   );
 }

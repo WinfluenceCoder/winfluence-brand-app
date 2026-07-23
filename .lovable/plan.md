@@ -1,36 +1,63 @@
-Ziel: In `/profile` wird rechts neben jedem URL-Feld ein "Link out"-Icon angezeigt. Bei Klick öffnet sich die eingegebene URL in einem neuen Tab/Fenster. Das Icon ist disabled, wenn das Feld leer ist oder keine gültige URL (beginnend mit `http://` oder `https://`) enthält.
+## Ziel
+Auf `/campaigns/:id/edit` einen Delete-Button hinzufügen und Button-Bereich neu anordnen. Harte Löschung nur wenn Status = `draft` und keine verknüpften `collabs` existieren.
 
-Betroffene Felder:
-- `linkedin_url`
-- `insta_url`
-- `youtube_url`
-- `tiktok_url`
-- `user_linkedin_url`
+## Änderungen
 
-Änderungen:
+### 1. `src/lib/campaigns.functions.ts`
+- Neue Server Function `getCampaignDeletability({ id })`:
+  - Auth-Middleware, Brand des Users laden, Ownership prüfen.
+  - Liest `status` aus `campaigns` und `count` aus `collabs` mit `campaign_id = id`.
+  - Rückgabe: `{ canDelete: boolean, reason?: 'status' | 'collabs' }`.
+- Neue Server Function `deleteCampaign({ id })`:
+  - Auth-Middleware, Brand-Ownership prüfen.
+  - Server-seitige Re-Validierung: `status === 'draft'` und `collabs`-Count = 0, sonst Error (`not-deletable-status` / `has-collabs`).
+  - `delete()` auf `campaigns` mit `id` + `brand_id`-Filter.
+  - Rückgabe `{ ok: true }`.
 
-1. **Neue Hilfskomponente `UrlInputWithLink`** in `src/components/app/UrlInputWithLink.tsx`:
-   - Props: `id`, `value`, `error`, `placeholder`, `registration` (oder `field`-Props für react-hook-form), `aria-invalid`, `className`.
-   - Rendert ein `Input` plus einen `Button` (Icon-Button) mit `variant="ghost"` und `size="icon"` direkt rechts daneben im selben flex-Container.
-   - Icon: `ExternalLink` aus `lucide-react`.
-   - OnClick: `window.open(value, "_blank", "noopener,noreferrer")`.
-   - Disabled-Zustand: `disabled={!value || !/^https?:\/\//i.test(value)}`.
-   - Barrierefreiheit: `aria-label="Link öffnen"`, `type="button"`, damit das Formular nicht abgeschickt wird.
+### 2. `src/components/app/CampaignForm.tsx`
+- Button-Zeile: von `justify-end` auf `flex items-center gap-3` (left-aligned).
+- Reihenfolge: **Speichern** (primary) → **Abbrechen** (outline) → **Kampagne löschen** (`variant="destructive"`).
+- Delete-Button nur bei `mode === 'edit'` UND `getCampaignDeletability`-Query liefert `canDelete === true` (via `useQuery`).
+- OnClick öffnet `AlertDialog` (shadcn) mit Warntext; Bestätigung ruft `deleteCampaign` per `useMutation`:
+  - onSuccess: Toast, `queryClient.invalidateQueries(["home","campaigns"])`, `router.navigate({ to: "/" })`.
+  - onError: Toast mit übersetzter Fehlermeldung.
 
-2. **Integration in `src/routes/_authenticated/profile.tsx`**:
-   - Import von `UrlInputWithLink` hinzufügen.
-   - Die fünf URL-Eingabefelder (`linkedin_url`, `insta_url`, `youtube_url`, `tiktok_url`, `user_linkedin_url`) ersetzen durch die neue Komponente.
-   - Fehler- und Label-Darstellung bleibt unverändert; das Icon-Button-Layout wird innerhalb der bestehenden `grid gap-2`-Wrapper eingebettet.
-   - Für `insta_url`: Da das Feld derzeit `@brand` als Placeholder hat und schemalose URL-Validierung besitzt, wird das Icon weiterhin nur bei einer vollständigen `http(s)://`-URL aktiviert. Die Anforderung "keine gültige URL" bleibt damit konsistent.
+### 3. `src/locales/de.json` — neue Keys unter `campaignForm`
+- `deleteButton`: „Kampagne löschen"
+- `deleteConfirmTitle`: „Kampagne löschen?"
+- `deleteConfirmBody`: „Diese Aktion kann nicht rückgängig gemacht werden."
+- `deleteConfirm`: „Endgültig löschen"
+- `deleted`: „Kampagne gelöscht"
+- `deleteError`: „Löschen fehlgeschlagen"
 
-3. **Lokalisierung**:
-   - Neuer Key `profile.openLink` mit dem Wert "Link öffnen" in `src/locales/de.json` hinzufügen, damit das `aria-label` übersetzt bleibt.
+### 4. SQL für externe Supabase-DB — RLS DELETE-Policy
+Ablage als Referenz-Snippet unter `.lovable/external-supabase-campaigns-delete-policy.sql`. **Nicht automatisch ausgeführt** — muss der User im externen Supabase-Projekt (`rssnbsduduboxlrvpodw`) manuell laufen lassen, da wir keine Schema-Änderungen aus Lovable heraus vornehmen.
 
-4. **Validierung**:
-   - Es wird keine zusätzliche Validierungslogik eingeführt. Die URL-Prüfung im Icon verwendet denselben einfachen Regex (`/^https?:\/\//i`), der auch im Zod-Schema (`urlOpt`) für die meisten URL-Felder genutzt wird.
+```sql
+-- Erlaubt einem Brand-Owner, eigene Kampagnen zu löschen.
+-- Die Server Function 'deleteCampaign' erzwingt zusätzlich status='draft'
+-- und das Fehlen verknüpfter collabs; die Policy muss diese Fachlogik
+-- nicht duplizieren, sollte aber Ownership hart einschränken.
 
-Technische Details:
-- Kein Backend- oder Schema-Change.
-- Keine Cloud-Funktionalität.
-- Styling mit Tailwind-Utility-Klassen; Icon-Button verwendet die bestehenden `Button`-Varianten.
-- Die Komponente bleibt client-seitig und wird in der SSR-Route wie alle anderen Formularfelder lazy-hydratisiert.
+DROP POLICY IF EXISTS "brand_owner_delete_campaigns" ON public.campaigns;
+
+CREATE POLICY "brand_owner_delete_campaigns"
+ON public.campaigns
+FOR DELETE
+TO authenticated
+USING (
+  brand_id IN (
+    SELECT id FROM public.brands WHERE user_id = auth.uid()
+  )
+);
+
+-- Sicherstellen, dass authenticated überhaupt DELETE-Recht auf die Tabelle hat
+GRANT DELETE ON public.campaigns TO authenticated;
+```
+
+Hinweis: Falls bereits eine allgemeinere Owner-Policy `FOR ALL` existiert, ist die separate DELETE-Policy optional — dann reicht das `GRANT DELETE`. Der User entscheidet nach Sichtung der bestehenden Policies.
+
+## Nicht enthalten
+- Kein Soft-Delete, keine Status-Änderungen.
+- Keine Änderungen an `collabs` oder anderen Routen.
+- Keine automatische DB-Migration — SQL wird nur bereitgestellt.
