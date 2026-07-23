@@ -47,12 +47,13 @@ const groups: Group[] = [
     icon: Megaphone,
     items: [
       { titleKey: "nav.campaignsNew", to: "/campaigns/new" },
-      { titleKey: "nav.campaignsDrafts", to: "/campaigns/drafts" },
+      { titleKey: "nav.campaignsDraft", to: "/campaigns/draft" },
       { titleKey: "nav.campaignsPublished", to: "/campaigns/published" },
       { titleKey: "nav.campaignsRunning", to: "/campaigns/running" },
       { titleKey: "nav.campaignsExpired", to: "/campaigns/expired" },
-      { titleKey: "nav.campaignsCompleted", to: "/campaigns/completed" },
-      { titleKey: "nav.campaignsArchive", to: "/campaigns/archive" },
+      { titleKey: "nav.campaignsEnded", to: "/campaigns/ended" },
+      { titleKey: "nav.campaignsApproved", to: "/campaigns/approved" },
+      { titleKey: "nav.campaignsArchived", to: "/campaigns/archived" },
     ],
   },
   {
