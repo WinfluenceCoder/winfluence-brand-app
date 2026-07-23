@@ -208,7 +208,13 @@
       "archived": "Archiviert"
     },
     "emptyForFilter": "Keine Kampagnen mit diesem Status.",
-    "showAll": "Alle anzeigen"
+    "showAll": "Alle anzeigen",
+    "actions": {
+      "openMenu": "Aktionen öffnen",
+      "edit": "Bearbeiten",
+      "publish": "Publizieren",
+      "delete": "Löschen"
+    }
   },
   "placeholders": {
     "campaignsNew": "Neue Kampagne",

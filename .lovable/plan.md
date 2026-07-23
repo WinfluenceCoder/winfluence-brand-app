@@ -1,31 +1,55 @@
-## Änderungen auf `/campaigns`
+## Ziel
 
-### 1. Kachel entfernen
-In `src/routes/_authenticated/campaigns.index.tsx` die `Card`/`CardHeader`/`CardContent`-Struktur entfernen. Stattdessen:
-- Seitentitel `h1` „Meine Kampagnen" (analog Dashboard-Stil: `text-2xl font-semibold tracking-tight`)
-- Rechts daneben Button „Neue Kampagne"
-- Darunter direkt die `CampaignsTable` (ohne Card-Wrapper)
+In der `CampaignsTable` am Zeilenende ein 3-Punkte-Menü mit Aktionen ergänzen und eine neue Platzhalterroute `/campaigns/publish/$id` anlegen.
 
-Dashboard (`/`) bleibt unverändert — dort wird die Tabelle weiterhin in einer Card angezeigt.
+## Änderungen
 
-### 2. Status-Filter in Tabellen-Header verschieben
-- Das `Select`-Dropdown aus dem Card-Header entfernen.
-- In `src/components/app/CampaignsTable.tsx` die Spalte `Status` (`TableHead`) so umbauen, dass sie optional ein Dropdown enthält, wenn eine `statusFilter`-Prop übergeben wird:
-  - Prop-Signatur erweitern: `statusFilter?: { value: string; onChange: (v: string) => void }`
-  - Wenn gesetzt: `TableHead` rendert das `Select` inline statt reinem Text
-  - Wenn nicht gesetzt (Dashboard): normaler Text-Header „Status"
-- Styling des `SelectTrigger`:
-  - Ohne Border/Background, damit es visuell wie ein Header-Label wirkt
-  - Schriftgröße/Farbe/Gewicht analog `TableHead` (`text-sm font-medium text-muted-foreground` — shadcn-Default)
-  - Breite `w-auto` mit passendem Padding, Chevron-Icon bleibt sichtbar
-- Optionen: „Alle Stati" + alle sieben Status-Labels (aus i18n).
+### 1. `src/components/app/CampaignsTable.tsx`
 
-### 3. Empty-State
-Der bisherige „keine Kampagnen für Filter"-Bereich bleibt erhalten, wird aber unterhalb der Tabelle (bzw. anstelle der Tabelle bei leerem Ergebnis) gerendert — ohne Card-Wrapper, mit gleicher Padding-Struktur wie bisher.
+- Neue Spalte ganz rechts (`TableHead` leer, `w-12`) für das Aktionsmenü.
+- Pro Zeile ein shadcn `DropdownMenu` mit `MoreHorizontal`-Trigger (Ghost-IconButton).
+  - Trigger-Klick per `stopPropagation`, damit der bestehende Row-Click (Navigation nach Edit) nicht feuert.
+- Menüeinträge (jeweils mit Lucide-Icon links):
+  - `Pencil` „Bearbeiten" → `router.navigate({ to: "/campaigns/$id/edit", params: { id } })`
+  - `Send` „Publizieren" → `router.navigate({ to: "/campaigns/publish/$id", params: { id } })`
+  - Separator
+  - `Trash2` „Löschen" (rot, `text-destructive focus:text-destructive`) → öffnet lokalen `AlertDialog`.
+- Delete-Flow analog zum Button in `CampaignForm`:
+  - Vor Öffnen des Dialogs `getCampaignDeletability` per `useMutation`/`useServerFn` prüfen; bei `canDelete=false` Toast mit passendem Grund (`status` / `collabs`) und Dialog nicht öffnen. Alternativ Dialog direkt öffnen und Bedingungen dort anzeigen — Umsetzung analog zu `CampaignForm.tsx` (dortiges Muster übernehmen).
+  - Bei Bestätigung `deleteCampaign` aufrufen, danach `queryClient.invalidateQueries({ queryKey: ["campaigns"] })` und Toast.
+- i18n-Keys wiederverwenden, wo vorhanden (`campaignsList.actions.*` neu ergänzen, sonst bestehende Delete-Texte aus `campaignForm`/`campaignsList` nutzen).
 
-### Betroffene Dateien
-- `src/routes/_authenticated/campaigns.index.tsx` — Card entfernen, Titel + Button-Layout, `statusFilter`-Prop an Tabelle übergeben
-- `src/components/app/CampaignsTable.tsx` — optionale `statusFilter`-Prop, Status-Header rendert Dropdown
-- `src/locales/de.json` — ggf. Titel-Key ergänzen (`campaignsList.title` existiert bereits, wird auf „Meine Kampagnen" gesetzt falls abweichend)
+### 2. `src/locales/de.json`
 
-Dashboard bleibt unangetastet.
+Neue Keys unter `campaignsList.actions`:
+
+- `openMenu` (aria-label)
+- `edit` „Editieren"
+- `publish` „Publizieren"
+- `delete` „Löschen"
+
+Bestehende Delete-Confirm-/Fehlertexte werden wiederverwendet.
+
+### 3. Neue Route `src/routes/_authenticated/campaigns.publish.$id.tsx`
+
+Platzhalterseite:
+
+```tsx
+export const Route = createFileRoute("/_authenticated/campaigns/publish/$id")({
+  component: PublishCampaignPage,
+});
+```
+
+Inhalt: `p-8`, Zurück-Link (`router.history.back()`), `h1` „Kampagne publizieren", Kurztext „Inhalt folgt." Keine Backend-Logik.
+
+### 4. Keine Änderung an
+
+- `src/routes/_authenticated/campaigns.index.tsx` (Tabelle bleibt eingebunden)
+- `src/routes/_authenticated/index.tsx` (Dashboard nutzt gleiche Tabelle → Menü erscheint dort automatisch)
+- `src/lib/campaigns.functions.ts` (bestehende Server-Funktionen decken Deletability + Delete bereits ab)
+- Sidebar / DB / RLS
+
+## Technische Hinweise
+
+- Row-Navigation bleibt (Click auf Zelle → Edit). Menü-Trigger und `DropdownMenuContent` verhindern Propagation.
+- Delete-Prüfung server-seitig via bestehende `getCampaignDeletability` / `deleteCampaign` (RLS-Policy in `.lovable/external-supabase-campaigns-delete-policy.sql` bereits vorhanden).

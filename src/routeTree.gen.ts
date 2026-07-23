@@ -30,6 +30,7 @@ import { Route as AuthenticatedInfluencersCurrentRouteImport } from './routes/_a
 import { Route as AuthenticatedCampaignsNewRouteImport } from './routes/_authenticated/campaigns.new'
 import { Route as AuthenticatedAnalyticsInfluencersRouteImport } from './routes/_authenticated/analytics.influencers'
 import { Route as AuthenticatedAnalyticsCampaignsRouteImport } from './routes/_authenticated/analytics.campaigns'
+import { Route as AuthenticatedCampaignsPublishIdRouteImport } from './routes/_authenticated/campaigns.publish.$id'
 import { Route as AuthenticatedCampaignsIdEditRouteImport } from './routes/_authenticated/campaigns.$id.edit'
 
 const WelcomeRoute = WelcomeRouteImport.update({
@@ -147,6 +148,12 @@ const AuthenticatedAnalyticsCampaignsRoute =
     path: '/analytics/campaigns',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCampaignsPublishIdRoute =
+  AuthenticatedCampaignsPublishIdRouteImport.update({
+    id: '/campaigns/publish/$id',
+    path: '/campaigns/publish/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCampaignsIdEditRoute =
   AuthenticatedCampaignsIdEditRouteImport.update({
     id: '/campaigns/$id/edit',
@@ -176,6 +183,7 @@ export interface FileRoutesByFullPath {
   '/messages/system': typeof AuthenticatedMessagesSystemRoute
   '/campaigns/': typeof AuthenticatedCampaignsIndexRoute
   '/campaigns/$id/edit': typeof AuthenticatedCampaignsIdEditRoute
+  '/campaigns/publish/$id': typeof AuthenticatedCampaignsPublishIdRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -199,6 +207,7 @@ export interface FileRoutesByTo {
   '/messages/system': typeof AuthenticatedMessagesSystemRoute
   '/campaigns': typeof AuthenticatedCampaignsIndexRoute
   '/campaigns/$id/edit': typeof AuthenticatedCampaignsIdEditRoute
+  '/campaigns/publish/$id': typeof AuthenticatedCampaignsPublishIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -224,6 +233,7 @@ export interface FileRoutesById {
   '/_authenticated/messages/system': typeof AuthenticatedMessagesSystemRoute
   '/_authenticated/campaigns/': typeof AuthenticatedCampaignsIndexRoute
   '/_authenticated/campaigns/$id/edit': typeof AuthenticatedCampaignsIdEditRoute
+  '/_authenticated/campaigns/publish/$id': typeof AuthenticatedCampaignsPublishIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -249,6 +259,7 @@ export interface FileRouteTypes {
     | '/messages/system'
     | '/campaigns/'
     | '/campaigns/$id/edit'
+    | '/campaigns/publish/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -272,6 +283,7 @@ export interface FileRouteTypes {
     | '/messages/system'
     | '/campaigns'
     | '/campaigns/$id/edit'
+    | '/campaigns/publish/$id'
   id:
     | '__root__'
     | '/_authenticated'
@@ -296,6 +308,7 @@ export interface FileRouteTypes {
     | '/_authenticated/messages/system'
     | '/_authenticated/campaigns/'
     | '/_authenticated/campaigns/$id/edit'
+    | '/_authenticated/campaigns/publish/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -456,6 +469,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAnalyticsCampaignsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/campaigns/publish/$id': {
+      id: '/_authenticated/campaigns/publish/$id'
+      path: '/campaigns/publish/$id'
+      fullPath: '/campaigns/publish/$id'
+      preLoaderRoute: typeof AuthenticatedCampaignsPublishIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/campaigns/$id/edit': {
       id: '/_authenticated/campaigns/$id/edit'
       path: '/campaigns/$id/edit'
@@ -483,6 +503,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMessagesSystemRoute: typeof AuthenticatedMessagesSystemRoute
   AuthenticatedCampaignsIndexRoute: typeof AuthenticatedCampaignsIndexRoute
   AuthenticatedCampaignsIdEditRoute: typeof AuthenticatedCampaignsIdEditRoute
+  AuthenticatedCampaignsPublishIdRoute: typeof AuthenticatedCampaignsPublishIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -505,6 +526,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMessagesSystemRoute: AuthenticatedMessagesSystemRoute,
   AuthenticatedCampaignsIndexRoute: AuthenticatedCampaignsIndexRoute,
   AuthenticatedCampaignsIdEditRoute: AuthenticatedCampaignsIdEditRoute,
+  AuthenticatedCampaignsPublishIdRoute: AuthenticatedCampaignsPublishIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -521,13 +543,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
