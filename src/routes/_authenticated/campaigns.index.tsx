@@ -53,7 +53,7 @@ function CampaignsListPage() {
   );
 
   const setStatus = (next: string) => {
-    navigate({ search: (prev) => ({ ...prev, status: next }) });
+    navigate({ search: (prev: { status: string }) => ({ ...prev, status: next }) });
   };
 
   return (

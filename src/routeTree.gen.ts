@@ -19,6 +19,7 @@ import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedSecurityRouteImport } from './routes/_authenticated/security'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedCampaignsIndexRouteImport } from './routes/_authenticated/campaigns.index'
 import { Route as AuthenticatedMessagesSystemRouteImport } from './routes/_authenticated/messages.system'
 import { Route as AuthenticatedMessagesPersonalRouteImport } from './routes/_authenticated/messages.personal'
 import { Route as AuthenticatedMessagesNotificationsRouteImport } from './routes/_authenticated/messages.notifications'
@@ -80,6 +81,12 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCampaignsIndexRoute =
+  AuthenticatedCampaignsIndexRouteImport.update({
+    id: '/campaigns/',
+    path: '/campaigns/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedMessagesSystemRoute =
   AuthenticatedMessagesSystemRouteImport.update({
     id: '/messages/system',
@@ -167,6 +174,7 @@ export interface FileRoutesByFullPath {
   '/messages/notifications': typeof AuthenticatedMessagesNotificationsRoute
   '/messages/personal': typeof AuthenticatedMessagesPersonalRoute
   '/messages/system': typeof AuthenticatedMessagesSystemRoute
+  '/campaigns/': typeof AuthenticatedCampaignsIndexRoute
   '/campaigns/$id/edit': typeof AuthenticatedCampaignsIdEditRoute
 }
 export interface FileRoutesByTo {
@@ -189,6 +197,7 @@ export interface FileRoutesByTo {
   '/messages/notifications': typeof AuthenticatedMessagesNotificationsRoute
   '/messages/personal': typeof AuthenticatedMessagesPersonalRoute
   '/messages/system': typeof AuthenticatedMessagesSystemRoute
+  '/campaigns': typeof AuthenticatedCampaignsIndexRoute
   '/campaigns/$id/edit': typeof AuthenticatedCampaignsIdEditRoute
 }
 export interface FileRoutesById {
@@ -213,6 +222,7 @@ export interface FileRoutesById {
   '/_authenticated/messages/notifications': typeof AuthenticatedMessagesNotificationsRoute
   '/_authenticated/messages/personal': typeof AuthenticatedMessagesPersonalRoute
   '/_authenticated/messages/system': typeof AuthenticatedMessagesSystemRoute
+  '/_authenticated/campaigns/': typeof AuthenticatedCampaignsIndexRoute
   '/_authenticated/campaigns/$id/edit': typeof AuthenticatedCampaignsIdEditRoute
 }
 export interface FileRouteTypes {
@@ -237,6 +247,7 @@ export interface FileRouteTypes {
     | '/messages/notifications'
     | '/messages/personal'
     | '/messages/system'
+    | '/campaigns/'
     | '/campaigns/$id/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -259,6 +270,7 @@ export interface FileRouteTypes {
     | '/messages/notifications'
     | '/messages/personal'
     | '/messages/system'
+    | '/campaigns'
     | '/campaigns/$id/edit'
   id:
     | '__root__'
@@ -282,6 +294,7 @@ export interface FileRouteTypes {
     | '/_authenticated/messages/notifications'
     | '/_authenticated/messages/personal'
     | '/_authenticated/messages/system'
+    | '/_authenticated/campaigns/'
     | '/_authenticated/campaigns/$id/edit'
   fileRoutesById: FileRoutesById
 }
@@ -364,6 +377,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/campaigns/': {
+      id: '/_authenticated/campaigns/'
+      path: '/campaigns'
+      fullPath: '/campaigns/'
+      preLoaderRoute: typeof AuthenticatedCampaignsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/messages/system': {
@@ -461,6 +481,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMessagesNotificationsRoute: typeof AuthenticatedMessagesNotificationsRoute
   AuthenticatedMessagesPersonalRoute: typeof AuthenticatedMessagesPersonalRoute
   AuthenticatedMessagesSystemRoute: typeof AuthenticatedMessagesSystemRoute
+  AuthenticatedCampaignsIndexRoute: typeof AuthenticatedCampaignsIndexRoute
   AuthenticatedCampaignsIdEditRoute: typeof AuthenticatedCampaignsIdEditRoute
 }
 
@@ -482,6 +503,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedMessagesNotificationsRoute,
   AuthenticatedMessagesPersonalRoute: AuthenticatedMessagesPersonalRoute,
   AuthenticatedMessagesSystemRoute: AuthenticatedMessagesSystemRoute,
+  AuthenticatedCampaignsIndexRoute: AuthenticatedCampaignsIndexRoute,
   AuthenticatedCampaignsIdEditRoute: AuthenticatedCampaignsIdEditRoute,
 }
 

@@ -3,56 +3,26 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Plus, Megaphone } from "lucide-react";
+import { CampaignsTable } from "@/components/app/CampaignsTable";
+import { campaignsListQueryOptions } from "@/lib/campaigns-list";
 
-const activeStatuses = ["draft", "published", "running", "expired", "ended"] as const;
+const DASHBOARD_STATUSES = [
+  "draft",
+  "published",
+  "running",
+  "expired",
+  "ended",
+] as const;
 
 export const Route = createFileRoute("/_authenticated/")({
   component: HomePage,
 });
 
-type CampaignRow = {
-  id: number;
-  title: string | null;
-  status: string | null;
-  start: string | null;
-  ende: string | null;
-  budget: number | null;
-  campaign_visual_url: string | null;
-};
-
 function useMyCampaigns() {
-  return useSuspenseQuery({
-    queryKey: ["home", "campaigns"],
-    queryFn: async () => {
-      const { data: brand } = await supabase
-        .from("brands")
-        .select("id")
-        .maybeSingle();
-      if (!brand) return [] as CampaignRow[];
-      const { data, error } = await supabase
-        .from("campaigns")
-        .select("id, title, status, start, ende, budget, campaign_visual_url")
-        .eq("brand_id", brand.id)
-        .in("status", activeStatuses as unknown as string[])
-        .order("created_at", { ascending: false })
-        .returns<CampaignRow[]>();
-
-      if (error) throw new Error(error.message);
-      return data ?? [];
-    },
-  });
+  return useSuspenseQuery(campaignsListQueryOptions({ statusIn: DASHBOARD_STATUSES }));
 }
 
 function useProfileQuality() {
@@ -67,47 +37,6 @@ function useProfileQuality() {
       return data?.profile_quality ?? 1;
     },
   });
-}
-
-function formatDate(iso: string | null) {
-  if (!iso) return "–";
-  return new Date(iso).toLocaleDateString("de-CH", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-}
-
-function statusLabel(t: (k: string) => string, s: string | null) {
-  switch (s) {
-    case "draft":
-      return t("home.statusDraft");
-    case "published":
-      return t("home.statusPublished");
-    case "running":
-      return t("home.statusRunning");
-    case "expired":
-      return t("home.statusExpired");
-    case "ended":
-      return t("home.statusEnded");
-    default:
-      return s ?? "–";
-  }
-}
-
-function statusVariant(s: string | null): "default" | "secondary" | "outline" | "destructive" {
-  switch (s) {
-    case "running":
-      return "default";
-    case "published":
-      return "secondary";
-    case "draft":
-      return "outline";
-    case "expired":
-      return "destructive";
-    default:
-      return "secondary";
-  }
 }
 
 function ProfileProgress() {
@@ -179,54 +108,7 @@ function HomePage() {
           </Button>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-16"></TableHead>
-                <TableHead>{t("home.tableName")}</TableHead>
-                <TableHead>{t("home.tableStatus")}</TableHead>
-                <TableHead>{t("home.tableStart")}</TableHead>
-                <TableHead>{t("home.tableEnd")}</TableHead>
-                <TableHead className="text-right">{t("home.tableBudget")}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data.map((row) => (
-                <TableRow
-                  key={row.id}
-                  className="cursor-pointer"
-                  onClick={() =>
-                    router.navigate({ to: "/campaigns/$id/edit", params: { id: String(row.id) } })
-                  }
-                >
-                  <TableCell>
-                    {row.campaign_visual_url ? (
-                      <img
-                        src={row.campaign_visual_url}
-                        alt=""
-                        className="h-12 w-12 rounded-md object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-12 w-12 items-center justify-center rounded-md bg-muted">
-                        <Megaphone className="h-5 w-5 text-muted-foreground" />
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell className="font-medium">{row.title}</TableCell>
-                  <TableCell>
-                    <Badge variant={statusVariant(row.status)}>{statusLabel(t, row.status)}</Badge>
-                  </TableCell>
-                  <TableCell>{formatDate(row.start)}</TableCell>
-                  <TableCell>{formatDate(row.ende)}</TableCell>
-                  <TableCell className="text-right tabular-nums">
-                    {row.budget != null ? `CHF ${row.budget.toLocaleString("de-CH")}` : "–"}
-                  </TableCell>
-                </TableRow>
-              ))}
-
-
-            </TableBody>
-          </Table>
+          <CampaignsTable rows={data} />
         </CardContent>
       </Card>
     </div>
