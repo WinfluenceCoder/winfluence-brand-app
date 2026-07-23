@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/collapsible";
 import { ChevronRight } from "lucide-react";
 
-type SubItem = { titleKey: string; to: string };
+type SubItem = { titleKey: string; to: string; search?: Record<string, string> };
 type Group = {
   titleKey: string;
   icon: React.ComponentType<{ className?: string }>;
@@ -47,13 +47,13 @@ const groups: Group[] = [
     icon: Megaphone,
     items: [
       { titleKey: "nav.campaignsNew", to: "/campaigns/new" },
-      { titleKey: "nav.campaignsDraft", to: "/campaigns/draft" },
-      { titleKey: "nav.campaignsPublished", to: "/campaigns/published" },
-      { titleKey: "nav.campaignsRunning", to: "/campaigns/running" },
-      { titleKey: "nav.campaignsExpired", to: "/campaigns/expired" },
-      { titleKey: "nav.campaignsEnded", to: "/campaigns/ended" },
-      { titleKey: "nav.campaignsApproved", to: "/campaigns/approved" },
-      { titleKey: "nav.campaignsArchived", to: "/campaigns/archived" },
+      { titleKey: "nav.campaignsDraft", to: "/campaigns", search: { status: "draft" } },
+      { titleKey: "nav.campaignsPublished", to: "/campaigns", search: { status: "published" } },
+      { titleKey: "nav.campaignsRunning", to: "/campaigns", search: { status: "running" } },
+      { titleKey: "nav.campaignsExpired", to: "/campaigns", search: { status: "expired" } },
+      { titleKey: "nav.campaignsEnded", to: "/campaigns", search: { status: "ended" } },
+      { titleKey: "nav.campaignsApproved", to: "/campaigns", search: { status: "approved" } },
+      { titleKey: "nav.campaignsArchived", to: "/campaigns", search: { status: "archived" } },
     ],
   },
   {
@@ -91,10 +91,18 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const pathname = useRouterState({ select: (r) => r.location.pathname });
+  const searchStatus = useRouterState({
+    select: (r) => (r.location.search as { status?: string } | undefined)?.status ?? "all",
+  });
 
+  const isSubActive = (item: SubItem) => {
+    if (pathname !== item.to) return false;
+    if (!item.search) return true;
+    return item.search.status === searchStatus;
+  };
   const isActive = (to: string) => (to === "/" ? pathname === "/" : pathname === to);
   const isGroupActive = (g: Group) =>
-    g.items ? g.items.some((i) => pathname === i.to) : false;
+    g.items ? g.items.some((i) => isSubActive(i)) : false;
 
   return (
     <Sidebar collapsible="icon" className="border-r">
@@ -155,12 +163,17 @@ export function AppSidebar() {
                       <CollapsibleContent>
                         <SidebarMenuSub>
                           {group.items.map((item) => (
-                            <SidebarMenuSubItem key={item.to}>
+                            <SidebarMenuSubItem key={`${item.to}-${item.search?.status ?? ""}`}>
                               <SidebarMenuSubButton
                                 asChild
-                                isActive={isActive(item.to)}
+                                isActive={isSubActive(item)}
                               >
-                                <Link to={item.to}>{t(item.titleKey)}</Link>
+                                <Link
+                                  to={item.to}
+                                  search={item.search as never}
+                                >
+                                  {t(item.titleKey)}
+                                </Link>
                               </SidebarMenuSubButton>
                             </SidebarMenuSubItem>
                           ))}
