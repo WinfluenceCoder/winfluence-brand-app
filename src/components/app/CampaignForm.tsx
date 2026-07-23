@@ -562,13 +562,23 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
         </CardContent>
       </Card>
 
-      <div className="flex items-center justify-end gap-3">
-        <Button type="button" variant="outline" onClick={handleCancel} disabled={mutation.isPending}>
-          {t("common.cancel")}
-        </Button>
+      <div className="flex flex-wrap items-center gap-3">
         <Button type="submit" disabled={mutation.isPending}>
           {mutation.isPending ? t("common.loading") : t("common.save")}
         </Button>
+        <Button type="button" variant="outline" onClick={handleCancel} disabled={mutation.isPending}>
+          {t("common.cancel")}
+        </Button>
+        {mode === "edit" && deletability.data?.canDelete && (
+          <Button
+            type="button"
+            variant="destructive"
+            onClick={() => setDeleteOpen(true)}
+            disabled={deleteMutation.isPending}
+          >
+            {t("campaignForm.deleteButton")}
+          </Button>
+        )}
       </div>
 
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
@@ -585,6 +595,25 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("campaignForm.deleteConfirmTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("campaignForm.deleteConfirmBody")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => deleteMutation.mutate()}
+            >
+              {t("campaignForm.deleteConfirm")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
     </form>
   );
 }
