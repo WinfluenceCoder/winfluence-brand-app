@@ -5,14 +5,6 @@ import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { CampaignsTable } from "@/components/app/CampaignsTable";
 import {
   CAMPAIGN_STATUSES,
@@ -58,49 +50,37 @@ function CampaignsListPage() {
 
   return (
     <div className="p-8">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <div className="flex items-center gap-3">
-            <CardTitle>{t("campaignsList.title")}</CardTitle>
-            <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t("campaignsList.filterAll")}</SelectItem>
-                {CAMPAIGN_STATUSES.map((s) => (
-                  <SelectItem key={s} value={s}>
-                    {t(`campaignsList.status.${s}`)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+      <div className="flex flex-row items-center justify-between">
+        <h1 className="text-2xl font-semibold tracking-tight">
+          {t("campaignsList.title")}
+        </h1>
+        <Button asChild>
+          <Link to="/campaigns/new">
+            <Plus className="h-4 w-4 mr-1" /> {t("home.newCampaign")}
+          </Link>
+        </Button>
+      </div>
+
+      <div className="mt-6">
+        <CampaignsTable
+          rows={data}
+          statusFilter={{ value: status, onChange: setStatus }}
+        />
+        {data.length === 0 && (
+          <div className="py-12 text-center text-sm text-muted-foreground">
+            <p>{t("campaignsList.emptyForFilter")}</p>
+            {status !== "all" && (
+              <button
+                type="button"
+                onClick={() => setStatus("all")}
+                className="mt-2 text-primary underline underline-offset-4"
+              >
+                {t("campaignsList.showAll")}
+              </button>
+            )}
           </div>
-          <Button asChild>
-            <Link to="/campaigns/new">
-              <Plus className="h-4 w-4 mr-1" /> {t("home.newCampaign")}
-            </Link>
-          </Button>
-        </CardHeader>
-        <CardContent>
-          {data.length === 0 ? (
-            <div className="py-12 text-center text-sm text-muted-foreground">
-              <p>{t("campaignsList.emptyForFilter")}</p>
-              {status !== "all" && (
-                <button
-                  type="button"
-                  onClick={() => setStatus("all")}
-                  className="mt-2 text-primary underline underline-offset-4"
-                >
-                  {t("campaignsList.showAll")}
-                </button>
-              )}
-            </div>
-          ) : (
-            <CampaignsTable rows={data} />
-          )}
-        </CardContent>
-      </Card>
+        )}
+      </div>
     </div>
   );
 }

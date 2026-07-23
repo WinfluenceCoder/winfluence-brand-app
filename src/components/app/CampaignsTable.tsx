@@ -10,7 +10,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { CampaignListRow } from "@/lib/campaigns-list";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { CAMPAIGN_STATUSES, type CampaignListRow } from "@/lib/campaigns-list";
 
 export function formatDate(iso: string | null) {
   if (!iso) return "–";
@@ -63,9 +70,10 @@ export function statusVariant(
 
 type Props = {
   rows: CampaignListRow[];
+  statusFilter?: { value: string; onChange: (v: string) => void };
 };
 
-export function CampaignsTable({ rows }: Props) {
+export function CampaignsTable({ rows, statusFilter }: Props) {
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -75,7 +83,25 @@ export function CampaignsTable({ rows }: Props) {
         <TableRow>
           <TableHead className="w-16"></TableHead>
           <TableHead>{t("home.tableName")}</TableHead>
-          <TableHead>{t("home.tableStatus")}</TableHead>
+          <TableHead className="p-0">
+            {statusFilter ? (
+              <Select value={statusFilter.value} onValueChange={statusFilter.onChange}>
+                <SelectTrigger className="h-auto w-auto gap-1 border-0 bg-transparent px-4 py-3 text-sm font-medium text-muted-foreground shadow-none hover:text-foreground focus:ring-0 focus-visible:ring-0 [&>svg]:opacity-100">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t("campaignsList.filterAll")}</SelectItem>
+                  {CAMPAIGN_STATUSES.map((s) => (
+                    <SelectItem key={s} value={s}>
+                      {t(`campaignsList.status.${s}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : (
+              <span className="px-4">{t("home.tableStatus")}</span>
+            )}
+          </TableHead>
           <TableHead>{t("home.tableStart")}</TableHead>
           <TableHead>{t("home.tableEnd")}</TableHead>
           <TableHead className="text-right">{t("home.tableBudget")}</TableHead>
