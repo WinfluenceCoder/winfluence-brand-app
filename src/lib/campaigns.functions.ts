@@ -177,3 +177,43 @@ export const deleteCampaign = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true as const };
   });
+
+export const publishCampaign = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) =>
+    z
+      .object({
+        id: z.number().int(),
+        apply_till: z.string().trim().min(1),
+        start: z.string().trim().min(1),
+        ende: z.string().trim().min(1),
+      })
+      .parse(data),
+  )
+  .handler(async ({ context, data }) => {
+    const { brand, row } = await loadOwnedCampaign(context, data.id);
+    if (row.status !== "draft") throw new Error("not-publishable-status");
+    const apply = new Date(data.apply_till);
+    const start = new Date(data.start);
+    const ende = new Date(data.ende);
+    const minApply = new Date();
+    minApply.setDate(minApply.getDate() + 1);
+    if (!(apply.getTime() >= minApply.getTime())) throw new Error("apply-till-min");
+    if (!(start.getTime() > apply.getTime())) throw new Error("start-after-apply");
+    if (!(ende.getTime() > start.getTime())) throw new Error("end-after-start");
+    const patch = {
+      status: "published",
+      apply_till: apply.toISOString(),
+      start: start.toISOString(),
+      ende: ende.toISOString(),
+      updated_at: new Date().toISOString(),
+    } as unknown as never;
+    const { error } = await context.supabase
+      .from("campaigns")
+      .update(patch)
+      .eq("id", data.id)
+      .eq("brand_id", brand.id);
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
+
