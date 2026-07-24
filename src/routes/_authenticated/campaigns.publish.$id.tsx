@@ -111,6 +111,8 @@ function PublishCampaignPage() {
   const invalidCls = "border-destructive focus-visible:ring-destructive";
   const isDraft = campaign.status === "draft";
   const [submitting, setSubmitting] = useState(false);
+  const [agbAccepted, setAgbAccepted] = useState(false);
+
 
   const mutation = useMutation({
     mutationFn: (values: FormValues) =>
@@ -178,34 +180,8 @@ function PublishCampaignPage() {
       </div>
 
       {/* Read-only campaign data */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("campaignPublish.sections.campaign")}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {campaign.campaign_visual_url ? (
-            <img
-              src={campaign.campaign_visual_url}
-              alt=""
-              className="h-64 w-full rounded-md object-cover"
-            />
-          ) : (
-            <div className="flex h-64 w-full items-center justify-center rounded-md bg-muted">
-              <Megaphone className="h-10 w-10 text-muted-foreground" />
-            </div>
-          )}
-          <div>
-            <h2 className="text-xl font-semibold tracking-tight">
-              {campaign.title ?? "–"}
-            </h2>
-          </div>
-          {campaign.briefing && (
-            <p className="whitespace-pre-wrap text-sm text-muted-foreground">
-              {campaign.briefing}
-            </p>
-          )}
-        </CardContent>
-      </Card>
+      <CampaignCard campaign={campaign} />
+
 
       {/* Schedule */}
       <Card>
