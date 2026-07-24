@@ -334,7 +334,7 @@
       "schedule": "Laufzeit und Fristen bestätigen",
       "publish": "Publizieren"
     },
-    "explanation": "Durch das Publizieren der Kampagne wird diese auf dem öffentlichen Marktplatz sichtbar.",
+    "explanation": "Durch das Publizieren der Kampagne wird diese auf dem öffentlichen Marktplatz sichtbar. Passende Influencer werden über die Kampagne informiert und können sich bewerben.\nDie Kampagne kann jederzeit zurückgezogen werden.",
     "previewButton": "Vorschau anzeigen",
     "publishButton": "Publizieren",
     "notDraftHint": "Nur Kampagnen im Status «Entwurf» können publiziert werden.",

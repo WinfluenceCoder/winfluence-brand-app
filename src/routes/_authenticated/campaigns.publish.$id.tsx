@@ -258,7 +258,7 @@ function PublishCampaignPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between gap-4">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground whitespace-pre-line">
               {t("campaignPublish.explanation")}
             </p>
             <Button variant="outline" type="button" asChild>
