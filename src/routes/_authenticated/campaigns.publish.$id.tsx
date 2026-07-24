@@ -7,13 +7,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { ChevronLeft, Megaphone } from "lucide-react";
+import { ChevronLeft, ExternalLink } from "lucide-react";
 import { getMyCampaign, publishCampaign } from "@/lib/campaigns.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { CampaignCard } from "@/components/app/CampaignCard";
 import { cn } from "@/lib/utils";
+
 
 export const Route = createFileRoute("/_authenticated/campaigns/publish/$id")({
   component: PublishCampaignPage,
