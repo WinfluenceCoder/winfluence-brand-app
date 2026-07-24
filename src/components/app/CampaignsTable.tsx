@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Megaphone, MoreHorizontal, Pencil, Send, Trash2 } from "lucide-react";
+import { Megaphone, MoreVertical, Pencil, Send, Trash2 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -225,7 +225,7 @@ export function CampaignsTable({ rows, statusFilter }: Props) {
                       aria-label={t("campaignsList.actions.openMenu")}
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <MoreHorizontal className="h-4 w-4" />
+                      <MoreVertical className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
