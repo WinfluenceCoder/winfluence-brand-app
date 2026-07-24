@@ -1,55 +1,84 @@
 ## Ziel
 
-In der `CampaignsTable` am Zeilenende ein 3-Punkte-Menü mit Aktionen ergänzen und eine neue Platzhalterroute `/campaigns/publish/$id` anlegen.
+Die bestehende Platzhalter-Route `/campaigns/publish/$id` zu einer funktionalen Publizieren-Seite ausbauen: Kampagnendaten read-only anzeigen, Fristen-/Laufzeit-Felder editierbar mit angepasster Validierung, und Publish-Aktion, die den Status auf `published` setzt.
 
 ## Änderungen
 
-### 1. `src/components/app/CampaignsTable.tsx`
+### 1. `src/lib/campaigns.functions.ts`
 
-- Neue Spalte ganz rechts (`TableHead` leer, `w-12`) für das Aktionsmenü.
-- Pro Zeile ein shadcn `DropdownMenu` mit `MoreHorizontal`-Trigger (Ghost-IconButton).
-  - Trigger-Klick per `stopPropagation`, damit der bestehende Row-Click (Navigation nach Edit) nicht feuert.
-- Menüeinträge (jeweils mit Lucide-Icon links):
-  - `Pencil` „Bearbeiten" → `router.navigate({ to: "/campaigns/$id/edit", params: { id } })`
-  - `Send` „Publizieren" → `router.navigate({ to: "/campaigns/publish/$id", params: { id } })`
-  - Separator
-  - `Trash2` „Löschen" (rot, `text-destructive focus:text-destructive`) → öffnet lokalen `AlertDialog`.
-- Delete-Flow analog zum Button in `CampaignForm`:
-  - Vor Öffnen des Dialogs `getCampaignDeletability` per `useMutation`/`useServerFn` prüfen; bei `canDelete=false` Toast mit passendem Grund (`status` / `collabs`) und Dialog nicht öffnen. Alternativ Dialog direkt öffnen und Bedingungen dort anzeigen — Umsetzung analog zu `CampaignForm.tsx` (dortiges Muster übernehmen).
-  - Bei Bestätigung `deleteCampaign` aufrufen, danach `queryClient.invalidateQueries({ queryKey: ["campaigns"] })` und Toast.
-- i18n-Keys wiederverwenden, wo vorhanden (`campaignsList.actions.*` neu ergänzen, sonst bestehende Delete-Texte aus `campaignForm`/`campaignsList` nutzen).
+Neue Server-Funktion `publishCampaign`:
 
-### 2. `src/locales/de.json`
+- Input: `{ id: number, apply_till: string, start: string, ende: string }` (alle drei required, ISO-Strings)
+- Middleware: `requireSupabaseAuth`
+- Validiert Ownership via `loadOwnedCampaign` und wirft `not-publishable-status`, falls Status ≠ `draft`.
+- Server-seitige Datums-Checks parallel zu Client-Validierung:
+  - `apply_till >= heute + 1 Tag`
+  - `start > apply_till`
+  - `ende > start`
+- Update: setzt `status = 'published'`, `apply_till`, `start`, `ende`, `updated_at`.
 
-Neue Keys unter `campaignsList.actions`:
+### 2. `src/routes/_authenticated/campaigns.publish.$id.tsx`
 
-- `openMenu` (aria-label)
-- `edit` „Editieren"
-- `publish` „Publizieren"
-- `delete` „Löschen"
+Platzhalter durch vollwertige Seite ersetzen.
 
-Bestehende Delete-Confirm-/Fehlertexte werden wiederverwendet.
+**Layout (`mx-auto max-w-4xl space-y-6 p-8`):**
 
-### 3. Neue Route `src/routes/_authenticated/campaigns.publish.$id.tsx`
+1. **Zurück-Link** oben (`ChevronLeft` + `common.back`, `router.history.back()`).
+2. **Header-Zeile** (`flex items-center justify-between`):
+   - Links: `<h1>` „Kampagne publizieren"
+   - Rechts: Button „Kampagne bearbeiten" → `/campaigns/$id/edit` (`variant="outline"`)
+3. **Read-only-Card „Kampagne"**:
+   - Visual (`campaign_visual_url`) als abgerundetes Bild
+   - Titel als großer Text unterhalb
+   - Briefing als Fließtext (`whitespace-pre-wrap text-sm`)
+4. **Card „Laufzeit und Fristen bestätigen"** — Feldreihenfolge:
+   1. `apply_till` (Bewerbung bis) — **alleine auf einer Zeile** (volle Breite)
+   2. `start` und `ende` — **nebeneinander** in `grid gap-4 sm:grid-cols-2`
+   - Alle drei `datetime-local`, alle required, gleiche Label/Placeholder wie in `CampaignForm`.
+   - Validierung via Zod + `superRefine`:
+     - `apply_till` required → `validation.required`
+     - `apply_till < heute + 1 Tag` → „Bewerbungsfrist muss mindestens 1 Tag betragen"
+     - `start` required
+     - `start <= apply_till` → „Kampagne kann erst nach der Bewerbungsfrist starten"
+     - `ende` required
+     - `ende <= start` → bestehender Key `campaignForm.errors.endAfterStart`
+5. **Card „Publizieren"**:
+   - Zeile (`flex items-center justify-between`): Erklärungstext links („Durch das Publizieren…") + Button „Vorschau anzeigen" rechts (`variant="outline"`, Link zu `/campaigns/preview/$id`).
+   - Darunter Buttons linksbündig: „Publizieren" (primary, submit) + „Abbrechen" (`variant="outline"`, `router.history.back()`).
 
-Platzhalterseite:
+**Verhalten:**
 
-```tsx
-export const Route = createFileRoute("/_authenticated/campaigns/publish/$id")({
-  component: PublishCampaignPage,
-});
-```
+- Daten-Load via `useSuspenseQuery` + `getMyCampaign` (Pattern wie Edit-Route).
+- Default-Werte für `apply_till`, `start`, `ende` aus geladener Kampagne via lokalem `toLocal()`-Helper.
+- Publizieren-Mutation → neue `publishCampaign` server-fn. onSuccess: `qc.invalidateQueries({ queryKey: ["campaigns"] })` + `["home", "campaigns"]`, Toast, Navigation zu `/campaigns?status=published`.
+- Fehler-Toasts: `not-publishable-status` → spezifische Meldung, sonst generisch.
+- Wenn `status !== 'draft'`: Publish-Button `disabled` + Hinweistext.
 
-Inhalt: `p-8`, Zurück-Link (`router.history.back()`), `h1` „Kampagne publizieren", Kurztext „Inhalt folgt." Keine Backend-Logik.
+### 3. Neue Platzhalter-Route `src/routes/_authenticated/campaigns.preview.$id.tsx`
 
-### 4. Keine Änderung an
+Minimaler Platzhalter: Zurück-Link, `h1` „Kampagnen-Vorschau", Kurztext „Inhalt folgt.", Anzeige der ID. Keine Backend-Logik.
 
-- `src/routes/_authenticated/campaigns.index.tsx` (Tabelle bleibt eingebunden)
-- `src/routes/_authenticated/index.tsx` (Dashboard nutzt gleiche Tabelle → Menü erscheint dort automatisch)
-- `src/lib/campaigns.functions.ts` (bestehende Server-Funktionen decken Deletability + Delete bereits ab)
-- Sidebar / DB / RLS
+### 4. `src/locales/de.json`
+
+Neue Keys unter `campaignPublish`:
+
+- `title`, `editButton`, `sections.campaign`, `sections.schedule`, `sections.publish`
+- `explanation`, `previewButton`, `publishButton`, `notDraftHint`
+- `published`, `publishError`, `publishErrorStatus`
+- `previewTitle`, `previewPlaceholder`
+- `errors.applyTillMin`: „Bewerbungsfrist muss mindestens 1 Tag betragen"
+- `errors.startAfterApply`: „Kampagne kann erst nach der Bewerbungsfrist starten"
+
+Labels für `apply_till`/`start`/`ende` und `endAfterStart` werden aus bestehendem `campaignForm.*` wiederverwendet.
+
+### 5. Keine Änderung an
+
+- `src/components/app/CampaignsTable.tsx` (Menüeintrag verlinkt bereits korrekt)
+- Datenbank / RLS
+- `src/components/app/CampaignForm.tsx`
 
 ## Technische Hinweise
 
-- Row-Navigation bleibt (Click auf Zelle → Edit). Menü-Trigger und `DropdownMenuContent` verhindern Propagation.
-- Delete-Prüfung server-seitig via bestehende `getCampaignDeletability` / `deleteCampaign` (RLS-Policy in `.lovable/external-supabase-campaigns-delete-policy.sql` bereits vorhanden).
+- `toLocal`/`fromLocal`-Helper in der Publish-Route lokal duplizieren (klein, gleiche Semantik wie in `CampaignForm`).
+- „heute + 1 Tag"-Schwelle: `const minApply = new Date(); minApply.setDate(minApply.getDate() + 1);` — Vergleich auf Zeitstempel-Ebene (nicht Kalendertag), damit clientseitig direkt nutzbar. Server-seitig identisch prüfen.
+- `publishCampaign` prüft Status server-seitig (Race-Safety); RLS erzwingt Ownership über `brand_id`.

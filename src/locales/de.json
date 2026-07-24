@@ -313,6 +313,28 @@
       "applyBeforeStart": "Die Bewerbungsfrist muss vor dem Start liegen."
     }
   },
+  "campaignPublish": {
+    "title": "Kampagne publizieren",
+    "editButton": "Kampagne bearbeiten",
+    "sections": {
+      "campaign": "Kampagne",
+      "schedule": "Laufzeit und Fristen bestätigen",
+      "publish": "Publizieren"
+    },
+    "explanation": "Durch das Publizieren der Kampagne wird diese auf dem öffentlichen Marktplatz sichtbar.",
+    "previewButton": "Vorschau anzeigen",
+    "publishButton": "Publizieren",
+    "notDraftHint": "Nur Kampagnen im Status «Entwurf» können publiziert werden.",
+    "published": "Kampagne publiziert.",
+    "publishError": "Kampagne konnte nicht publiziert werden.",
+    "publishErrorStatus": "Kampagne ist nicht mehr im Status «Entwurf».",
+    "previewTitle": "Kampagnen-Vorschau",
+    "previewPlaceholder": "Inhalt folgt.",
+    "errors": {
+      "applyTillMin": "Bewerbungsfrist muss mindestens 1 Tag betragen.",
+      "startAfterApply": "Kampagne kann erst nach der Bewerbungsfrist starten."
+    }
+  },
   "industry": {
     "beauty_cosmetics": "Beauty & Kosmetik",
     "fashion_accessories": "Mode & Accessoires",
