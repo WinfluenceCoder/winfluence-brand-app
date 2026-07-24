@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WelcomeRouteImport } from './routes/welcome'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SignedOutRouteImport } from './routes/signed-out'
 import { Route as SetPasswordRouteImport } from './routes/set-password'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -37,6 +38,11 @@ import { Route as AuthenticatedCampaignsIdEditRouteImport } from './routes/_auth
 const WelcomeRoute = WelcomeRouteImport.update({
   id: '/welcome',
   path: '/welcome',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SignedOutRoute = SignedOutRouteImport.update({
@@ -174,6 +180,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/set-password': typeof SetPasswordRoute
   '/signed-out': typeof SignedOutRoute
+  '/terms': typeof TermsRoute
   '/welcome': typeof WelcomeRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/security': typeof AuthenticatedSecurityRoute
@@ -198,6 +205,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/set-password': typeof SetPasswordRoute
   '/signed-out': typeof SignedOutRoute
+  '/terms': typeof TermsRoute
   '/welcome': typeof WelcomeRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/security': typeof AuthenticatedSecurityRoute
@@ -225,6 +233,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/set-password': typeof SetPasswordRoute
   '/signed-out': typeof SignedOutRoute
+  '/terms': typeof TermsRoute
   '/welcome': typeof WelcomeRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/security': typeof AuthenticatedSecurityRoute
@@ -253,6 +262,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/set-password'
     | '/signed-out'
+    | '/terms'
     | '/welcome'
     | '/profile'
     | '/security'
@@ -277,6 +287,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/set-password'
     | '/signed-out'
+    | '/terms'
     | '/welcome'
     | '/profile'
     | '/security'
@@ -303,6 +314,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/set-password'
     | '/signed-out'
+    | '/terms'
     | '/welcome'
     | '/_authenticated/profile'
     | '/_authenticated/security'
@@ -330,6 +342,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SetPasswordRoute: typeof SetPasswordRoute
   SignedOutRoute: typeof SignedOutRoute
+  TermsRoute: typeof TermsRoute
   WelcomeRoute: typeof WelcomeRoute
 }
 
@@ -340,6 +353,13 @@ declare module '@tanstack/react-router' {
       path: '/welcome'
       fullPath: '/welcome'
       preLoaderRoute: typeof WelcomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/signed-out': {
@@ -560,6 +580,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SetPasswordRoute: SetPasswordRoute,
   SignedOutRoute: SignedOutRoute,
+  TermsRoute: TermsRoute,
   WelcomeRoute: WelcomeRoute,
 }
 export const routeTree = rootRouteImport
