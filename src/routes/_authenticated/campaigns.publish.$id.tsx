@@ -299,7 +299,6 @@ function PublishCampaignPage() {
           </div>
         </CardContent>
 
-        </CardContent>
       </Card>
     </form>
   );
