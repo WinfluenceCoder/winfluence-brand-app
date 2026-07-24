@@ -7,13 +7,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { ChevronLeft, Megaphone } from "lucide-react";
+import { ChevronLeft, ExternalLink } from "lucide-react";
 import { getMyCampaign, publishCampaign } from "@/lib/campaigns.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { CampaignCard } from "@/components/app/CampaignCard";
 import { cn } from "@/lib/utils";
+
 
 export const Route = createFileRoute("/_authenticated/campaigns/publish/$id")({
   component: PublishCampaignPage,
@@ -108,6 +111,8 @@ function PublishCampaignPage() {
   const invalidCls = "border-destructive focus-visible:ring-destructive";
   const isDraft = campaign.status === "draft";
   const [submitting, setSubmitting] = useState(false);
+  const [agbAccepted, setAgbAccepted] = useState(false);
+
 
   const mutation = useMutation({
     mutationFn: (values: FormValues) =>
@@ -175,34 +180,8 @@ function PublishCampaignPage() {
       </div>
 
       {/* Read-only campaign data */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("campaignPublish.sections.campaign")}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {campaign.campaign_visual_url ? (
-            <img
-              src={campaign.campaign_visual_url}
-              alt=""
-              className="h-64 w-full rounded-md object-cover"
-            />
-          ) : (
-            <div className="flex h-64 w-full items-center justify-center rounded-md bg-muted">
-              <Megaphone className="h-10 w-10 text-muted-foreground" />
-            </div>
-          )}
-          <div>
-            <h2 className="text-xl font-semibold tracking-tight">
-              {campaign.title ?? "–"}
-            </h2>
-          </div>
-          {campaign.briefing && (
-            <p className="whitespace-pre-wrap text-sm text-muted-foreground">
-              {campaign.briefing}
-            </p>
-          )}
-        </CardContent>
-      </Card>
+      <CampaignCard campaign={campaign} />
+
 
       {/* Schedule */}
       <Card>
@@ -210,23 +189,24 @@ function PublishCampaignPage() {
           <CardTitle>{t("campaignPublish.sections.schedule")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="apply_till">
-              {t("campaignForm.labels.apply_till")} *
-            </Label>
-            <Input
-              id="apply_till"
-              type="datetime-local"
-              {...form.register("apply_till")}
-              className={cn(errors.apply_till && invalidCls)}
-            />
-            {fieldError("apply_till") && (
-              <p className="mt-1 text-sm text-destructive">
-                {fieldError("apply_till")}
-              </p>
-            )}
-          </div>
           <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <Label htmlFor="apply_till">
+                {t("campaignForm.labels.apply_till")} *
+              </Label>
+              <Input
+                id="apply_till"
+                type="datetime-local"
+                {...form.register("apply_till")}
+                className={cn(errors.apply_till && invalidCls)}
+              />
+              {fieldError("apply_till") && (
+                <p className="mt-1 text-sm text-destructive">
+                  {fieldError("apply_till")}
+                </p>
+              )}
+            </div>
+            <div className="hidden sm:block" aria-hidden="true" />
             <div>
               <Label htmlFor="start">
                 {t("campaignForm.labels.start")} *
@@ -261,6 +241,7 @@ function PublishCampaignPage() {
             </div>
           </div>
         </CardContent>
+
       </Card>
 
       {/* Publish */}
@@ -274,13 +255,30 @@ function PublishCampaignPage() {
               {t("campaignPublish.explanation")}
             </p>
             <Button variant="outline" type="button" asChild>
-              <Link
-                to="/campaigns/preview/$id"
-                params={{ id: String(campaignId) }}
+              <a
+                href={`/campaigns/preview/${campaignId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1"
               >
                 {t("campaignPublish.previewButton")}
-              </Link>
+                <ExternalLink className="h-4 w-4" />
+              </a>
             </Button>
+          </div>
+          <div className="flex items-start gap-2">
+            <Checkbox
+              id="agb"
+              checked={agbAccepted}
+              onCheckedChange={(v) => setAgbAccepted(v === true)}
+            />
+            <Label htmlFor="agb" className="text-sm font-normal leading-snug">
+              {t("campaignPublish.agbBefore")}
+              <Link to="/terms" target="_blank" className="underline">
+                {t("campaignPublish.agbLinkLabel")}
+              </Link>
+              {t("campaignPublish.agbAfter")}
+            </Label>
           </div>
           {!isDraft && (
             <p className="text-sm text-destructive">
@@ -288,7 +286,7 @@ function PublishCampaignPage() {
             </p>
           )}
           <div className="flex items-center gap-2">
-            <Button type="submit" disabled={!isDraft || submitting}>
+            <Button type="submit" disabled={!isDraft || submitting || !agbAccepted}>
               {t("campaignPublish.publishButton")}
             </Button>
             <Button
@@ -300,6 +298,7 @@ function PublishCampaignPage() {
             </Button>
           </div>
         </CardContent>
+
       </Card>
     </form>
   );

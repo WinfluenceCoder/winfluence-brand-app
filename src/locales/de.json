@@ -330,11 +330,19 @@
     "publishErrorStatus": "Kampagne ist nicht mehr im Status «Entwurf».",
     "previewTitle": "Kampagnen-Vorschau",
     "previewPlaceholder": "Inhalt folgt.",
+    "agbBefore": "Ich habe die ",
+    "agbLinkLabel": "AGB",
+    "agbAfter": " gelesen und bin damit einverstanden.",
     "errors": {
       "applyTillMin": "Bewerbungsfrist muss mindestens 1 Tag betragen.",
       "startAfterApply": "Kampagne kann erst nach der Bewerbungsfrist starten."
     }
   },
+  "terms": {
+    "title": "AGB",
+    "placeholder": "Inhalt folgt."
+  },
+
   "industry": {
     "beauty_cosmetics": "Beauty & Kosmetik",
     "fashion_accessories": "Mode & Accessoires",
