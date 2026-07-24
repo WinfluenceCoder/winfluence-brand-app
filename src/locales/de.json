@@ -243,6 +243,18 @@
     "settings": "Einstellungen"
   },
   "campaignForm": {
+    "statusLabel": "Status",
+    "viewLive": "Live Version anzeigen",
+    "partialEditWarning": "Daten können nur noch teilweise geändert werden (Brand-Logo, Kampagnen-Visual, Budget, Links, Bewerbungsfrist, Barter Bestell-URL und Barter Gutscheincode).",
+    "statuses": {
+      "draft": "Entwurf",
+      "published": "Publiziert",
+      "running": "Laufend",
+      "expired": "Abgelaufen",
+      "ended": "Beendet",
+      "approved": "Genehmigt",
+      "archived": "Archiviert"
+    },
     "newTitle": "Neue Kampagne",
     "editTitle": "Kampagne bearbeiten",
     "created": "Kampagne wurde erstellt.",
