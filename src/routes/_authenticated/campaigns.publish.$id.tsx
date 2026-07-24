@@ -83,7 +83,7 @@ function PublishCampaignPage() {
     queryFn: () => fetchCampaign({ data: { id: campaignId } }),
   });
 
-  const campaign = data as {
+  const campaign = data as unknown as {
     id: number;
     title: string | null;
     briefing: string | null;
