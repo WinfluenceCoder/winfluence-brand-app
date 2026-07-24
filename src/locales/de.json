@@ -211,9 +211,22 @@
     "showAll": "Alle anzeigen",
     "actions": {
       "openMenu": "Aktionen öffnen",
+      "nextStep": "Next Step",
       "edit": "Bearbeiten",
+      "preview": "Vorschau",
       "publish": "Publizieren",
-      "delete": "Löschen"
+      "delete": "Löschen",
+      "start": "Starten",
+      "end": "Beenden",
+      "extend": "Verlängern",
+      "approve": "Genehmigen",
+      "archive": "Archivieren",
+      "restart": "Neu starten",
+      "curate": "Kuratieren",
+      "revoke": "Zurückziehen",
+      "monitor": "Überwachen",
+      "rate": "Bewerten",
+      "stats": "Statistik"
     }
   },
   "placeholders": {
