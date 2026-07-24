@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useRouter } from "@tanstack/react-router";
+import { Link, useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Megaphone, MoreVertical, Pencil, Send, Trash2 } from "lucide-react";
+import { Megaphone, MoreVertical } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -44,6 +44,10 @@ import {
   deleteCampaign,
   getCampaignDeletability,
 } from "@/lib/campaigns.functions";
+import {
+  getCampaignWorkflow,
+  type WorkflowAction,
+} from "@/lib/campaign-workflow";
 
 export function formatDate(iso: string | null) {
   if (!iso) return "–";
@@ -144,6 +148,49 @@ export function CampaignsTable({ rows, statusFilter }: Props) {
     }
   };
 
+  const renderMenuItem = (id: number, action: WorkflowAction) => {
+    const Icon = action.icon;
+    if (action.key === "delete") {
+      return (
+        <DropdownMenuItem
+          key={action.key}
+          className="text-destructive focus:text-destructive"
+          onSelect={() => {
+            void requestDelete(id);
+          }}
+        >
+          <Icon className="h-4 w-4" />
+          {t(action.labelKey)}
+        </DropdownMenuItem>
+      );
+    }
+    if (action.openInNewTab) {
+      const href = action.route.to.replace("$id", String(id));
+      return (
+        <DropdownMenuItem key={action.key} asChild>
+          <a href={href} target="_blank" rel="noopener noreferrer">
+            <Icon className="h-4 w-4" />
+            {t(action.labelKey)}
+          </a>
+        </DropdownMenuItem>
+      );
+    }
+    return (
+      <DropdownMenuItem
+        key={action.key}
+        onSelect={() =>
+          router.navigate({
+            to: action.route.to,
+            params: { id: String(id) },
+          })
+        }
+      >
+        <Icon className="h-4 w-4" />
+        {t(action.labelKey)}
+      </DropdownMenuItem>
+    );
+  };
+
   return (
     <>
       <Table>
@@ -170,6 +217,7 @@ export function CampaignsTable({ rows, statusFilter }: Props) {
                 <span className="px-4">{t("home.tableStatus")}</span>
               )}
             </TableHead>
+            <TableHead>{t("campaignsList.actions.nextStep")}</TableHead>
             <TableHead>{t("home.tableStart")}</TableHead>
             <TableHead>{t("home.tableEnd")}</TableHead>
             <TableHead className="text-right">{t("home.tableBudget")}</TableHead>
@@ -177,95 +225,95 @@ export function CampaignsTable({ rows, statusFilter }: Props) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {rows.map((row) => (
-            <TableRow
-              key={row.id}
-              className="cursor-pointer"
-              onClick={() =>
-                router.navigate({
-                  to: "/campaigns/$id/edit",
-                  params: { id: String(row.id) },
-                })
-              }
-            >
-              <TableCell>
-                {row.campaign_visual_url ? (
-                  <img
-                    src={row.campaign_visual_url}
-                    alt=""
-                    className="h-12 w-12 rounded-md object-cover"
-                  />
-                ) : (
-                  <div className="flex h-12 w-12 items-center justify-center rounded-md bg-muted">
-                    <Megaphone className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                )}
-              </TableCell>
-              <TableCell className="font-medium">{row.title}</TableCell>
-              <TableCell>
-                <Badge variant={statusVariant(row.status)}>
-                  {statusLabel(t, row.status)}
-                </Badge>
-              </TableCell>
-              <TableCell>{formatDate(row.start)}</TableCell>
-              <TableCell>{formatDate(row.ende)}</TableCell>
-              <TableCell className="text-right tabular-nums">
-                {row.budget != null ? `CHF ${row.budget.toLocaleString("de-CH")}` : "–"}
-              </TableCell>
-              <TableCell
-                className="text-right"
-                onClick={(e) => e.stopPropagation()}
+          {rows.map((row) => {
+            const wf = getCampaignWorkflow(row.status);
+            const next = wf.nextStep;
+            const NextIcon = next?.icon;
+            return (
+              <TableRow
+                key={row.id}
+                className="cursor-pointer"
+                onClick={() =>
+                  router.navigate({
+                    to: wf.rowClick.to,
+                    params: { id: String(row.id) },
+                  })
+                }
               >
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
-                      aria-label={t("campaignsList.actions.openMenu")}
-                      onClick={(e) => e.stopPropagation()}
+                <TableCell>
+                  {row.campaign_visual_url ? (
+                    <img
+                      src={row.campaign_visual_url}
+                      alt=""
+                      className="h-12 w-12 rounded-md object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-12 w-12 items-center justify-center rounded-md bg-muted">
+                      <Megaphone className="h-5 w-5 text-muted-foreground" />
+                    </div>
+                  )}
+                </TableCell>
+                <TableCell className="font-medium">{row.title}</TableCell>
+                <TableCell>
+                  <Badge variant={statusVariant(row.status)}>
+                    {statusLabel(t, row.status)}
+                  </Badge>
+                </TableCell>
+                <TableCell onClick={(e) => e.stopPropagation()}>
+                  {next && NextIcon ? (
+                    <Link
+                      to={next.route.to}
+                      params={{ id: String(row.id) }}
+                      className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline underline-offset-4"
                     >
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem
-                      onSelect={() =>
-                        router.navigate({
-                          to: "/campaigns/$id/edit",
-                          params: { id: String(row.id) },
-                        })
-                      }
-                    >
-                      <Pencil className="h-4 w-4" />
-                      {t("campaignsList.actions.edit")}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onSelect={() =>
-                        router.navigate({
-                          to: "/campaigns/publish/$id",
-                          params: { id: String(row.id) },
-                        })
-                      }
-                    >
-                      <Send className="h-4 w-4" />
-                      {t("campaignsList.actions.publish")}
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      className="text-destructive focus:text-destructive"
-                      onSelect={() => {
-                        void requestDelete(row.id);
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      {t("campaignsList.actions.delete")}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
-            </TableRow>
-          ))}
+                      <NextIcon className="h-4 w-4" />
+                      {t(next.labelKey)}
+                    </Link>
+                  ) : (
+                    "–"
+                  )}
+                </TableCell>
+                <TableCell>{formatDate(row.start)}</TableCell>
+                <TableCell>{formatDate(row.ende)}</TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {row.budget != null ? `CHF ${row.budget.toLocaleString("de-CH")}` : "–"}
+                </TableCell>
+                <TableCell
+                  className="text-right"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        aria-label={t("campaignsList.actions.openMenu")}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      {wf.menu.map((action, idx) => {
+                        const isLast = idx === wf.menu.length - 1;
+                        const needsSeparator =
+                          action.destructive && !isLast === false && idx > 0
+                            ? true
+                            : action.destructive && idx > 0;
+                        return (
+                          <div key={action.key}>
+                            {needsSeparator ? <DropdownMenuSeparator /> : null}
+                            {renderMenuItem(row.id, action)}
+                          </div>
+                        );
+                      })}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
 
