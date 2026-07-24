@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
 import { useSuspenseQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -100,12 +100,19 @@ function PublishCampaignPage() {
   const schema = makeSchema(t);
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
+    mode: "onChange",
+    reValidateMode: "onChange",
     defaultValues: {
       apply_till: toLocal(campaign.apply_till),
       start: toLocal(campaign.start),
       ende: toLocal(campaign.ende),
     },
   });
+
+  useEffect(() => {
+    void form.trigger();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const errors = form.formState.errors;
   const invalidCls = "border-destructive focus-visible:ring-destructive";
@@ -286,7 +293,16 @@ function PublishCampaignPage() {
             </p>
           )}
           <div className="flex items-center gap-2">
-            <Button type="submit" disabled={!isDraft || submitting || !agbAccepted}>
+            <Button
+              type="submit"
+              disabled={
+                !isDraft ||
+                submitting ||
+                !agbAccepted ||
+                !form.formState.isValid
+              }
+            >
+
               {t("campaignPublish.publishButton")}
             </Button>
             <Button
