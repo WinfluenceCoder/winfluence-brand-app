@@ -1,50 +1,34 @@
-# Kampagnen-Workflow: Status-abhängige Aktionen
+## Ziel
+`/campaigns/$id/edit` status-abhängig anpassen: Statusanzeige, "Live-Version"-Button, Warnhinweis bei `published`, und partielle bzw. vollständige Read-Only-Modi.
 
-## Neue Platzhalter-Routen
+## Änderungen
 
-Je eine Datei unter `src/routes/_authenticated/` mit Zurück-Link, Titel und ID-Anzeige (analog `campaigns.preview.$id.tsx`):
+### 1. `src/components/app/CampaignForm.tsx`
+- `initial` Type um `status?: string | null` erweitern; `status` als Prop durchreichen (aus `initial`).
+- Editierbarkeit ableiten:
+  - `isDraft` (oder `mode === "create"`): alles editierbar (Status quo).
+  - `isPublished` (`status === "published"`): nur diese Felder editierbar — `brand_logo_url`, `campaign_visual_url`, `budget`, `link_list`, `target_url`, `apply_till`, `barter_order_url`, `barter_order_coupon`. Alle übrigen als Read-Only-Anzeige rendern.
+  - `isLocked` (`status ∈ {running, expired, ended, approved, archived}`): alle Felder read-only, Buttons (Speichern/Abbrechen/Löschen) entfernt.
+- Neuer Block direkt unter `<h1>` (nur `mode === "edit"`):
+  - Zeile 1: Statusanzeige links (übersetztes Label, `Badge`), rechts „Live Version anzeigen" (`Button variant="outline" asChild`, `<a target="_blank">` auf `/campaigns/preview/$id`) — nur wenn `status ∈ {published, running, expired, ended, approved, archived}`.
+  - Zeile 2 (nur bei `published`): Warnhinweis mit `AlertTriangle`-Icon + i18n-Text („Daten können nur noch teilweise geändert werden …").
+- Read-only Rendering: Für Felder, die im aktuellen Status gesperrt sind, statt `<Input>`/`<Textarea>`/`<Select>`/`<ImageUploadField>` eine reine Anzeige (kleiner Text-Block, bei Bild ein `<img>` mit gerundeten Ecken analog Preview-Card, bei Datum formatierter String, bei Budget mit Tausender-Trennzeichen). Ein einfacher `ReadOnlyField`-Helfer inline in derselben Datei.
+- Validierung `apply_till < start` bleibt bestehen (bei `published` ist `start` gesperrt aber der Wert im Form, sodass die Cross-Field-Regel weiterhin greift).
+- Submit- / Delete-Verhalten:
+  - `isLocked`: gesamte Button-Leiste (inkl. AlertDialogs) nicht rendern.
+  - `isPublished`: Buttons bleiben; `updateCampaign` erhält weiterhin alle Felder aus dem Form (die read-only Werte kommen aus `defaultValues`).
+  - `draft`: unverändert.
 
-- `campaigns.start.$id.tsx` → `/campaigns/start/$id`
-- `campaigns.end.$id.tsx` → `/campaigns/end/$id`
-- `campaigns.extend.$id.tsx` → `/campaigns/extend/$id`
-- `campaigns.approve.$id.tsx` → `/campaigns/approve/$id`
-- `campaigns.archive.$id.tsx` → `/campaigns/archive/$id`
-- `campaigns.re-start.$id.tsx` → `/campaigns/re-start/$id`
-- `campaigns.curate.$id.tsx` → `/campaigns/curate/$id`
-- `campaigns.revoke.$id.tsx` → `/campaigns/revoke/$id`
-- `campaigns.monitor.$id.tsx` → `/campaigns/monitor/$id`
-- `campaigns.rate.$id.tsx` → `/campaigns/rate/$id`
-- `campaigns.stats.$id.tsx` → `/campaigns/stats/$id`
+### 2. `src/locales/de.json`
+Neue Keys unter `campaignForm`:
+- `statusLabel`: „Status"
+- `viewLive`: „Live Version anzeigen"
+- `partialEditWarning`: „Daten können nur noch teilweise geändert werden (Brand-Logo, Kampagnen-Visual, Budget, Links, Bewerbungsfrist, Barter Bestell-URL und Barter Gutscheincode)."
+- `statuses`: { draft, published, running, expired, ended, approved, archived } — deutsche Labels.
 
-(Hinweis: User schreibt teils `/campaign/...`, teils `/campaigns/...`. Ich vereinheitliche auf `/campaigns/...`, konsistent mit den bestehenden Routen `campaigns/publish`, `campaigns/preview`, `campaigns/$id/edit`.)
+### 3. `src/routes/_authenticated/campaigns.$id.edit.tsx`
+Keine Anpassung nötig — `data` enthält bereits `status` und wird vollständig als `initial` weitergereicht.
 
-## Zentrale Workflow-Map
-
-Neue Datei `src/lib/campaign-workflow.ts` mit einer Map `status → { rowClick, nextStep, menu[] }`. Jede Aktion trägt: `key`, Übersetzungs-Key, Lucide-Icon, Ziel-Route (`to` + optional `openInNewTab`). Diese Map ist Single Source of Truth für Tabelle und Menü.
-
-Icon-Zuordnung (Lucide):
-- publizieren `Send`, starten `Play`, beenden `Square`, verlängern `CalendarPlus`, genehmigen `CheckCircle2`, archivieren `Archive`, neu starten `RotateCcw`
-- bearbeiten `Pencil`, Vorschau `Eye`, löschen `Trash2`
-- kuratieren `ListChecks`, zurückziehen `Undo2`
-- überwachen `Activity`, bewerten `Star`, Statistik `BarChart3`
-
-## `src/components/app/CampaignsTable.tsx`
-
-- Neue Spalte „Next Step" rechts neben Status. Rendert Icon + Link-Text aus Workflow-Map (Standard: interner `<Link>`; `stopPropagation` gegen Row-Click). `draft` → nutzt bestehende Preview-Regel (in neuem Tab, sonst intern).
-- Kontext-Menü: statt fester Einträge aus Workflow-Map generiert. Löschen für `draft` bleibt am Ende separat (bestehender Delete-Flow mit `AlertDialog`). Vorschau öffnet in neuem Tab (`target="_blank"`).
-- Row-Click: statt fixer Route auf `campaigns/$id/edit` → Ziel aus Workflow-Map (`rowClick`). Menü-Zelle behält `stopPropagation`.
-
-## Übersetzungen
-
-`src/locales/de.json` → `campaignsList.actions` um neue Keys erweitern: `start`, `end`, `extend`, `approve`, `archive`, `restart`, `curate`, `revoke`, `monitor`, `rate`, `stats`, `nextStep` (Spaltentitel).
-
-## Workflow-Dokumentation
-
-Neue Datei `docs/campaign-workflow.md` mit Tabelle (Spalten: Status | Zeilen-Klick | Next Step | Kontext-Menü). Am Anfang der Datei ein Hinweis: „Diese Datei ist Single Source of Truth für den Kampagnen-Workflow. Bei Änderungen an Tabelle/Menü/Row-Click IMMER auch diese Datei aktualisieren."
-
-Zusätzlich Regel in `AGENTS.md` ergänzen: Verweis auf `docs/campaign-workflow.md` mit der Pflicht, das MD-File synchron zu halten.
-
-## Nicht betroffen
-
-- Keine DB-/RLS-Änderung, keine neuen Server-Funktionen (Status-Übergänge kommen laut Aufgabenstellung in Folge-Prompts).
-- `campaigns.publish.$id.tsx` und `campaigns.preview.$id.tsx` bleiben unverändert.
+## Nicht enthalten
+- Keine Backend-/Server-Fn-Änderungen. Die serverseitige Autorisierung bleibt wie sie ist; falls in Zukunft ein „nur diese Felder bei published"-Guard serverseitig gewünscht ist, wäre das ein separater Task.
+- Kampagnen-Workflow-Doku (`docs/campaign-workflow.md`) bleibt unverändert (betrifft Tabellen-Workflow, nicht das Edit-Formular).
