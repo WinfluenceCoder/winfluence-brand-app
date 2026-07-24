@@ -189,23 +189,24 @@ function PublishCampaignPage() {
           <CardTitle>{t("campaignPublish.sections.schedule")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="apply_till">
-              {t("campaignForm.labels.apply_till")} *
-            </Label>
-            <Input
-              id="apply_till"
-              type="datetime-local"
-              {...form.register("apply_till")}
-              className={cn(errors.apply_till && invalidCls)}
-            />
-            {fieldError("apply_till") && (
-              <p className="mt-1 text-sm text-destructive">
-                {fieldError("apply_till")}
-              </p>
-            )}
-          </div>
           <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <Label htmlFor="apply_till">
+                {t("campaignForm.labels.apply_till")} *
+              </Label>
+              <Input
+                id="apply_till"
+                type="datetime-local"
+                {...form.register("apply_till")}
+                className={cn(errors.apply_till && invalidCls)}
+              />
+              {fieldError("apply_till") && (
+                <p className="mt-1 text-sm text-destructive">
+                  {fieldError("apply_till")}
+                </p>
+              )}
+            </div>
+            <div className="hidden sm:block" aria-hidden="true" />
             <div>
               <Label htmlFor="start">
                 {t("campaignForm.labels.start")} *
@@ -240,6 +241,7 @@ function PublishCampaignPage() {
             </div>
           </div>
         </CardContent>
+
       </Card>
 
       {/* Publish */}
@@ -253,13 +255,30 @@ function PublishCampaignPage() {
               {t("campaignPublish.explanation")}
             </p>
             <Button variant="outline" type="button" asChild>
-              <Link
-                to="/campaigns/preview/$id"
-                params={{ id: String(campaignId) }}
+              <a
+                href={`/campaigns/preview/${campaignId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1"
               >
                 {t("campaignPublish.previewButton")}
-              </Link>
+                <ExternalLink className="h-4 w-4" />
+              </a>
             </Button>
+          </div>
+          <div className="flex items-start gap-2">
+            <Checkbox
+              id="agb"
+              checked={agbAccepted}
+              onCheckedChange={(v) => setAgbAccepted(v === true)}
+            />
+            <Label htmlFor="agb" className="text-sm font-normal leading-snug">
+              {t("campaignPublish.agbBefore")}
+              <Link to="/terms" target="_blank" className="underline">
+                {t("campaignPublish.agbLinkLabel")}
+              </Link>
+              {t("campaignPublish.agbAfter")}
+            </Label>
           </div>
           {!isDraft && (
             <p className="text-sm text-destructive">
@@ -267,7 +286,7 @@ function PublishCampaignPage() {
             </p>
           )}
           <div className="flex items-center gap-2">
-            <Button type="submit" disabled={!isDraft || submitting}>
+            <Button type="submit" disabled={!isDraft || submitting || !agbAccepted}>
               {t("campaignPublish.publishButton")}
             </Button>
             <Button
@@ -278,6 +297,8 @@ function PublishCampaignPage() {
               {t("common.cancel")}
             </Button>
           </div>
+        </CardContent>
+
         </CardContent>
       </Card>
     </form>
