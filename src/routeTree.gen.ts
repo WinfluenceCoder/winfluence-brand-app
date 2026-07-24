@@ -31,8 +31,19 @@ import { Route as AuthenticatedInfluencersCurrentRouteImport } from './routes/_a
 import { Route as AuthenticatedCampaignsNewRouteImport } from './routes/_authenticated/campaigns.new'
 import { Route as AuthenticatedAnalyticsInfluencersRouteImport } from './routes/_authenticated/analytics.influencers'
 import { Route as AuthenticatedAnalyticsCampaignsRouteImport } from './routes/_authenticated/analytics.campaigns'
+import { Route as AuthenticatedCampaignsStatsIdRouteImport } from './routes/_authenticated/campaigns.stats.$id'
+import { Route as AuthenticatedCampaignsStartIdRouteImport } from './routes/_authenticated/campaigns.start.$id'
+import { Route as AuthenticatedCampaignsRevokeIdRouteImport } from './routes/_authenticated/campaigns.revoke.$id'
+import { Route as AuthenticatedCampaignsReStartIdRouteImport } from './routes/_authenticated/campaigns.re-start.$id'
+import { Route as AuthenticatedCampaignsRateIdRouteImport } from './routes/_authenticated/campaigns.rate.$id'
 import { Route as AuthenticatedCampaignsPublishIdRouteImport } from './routes/_authenticated/campaigns.publish.$id'
 import { Route as AuthenticatedCampaignsPreviewIdRouteImport } from './routes/_authenticated/campaigns.preview.$id'
+import { Route as AuthenticatedCampaignsMonitorIdRouteImport } from './routes/_authenticated/campaigns.monitor.$id'
+import { Route as AuthenticatedCampaignsExtendIdRouteImport } from './routes/_authenticated/campaigns.extend.$id'
+import { Route as AuthenticatedCampaignsEndIdRouteImport } from './routes/_authenticated/campaigns.end.$id'
+import { Route as AuthenticatedCampaignsCurateIdRouteImport } from './routes/_authenticated/campaigns.curate.$id'
+import { Route as AuthenticatedCampaignsArchiveIdRouteImport } from './routes/_authenticated/campaigns.archive.$id'
+import { Route as AuthenticatedCampaignsApproveIdRouteImport } from './routes/_authenticated/campaigns.approve.$id'
 import { Route as AuthenticatedCampaignsIdEditRouteImport } from './routes/_authenticated/campaigns.$id.edit'
 
 const WelcomeRoute = WelcomeRouteImport.update({
@@ -155,6 +166,36 @@ const AuthenticatedAnalyticsCampaignsRoute =
     path: '/analytics/campaigns',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCampaignsStatsIdRoute =
+  AuthenticatedCampaignsStatsIdRouteImport.update({
+    id: '/campaigns/stats/$id',
+    path: '/campaigns/stats/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCampaignsStartIdRoute =
+  AuthenticatedCampaignsStartIdRouteImport.update({
+    id: '/campaigns/start/$id',
+    path: '/campaigns/start/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCampaignsRevokeIdRoute =
+  AuthenticatedCampaignsRevokeIdRouteImport.update({
+    id: '/campaigns/revoke/$id',
+    path: '/campaigns/revoke/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCampaignsReStartIdRoute =
+  AuthenticatedCampaignsReStartIdRouteImport.update({
+    id: '/campaigns/re-start/$id',
+    path: '/campaigns/re-start/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCampaignsRateIdRoute =
+  AuthenticatedCampaignsRateIdRouteImport.update({
+    id: '/campaigns/rate/$id',
+    path: '/campaigns/rate/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCampaignsPublishIdRoute =
   AuthenticatedCampaignsPublishIdRouteImport.update({
     id: '/campaigns/publish/$id',
@@ -165,6 +206,42 @@ const AuthenticatedCampaignsPreviewIdRoute =
   AuthenticatedCampaignsPreviewIdRouteImport.update({
     id: '/campaigns/preview/$id',
     path: '/campaigns/preview/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCampaignsMonitorIdRoute =
+  AuthenticatedCampaignsMonitorIdRouteImport.update({
+    id: '/campaigns/monitor/$id',
+    path: '/campaigns/monitor/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCampaignsExtendIdRoute =
+  AuthenticatedCampaignsExtendIdRouteImport.update({
+    id: '/campaigns/extend/$id',
+    path: '/campaigns/extend/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCampaignsEndIdRoute =
+  AuthenticatedCampaignsEndIdRouteImport.update({
+    id: '/campaigns/end/$id',
+    path: '/campaigns/end/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCampaignsCurateIdRoute =
+  AuthenticatedCampaignsCurateIdRouteImport.update({
+    id: '/campaigns/curate/$id',
+    path: '/campaigns/curate/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCampaignsArchiveIdRoute =
+  AuthenticatedCampaignsArchiveIdRouteImport.update({
+    id: '/campaigns/archive/$id',
+    path: '/campaigns/archive/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCampaignsApproveIdRoute =
+  AuthenticatedCampaignsApproveIdRouteImport.update({
+    id: '/campaigns/approve/$id',
+    path: '/campaigns/approve/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedCampaignsIdEditRoute =
@@ -197,8 +274,19 @@ export interface FileRoutesByFullPath {
   '/messages/system': typeof AuthenticatedMessagesSystemRoute
   '/campaigns/': typeof AuthenticatedCampaignsIndexRoute
   '/campaigns/$id/edit': typeof AuthenticatedCampaignsIdEditRoute
+  '/campaigns/approve/$id': typeof AuthenticatedCampaignsApproveIdRoute
+  '/campaigns/archive/$id': typeof AuthenticatedCampaignsArchiveIdRoute
+  '/campaigns/curate/$id': typeof AuthenticatedCampaignsCurateIdRoute
+  '/campaigns/end/$id': typeof AuthenticatedCampaignsEndIdRoute
+  '/campaigns/extend/$id': typeof AuthenticatedCampaignsExtendIdRoute
+  '/campaigns/monitor/$id': typeof AuthenticatedCampaignsMonitorIdRoute
   '/campaigns/preview/$id': typeof AuthenticatedCampaignsPreviewIdRoute
   '/campaigns/publish/$id': typeof AuthenticatedCampaignsPublishIdRoute
+  '/campaigns/rate/$id': typeof AuthenticatedCampaignsRateIdRoute
+  '/campaigns/re-start/$id': typeof AuthenticatedCampaignsReStartIdRoute
+  '/campaigns/revoke/$id': typeof AuthenticatedCampaignsRevokeIdRoute
+  '/campaigns/start/$id': typeof AuthenticatedCampaignsStartIdRoute
+  '/campaigns/stats/$id': typeof AuthenticatedCampaignsStatsIdRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -223,8 +311,19 @@ export interface FileRoutesByTo {
   '/messages/system': typeof AuthenticatedMessagesSystemRoute
   '/campaigns': typeof AuthenticatedCampaignsIndexRoute
   '/campaigns/$id/edit': typeof AuthenticatedCampaignsIdEditRoute
+  '/campaigns/approve/$id': typeof AuthenticatedCampaignsApproveIdRoute
+  '/campaigns/archive/$id': typeof AuthenticatedCampaignsArchiveIdRoute
+  '/campaigns/curate/$id': typeof AuthenticatedCampaignsCurateIdRoute
+  '/campaigns/end/$id': typeof AuthenticatedCampaignsEndIdRoute
+  '/campaigns/extend/$id': typeof AuthenticatedCampaignsExtendIdRoute
+  '/campaigns/monitor/$id': typeof AuthenticatedCampaignsMonitorIdRoute
   '/campaigns/preview/$id': typeof AuthenticatedCampaignsPreviewIdRoute
   '/campaigns/publish/$id': typeof AuthenticatedCampaignsPublishIdRoute
+  '/campaigns/rate/$id': typeof AuthenticatedCampaignsRateIdRoute
+  '/campaigns/re-start/$id': typeof AuthenticatedCampaignsReStartIdRoute
+  '/campaigns/revoke/$id': typeof AuthenticatedCampaignsRevokeIdRoute
+  '/campaigns/start/$id': typeof AuthenticatedCampaignsStartIdRoute
+  '/campaigns/stats/$id': typeof AuthenticatedCampaignsStatsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -251,8 +350,19 @@ export interface FileRoutesById {
   '/_authenticated/messages/system': typeof AuthenticatedMessagesSystemRoute
   '/_authenticated/campaigns/': typeof AuthenticatedCampaignsIndexRoute
   '/_authenticated/campaigns/$id/edit': typeof AuthenticatedCampaignsIdEditRoute
+  '/_authenticated/campaigns/approve/$id': typeof AuthenticatedCampaignsApproveIdRoute
+  '/_authenticated/campaigns/archive/$id': typeof AuthenticatedCampaignsArchiveIdRoute
+  '/_authenticated/campaigns/curate/$id': typeof AuthenticatedCampaignsCurateIdRoute
+  '/_authenticated/campaigns/end/$id': typeof AuthenticatedCampaignsEndIdRoute
+  '/_authenticated/campaigns/extend/$id': typeof AuthenticatedCampaignsExtendIdRoute
+  '/_authenticated/campaigns/monitor/$id': typeof AuthenticatedCampaignsMonitorIdRoute
   '/_authenticated/campaigns/preview/$id': typeof AuthenticatedCampaignsPreviewIdRoute
   '/_authenticated/campaigns/publish/$id': typeof AuthenticatedCampaignsPublishIdRoute
+  '/_authenticated/campaigns/rate/$id': typeof AuthenticatedCampaignsRateIdRoute
+  '/_authenticated/campaigns/re-start/$id': typeof AuthenticatedCampaignsReStartIdRoute
+  '/_authenticated/campaigns/revoke/$id': typeof AuthenticatedCampaignsRevokeIdRoute
+  '/_authenticated/campaigns/start/$id': typeof AuthenticatedCampaignsStartIdRoute
+  '/_authenticated/campaigns/stats/$id': typeof AuthenticatedCampaignsStatsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -279,8 +389,19 @@ export interface FileRouteTypes {
     | '/messages/system'
     | '/campaigns/'
     | '/campaigns/$id/edit'
+    | '/campaigns/approve/$id'
+    | '/campaigns/archive/$id'
+    | '/campaigns/curate/$id'
+    | '/campaigns/end/$id'
+    | '/campaigns/extend/$id'
+    | '/campaigns/monitor/$id'
     | '/campaigns/preview/$id'
     | '/campaigns/publish/$id'
+    | '/campaigns/rate/$id'
+    | '/campaigns/re-start/$id'
+    | '/campaigns/revoke/$id'
+    | '/campaigns/start/$id'
+    | '/campaigns/stats/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -305,8 +426,19 @@ export interface FileRouteTypes {
     | '/messages/system'
     | '/campaigns'
     | '/campaigns/$id/edit'
+    | '/campaigns/approve/$id'
+    | '/campaigns/archive/$id'
+    | '/campaigns/curate/$id'
+    | '/campaigns/end/$id'
+    | '/campaigns/extend/$id'
+    | '/campaigns/monitor/$id'
     | '/campaigns/preview/$id'
     | '/campaigns/publish/$id'
+    | '/campaigns/rate/$id'
+    | '/campaigns/re-start/$id'
+    | '/campaigns/revoke/$id'
+    | '/campaigns/start/$id'
+    | '/campaigns/stats/$id'
   id:
     | '__root__'
     | '/_authenticated'
@@ -332,8 +464,19 @@ export interface FileRouteTypes {
     | '/_authenticated/messages/system'
     | '/_authenticated/campaigns/'
     | '/_authenticated/campaigns/$id/edit'
+    | '/_authenticated/campaigns/approve/$id'
+    | '/_authenticated/campaigns/archive/$id'
+    | '/_authenticated/campaigns/curate/$id'
+    | '/_authenticated/campaigns/end/$id'
+    | '/_authenticated/campaigns/extend/$id'
+    | '/_authenticated/campaigns/monitor/$id'
     | '/_authenticated/campaigns/preview/$id'
     | '/_authenticated/campaigns/publish/$id'
+    | '/_authenticated/campaigns/rate/$id'
+    | '/_authenticated/campaigns/re-start/$id'
+    | '/_authenticated/campaigns/revoke/$id'
+    | '/_authenticated/campaigns/start/$id'
+    | '/_authenticated/campaigns/stats/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -502,6 +645,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAnalyticsCampaignsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/campaigns/stats/$id': {
+      id: '/_authenticated/campaigns/stats/$id'
+      path: '/campaigns/stats/$id'
+      fullPath: '/campaigns/stats/$id'
+      preLoaderRoute: typeof AuthenticatedCampaignsStatsIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/campaigns/start/$id': {
+      id: '/_authenticated/campaigns/start/$id'
+      path: '/campaigns/start/$id'
+      fullPath: '/campaigns/start/$id'
+      preLoaderRoute: typeof AuthenticatedCampaignsStartIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/campaigns/revoke/$id': {
+      id: '/_authenticated/campaigns/revoke/$id'
+      path: '/campaigns/revoke/$id'
+      fullPath: '/campaigns/revoke/$id'
+      preLoaderRoute: typeof AuthenticatedCampaignsRevokeIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/campaigns/re-start/$id': {
+      id: '/_authenticated/campaigns/re-start/$id'
+      path: '/campaigns/re-start/$id'
+      fullPath: '/campaigns/re-start/$id'
+      preLoaderRoute: typeof AuthenticatedCampaignsReStartIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/campaigns/rate/$id': {
+      id: '/_authenticated/campaigns/rate/$id'
+      path: '/campaigns/rate/$id'
+      fullPath: '/campaigns/rate/$id'
+      preLoaderRoute: typeof AuthenticatedCampaignsRateIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/campaigns/publish/$id': {
       id: '/_authenticated/campaigns/publish/$id'
       path: '/campaigns/publish/$id'
@@ -514,6 +692,48 @@ declare module '@tanstack/react-router' {
       path: '/campaigns/preview/$id'
       fullPath: '/campaigns/preview/$id'
       preLoaderRoute: typeof AuthenticatedCampaignsPreviewIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/campaigns/monitor/$id': {
+      id: '/_authenticated/campaigns/monitor/$id'
+      path: '/campaigns/monitor/$id'
+      fullPath: '/campaigns/monitor/$id'
+      preLoaderRoute: typeof AuthenticatedCampaignsMonitorIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/campaigns/extend/$id': {
+      id: '/_authenticated/campaigns/extend/$id'
+      path: '/campaigns/extend/$id'
+      fullPath: '/campaigns/extend/$id'
+      preLoaderRoute: typeof AuthenticatedCampaignsExtendIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/campaigns/end/$id': {
+      id: '/_authenticated/campaigns/end/$id'
+      path: '/campaigns/end/$id'
+      fullPath: '/campaigns/end/$id'
+      preLoaderRoute: typeof AuthenticatedCampaignsEndIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/campaigns/curate/$id': {
+      id: '/_authenticated/campaigns/curate/$id'
+      path: '/campaigns/curate/$id'
+      fullPath: '/campaigns/curate/$id'
+      preLoaderRoute: typeof AuthenticatedCampaignsCurateIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/campaigns/archive/$id': {
+      id: '/_authenticated/campaigns/archive/$id'
+      path: '/campaigns/archive/$id'
+      fullPath: '/campaigns/archive/$id'
+      preLoaderRoute: typeof AuthenticatedCampaignsArchiveIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/campaigns/approve/$id': {
+      id: '/_authenticated/campaigns/approve/$id'
+      path: '/campaigns/approve/$id'
+      fullPath: '/campaigns/approve/$id'
+      preLoaderRoute: typeof AuthenticatedCampaignsApproveIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/campaigns/$id/edit': {
@@ -543,8 +763,19 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMessagesSystemRoute: typeof AuthenticatedMessagesSystemRoute
   AuthenticatedCampaignsIndexRoute: typeof AuthenticatedCampaignsIndexRoute
   AuthenticatedCampaignsIdEditRoute: typeof AuthenticatedCampaignsIdEditRoute
+  AuthenticatedCampaignsApproveIdRoute: typeof AuthenticatedCampaignsApproveIdRoute
+  AuthenticatedCampaignsArchiveIdRoute: typeof AuthenticatedCampaignsArchiveIdRoute
+  AuthenticatedCampaignsCurateIdRoute: typeof AuthenticatedCampaignsCurateIdRoute
+  AuthenticatedCampaignsEndIdRoute: typeof AuthenticatedCampaignsEndIdRoute
+  AuthenticatedCampaignsExtendIdRoute: typeof AuthenticatedCampaignsExtendIdRoute
+  AuthenticatedCampaignsMonitorIdRoute: typeof AuthenticatedCampaignsMonitorIdRoute
   AuthenticatedCampaignsPreviewIdRoute: typeof AuthenticatedCampaignsPreviewIdRoute
   AuthenticatedCampaignsPublishIdRoute: typeof AuthenticatedCampaignsPublishIdRoute
+  AuthenticatedCampaignsRateIdRoute: typeof AuthenticatedCampaignsRateIdRoute
+  AuthenticatedCampaignsReStartIdRoute: typeof AuthenticatedCampaignsReStartIdRoute
+  AuthenticatedCampaignsRevokeIdRoute: typeof AuthenticatedCampaignsRevokeIdRoute
+  AuthenticatedCampaignsStartIdRoute: typeof AuthenticatedCampaignsStartIdRoute
+  AuthenticatedCampaignsStatsIdRoute: typeof AuthenticatedCampaignsStatsIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -567,8 +798,19 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMessagesSystemRoute: AuthenticatedMessagesSystemRoute,
   AuthenticatedCampaignsIndexRoute: AuthenticatedCampaignsIndexRoute,
   AuthenticatedCampaignsIdEditRoute: AuthenticatedCampaignsIdEditRoute,
+  AuthenticatedCampaignsApproveIdRoute: AuthenticatedCampaignsApproveIdRoute,
+  AuthenticatedCampaignsArchiveIdRoute: AuthenticatedCampaignsArchiveIdRoute,
+  AuthenticatedCampaignsCurateIdRoute: AuthenticatedCampaignsCurateIdRoute,
+  AuthenticatedCampaignsEndIdRoute: AuthenticatedCampaignsEndIdRoute,
+  AuthenticatedCampaignsExtendIdRoute: AuthenticatedCampaignsExtendIdRoute,
+  AuthenticatedCampaignsMonitorIdRoute: AuthenticatedCampaignsMonitorIdRoute,
   AuthenticatedCampaignsPreviewIdRoute: AuthenticatedCampaignsPreviewIdRoute,
   AuthenticatedCampaignsPublishIdRoute: AuthenticatedCampaignsPublishIdRoute,
+  AuthenticatedCampaignsRateIdRoute: AuthenticatedCampaignsRateIdRoute,
+  AuthenticatedCampaignsReStartIdRoute: AuthenticatedCampaignsReStartIdRoute,
+  AuthenticatedCampaignsRevokeIdRoute: AuthenticatedCampaignsRevokeIdRoute,
+  AuthenticatedCampaignsStartIdRoute: AuthenticatedCampaignsStartIdRoute,
+  AuthenticatedCampaignsStatsIdRoute: AuthenticatedCampaignsStatsIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -586,13 +828,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
