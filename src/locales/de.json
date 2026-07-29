@@ -36,6 +36,7 @@
       "hint": "Mindestens 12 Zeichen, mit Gross-/Kleinbuchstaben, Zahl und Sonderzeichen."
     },
     "mobileCH": "Bitte gib eine gültige CH-Mobilnummer ein (z. B. +41 79 999 99 99).",
+    "domain": "Ungültige Domain (z. B. brand.ch)",
     "url": "Bitte gib eine gültige URL ein."
   },
   "auth": {

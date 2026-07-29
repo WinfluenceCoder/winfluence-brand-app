@@ -31,7 +31,29 @@ export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
 });
 
-const chMobileRegex = /^(?:\+41\s?|0)(?:\d{2})\s?\d{3}\s?\d{2}\s?\d{2}$/;
+const chMobileRegex = /^(?:\+41\s?|0041\s?|0)(?:\d{2})\s?\d{3}\s?\d{2}\s?\d{2}$/;
+
+const domainRegex = /^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}$/;
+
+function normalizeDomain(v: string): string {
+  let s = (v ?? "").trim().toLowerCase();
+  s = s.replace(/^https?:\/\//, "");
+  s = s.replace(/^www\./, "");
+  s = s.replace(/\/+$/, "");
+  return s;
+}
+
+function formatChMobile(v: string): string {
+  const raw = (v ?? "").trim();
+  if (!raw) return raw;
+  let digits = raw.replace(/[\s/.-]/g, "");
+  if (digits.startsWith("+41")) digits = digits.slice(3);
+  else if (digits.startsWith("0041")) digits = digits.slice(4);
+  else if (digits.startsWith("0")) digits = digits.slice(1);
+  else return raw;
+  if (!/^\d{9}$/.test(digits)) return raw;
+  return `+41 ${digits.slice(0, 2)} ${digits.slice(2, 5)} ${digits.slice(5, 7)} ${digits.slice(7, 9)}`;
+}
 
 const INDUSTRY_OPTIONS = [
   "beauty_cosmetics",
@@ -71,7 +93,11 @@ function makeSchema(t: (k: string) => string) {
     .or(z.literal(""))
     .refine((v) => !v || /^\d+$/.test(v), t("validation.url"));
   return z.object({
-    domain: z.string().trim().min(1, t("validation.required")),
+    domain: z
+      .string()
+      .trim()
+      .min(1, t("validation.required"))
+      .refine((v) => !v || domainRegex.test(normalizeDomain(v)), t("validation.domain")),
     insta_url: z.string().trim().optional().or(z.literal("")),
     brand_name: z.string().trim().optional().or(z.literal("")),
     industry: z.enum(INDUSTRY_OPTIONS).nullable(),
@@ -478,7 +504,14 @@ function ProfilePage() {
               id="domain"
               aria-invalid={!!errors.domain}
               className={errors.domain ? invalidCls : ""}
-              {...form.register("domain")}
+              {...form.register("domain", {
+                onBlur: (e) => {
+                  const next = normalizeDomain(e.target.value);
+                  if (next !== e.target.value) {
+                    form.setValue("domain", next, { shouldValidate: true, shouldDirty: true });
+                  }
+                },
+              })}
             />
             {errors.domain && <p className="text-xs text-destructive">{errors.domain.message}</p>}
           </div>
@@ -770,7 +803,14 @@ function ProfilePage() {
               aria-invalid={!!errors.mobile}
               className={errors.mobile ? invalidCls : ""}
               placeholder="+41 79 999 99 99"
-              {...form.register("mobile")}
+              {...form.register("mobile", {
+                onBlur: (e) => {
+                  const next = formatChMobile(e.target.value);
+                  if (next !== e.target.value) {
+                    form.setValue("mobile", next, { shouldValidate: true, shouldDirty: true });
+                  }
+                },
+              })}
             />
             {errors.mobile && <p className="text-xs text-destructive">{errors.mobile.message}</p>}
           </div>
