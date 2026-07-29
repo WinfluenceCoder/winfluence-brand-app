@@ -29,7 +29,16 @@ export type CampaignsListParams = {
 };
 
 async function fetchCampaigns(params: CampaignsListParams): Promise<CampaignListRow[]> {
-  const { data: brand } = await supabase.from("brands").select("id").maybeSingle();
+  const { data: auth } = await supabase.auth.getUser();
+  const userId = auth?.user?.id;
+  if (!userId) return [];
+
+  const { data: brand } = await supabase
+    .from("brands")
+    .select("id")
+    .eq("user_id", userId)
+    .limit(1)
+    .maybeSingle();
   if (!brand) return [];
 
   let query = supabase
