@@ -31,7 +31,29 @@ export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
 });
 
-const chMobileRegex = /^(?:\+41\s?|0)(?:\d{2})\s?\d{3}\s?\d{2}\s?\d{2}$/;
+const chMobileRegex = /^(?:\+41\s?|0041\s?|0)(?:\d{2})\s?\d{3}\s?\d{2}\s?\d{2}$/;
+
+const domainRegex = /^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}$/;
+
+function normalizeDomain(v: string): string {
+  let s = (v ?? "").trim().toLowerCase();
+  s = s.replace(/^https?:\/\//, "");
+  s = s.replace(/^www\./, "");
+  s = s.replace(/\/+$/, "");
+  return s;
+}
+
+function formatChMobile(v: string): string {
+  const raw = (v ?? "").trim();
+  if (!raw) return raw;
+  let digits = raw.replace(/[\s/.-]/g, "");
+  if (digits.startsWith("+41")) digits = digits.slice(3);
+  else if (digits.startsWith("0041")) digits = digits.slice(4);
+  else if (digits.startsWith("0")) digits = digits.slice(1);
+  else return raw;
+  if (!/^\d{9}$/.test(digits)) return raw;
+  return `+41 ${digits.slice(0, 2)} ${digits.slice(2, 5)} ${digits.slice(5, 7)} ${digits.slice(7, 9)}`;
+}
 
 const INDUSTRY_OPTIONS = [
   "beauty_cosmetics",
