@@ -93,7 +93,11 @@ function makeSchema(t: (k: string) => string) {
     .or(z.literal(""))
     .refine((v) => !v || /^\d+$/.test(v), t("validation.url"));
   return z.object({
-    domain: z.string().trim().min(1, t("validation.required")),
+    domain: z
+      .string()
+      .trim()
+      .min(1, t("validation.required"))
+      .refine((v) => !v || domainRegex.test(normalizeDomain(v)), t("validation.domain")),
     insta_url: z.string().trim().optional().or(z.literal("")),
     brand_name: z.string().trim().optional().or(z.literal("")),
     industry: z.enum(INDUSTRY_OPTIONS).nullable(),
