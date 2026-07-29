@@ -504,7 +504,14 @@ function ProfilePage() {
               id="domain"
               aria-invalid={!!errors.domain}
               className={errors.domain ? invalidCls : ""}
-              {...form.register("domain")}
+              {...form.register("domain", {
+                onBlur: (e) => {
+                  const next = normalizeDomain(e.target.value);
+                  if (next !== e.target.value) {
+                    form.setValue("domain", next, { shouldValidate: true, shouldDirty: true });
+                  }
+                },
+              })}
             />
             {errors.domain && <p className="text-xs text-destructive">{errors.domain.message}</p>}
           </div>
