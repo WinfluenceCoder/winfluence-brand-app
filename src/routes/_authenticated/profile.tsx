@@ -803,7 +803,14 @@ function ProfilePage() {
               aria-invalid={!!errors.mobile}
               className={errors.mobile ? invalidCls : ""}
               placeholder="+41 79 999 99 99"
-              {...form.register("mobile")}
+              {...form.register("mobile", {
+                onBlur: (e) => {
+                  const next = formatChMobile(e.target.value);
+                  if (next !== e.target.value) {
+                    form.setValue("mobile", next, { shouldValidate: true, shouldDirty: true });
+                  }
+                },
+              })}
             />
             {errors.mobile && <p className="text-xs text-destructive">{errors.mobile.message}</p>}
           </div>
