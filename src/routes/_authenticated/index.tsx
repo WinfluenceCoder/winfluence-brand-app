@@ -29,9 +29,14 @@ function useProfileQuality() {
   return useSuspenseQuery({
     queryKey: ["home", "profileQuality"],
     queryFn: async () => {
+      const { data: auth } = await supabase.auth.getUser();
+      const userId = auth?.user?.id;
+      if (!userId) return 1;
       const { data, error } = await supabase
         .from("brands")
         .select("profile_quality")
+        .eq("user_id", userId)
+        .limit(1)
         .maybeSingle<{ profile_quality: number | null }>();
       if (error) throw new Error(error.message);
       return data?.profile_quality ?? 1;
