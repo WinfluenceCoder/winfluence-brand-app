@@ -1,20 +1,15 @@
-## Ziel
-Im Brand-/Profilformular (`src/routes/_authenticated/profile.tsx` – dort liegt das Brand-Formular) Domain-Validierung und automatische Mobilnummer-Formatierung ergänzen. Nur Frontend, keine Schema- oder Backend-Änderung.
+## Diagnose
+Die Startseite crasht mit `JSON object requested, multiple (or no) rows returned`. Zwei Brand-Abfragen filtern nicht auf den eingeloggten Nutzer und verwenden `maybeSingle()`, das bei mehr als einer sichtbaren Zeile einen Fehler wirft:
 
-## 1. Domain
-- Bleibt Pflichtfeld (`validation.required` wie bisher).
-- Zusätzliche Formatprüfung: Labels aus a–z/0–9/Bindestrich, mindestens ein Punkt, TLD ≥ 2 Zeichen (`winfluence.net`, `sub.brand.co.uk` gültig).
-- Neue Hilfsfunktion `normalizeDomain(v)`: entfernt führendes `http://`/`https://`, ein `www.`-Präfix und einen abschliessenden `/`, wandelt in Kleinschreibung und trimmt.
-- Beim Verlassen des Feldes (`onBlur`) wird der normalisierte Wert via `form.setValue("domain", ..., { shouldValidate: true, shouldDirty: true })` zurückgeschrieben, sodass die reine Domain gespeichert wird.
-- Neuer i18n-Key `validation.domain` in `src/locales/de.json`: „Ungültige Domain (z. B. brand.ch)".
+- `src/routes/_authenticated/index.tsx:32-35` — `from("brands").select("profile_quality").maybeSingle()`
+- `src/lib/campaigns-list.ts:32` — `from("brands").select("id").maybeSingle()`
 
-## 2. Mobile
-- Bleibt optional.
-- Neue Hilfsfunktion `formatChMobile(v)`: erkennt CH-Nummern mit Präfix `0`, `+41` oder `0041` und normalisiert auf `+41 79 123 45 67`.
-- `onBlur` schreibt den formatierten Wert via `form.setValue("mobile", ..., { shouldValidate: true, shouldDirty: true })` zurück; ist die Nummer ungültig, bleibt die Eingabe unverändert und `validation.mobileCH` erscheint.
-- Bestehender `chMobileRegex` wird leicht erweitert, sodass auch `0041`-Nummern akzeptiert werden.
+Im Layout `src/routes/_authenticated/route.tsx:33` ist der Filter `.eq("user_id", user.id)` vorhanden — dort tritt der Fehler nicht auf. Das bestätigt: sobald über RLS mehr als eine `brands`-Zeile sichtbar ist, brechen genau die beiden ungefilterten Abfragen.
 
-## Technische Details
-- Beide Felder registrieren einen eigenen `onBlur`, der zuerst den von `form.register(...)` gelieferten `onBlur` aufruft und danach normalisiert/formatiert.
-- Hilfsfunktionen als Modul-Level-Funktionen oben in der Datei.
-- Zod-Schema-Anpassung nur für `domain` (zusätzliches `.refine`) und `mobile` (erweiterter Regex).
+## Fix
+1. **`src/routes/_authenticated/index.tsx`** — Profile-Quality-Query: aktuelle Auth-User-ID holen (`supabase.auth.getUser()`) und `.eq("user_id", user.id)` ergänzen; zusätzlich `.limit(1)` vor `maybeSingle()` als Absicherung. QueryKey um die User-ID erweitern.
+2. **`src/lib/campaigns-list.ts`** — Brand-Lookup analog auf `.eq("user_id", user.id).limit(1).maybeSingle()` umstellen; ohne User keine Kampagnen laden (leere Liste statt Fehler).
+3. **Fehlerrobustheit**: Wenn kein Brand-Datensatz gefunden wird, weiterhin Default (`profile_quality = 1`, leere Kampagnenliste) statt Exception, damit die Startseite auch für frisch angelegte Nutzer rendert.
+
+## Nicht enthalten
+- Keine Schema- oder RLS-Änderungen im externen Supabase-Projekt. Falls tatsächlich mehrere `brands`-Zeilen pro Nutzer existieren, ist das ein Datenthema, das separat geprüft werden sollte — der Fix macht die App dagegen robust.
