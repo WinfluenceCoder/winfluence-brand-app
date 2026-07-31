@@ -29,6 +29,7 @@ import { Route as AuthenticatedInfluencersHiredRouteImport } from './routes/_aut
 import { Route as AuthenticatedInfluencersFavoritesRouteImport } from './routes/_authenticated/influencers.favorites'
 import { Route as AuthenticatedInfluencersCurrentRouteImport } from './routes/_authenticated/influencers.current'
 import { Route as AuthenticatedInfluencersAppliedRouteImport } from './routes/_authenticated/influencers.applied'
+import { Route as AuthenticatedInfluencersIdRouteImport } from './routes/_authenticated/influencers.$id'
 import { Route as AuthenticatedCampaignsNewRouteImport } from './routes/_authenticated/campaigns.new'
 import { Route as AuthenticatedAnalyticsInfluencersRouteImport } from './routes/_authenticated/analytics.influencers'
 import { Route as AuthenticatedAnalyticsCampaignsRouteImport } from './routes/_authenticated/analytics.campaigns'
@@ -155,6 +156,12 @@ const AuthenticatedInfluencersAppliedRoute =
     path: '/influencers/applied',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedInfluencersIdRoute =
+  AuthenticatedInfluencersIdRouteImport.update({
+    id: '/influencers/$id',
+    path: '/influencers/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCampaignsNewRoute =
   AuthenticatedCampaignsNewRouteImport.update({
     id: '/campaigns/new',
@@ -272,6 +279,7 @@ export interface FileRoutesByFullPath {
   '/analytics/campaigns': typeof AuthenticatedAnalyticsCampaignsRoute
   '/analytics/influencers': typeof AuthenticatedAnalyticsInfluencersRoute
   '/campaigns/new': typeof AuthenticatedCampaignsNewRoute
+  '/influencers/$id': typeof AuthenticatedInfluencersIdRoute
   '/influencers/applied': typeof AuthenticatedInfluencersAppliedRoute
   '/influencers/current': typeof AuthenticatedInfluencersCurrentRoute
   '/influencers/favorites': typeof AuthenticatedInfluencersFavoritesRoute
@@ -310,6 +318,7 @@ export interface FileRoutesByTo {
   '/analytics/campaigns': typeof AuthenticatedAnalyticsCampaignsRoute
   '/analytics/influencers': typeof AuthenticatedAnalyticsInfluencersRoute
   '/campaigns/new': typeof AuthenticatedCampaignsNewRoute
+  '/influencers/$id': typeof AuthenticatedInfluencersIdRoute
   '/influencers/applied': typeof AuthenticatedInfluencersAppliedRoute
   '/influencers/current': typeof AuthenticatedInfluencersCurrentRoute
   '/influencers/favorites': typeof AuthenticatedInfluencersFavoritesRoute
@@ -350,6 +359,7 @@ export interface FileRoutesById {
   '/_authenticated/analytics/campaigns': typeof AuthenticatedAnalyticsCampaignsRoute
   '/_authenticated/analytics/influencers': typeof AuthenticatedAnalyticsInfluencersRoute
   '/_authenticated/campaigns/new': typeof AuthenticatedCampaignsNewRoute
+  '/_authenticated/influencers/$id': typeof AuthenticatedInfluencersIdRoute
   '/_authenticated/influencers/applied': typeof AuthenticatedInfluencersAppliedRoute
   '/_authenticated/influencers/current': typeof AuthenticatedInfluencersCurrentRoute
   '/_authenticated/influencers/favorites': typeof AuthenticatedInfluencersFavoritesRoute
@@ -390,6 +400,7 @@ export interface FileRouteTypes {
     | '/analytics/campaigns'
     | '/analytics/influencers'
     | '/campaigns/new'
+    | '/influencers/$id'
     | '/influencers/applied'
     | '/influencers/current'
     | '/influencers/favorites'
@@ -428,6 +439,7 @@ export interface FileRouteTypes {
     | '/analytics/campaigns'
     | '/analytics/influencers'
     | '/campaigns/new'
+    | '/influencers/$id'
     | '/influencers/applied'
     | '/influencers/current'
     | '/influencers/favorites'
@@ -467,6 +479,7 @@ export interface FileRouteTypes {
     | '/_authenticated/analytics/campaigns'
     | '/_authenticated/analytics/influencers'
     | '/_authenticated/campaigns/new'
+    | '/_authenticated/influencers/$id'
     | '/_authenticated/influencers/applied'
     | '/_authenticated/influencers/current'
     | '/_authenticated/influencers/favorites'
@@ -644,6 +657,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInfluencersAppliedRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/influencers/$id': {
+      id: '/_authenticated/influencers/$id'
+      path: '/influencers/$id'
+      fullPath: '/influencers/$id'
+      preLoaderRoute: typeof AuthenticatedInfluencersIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/campaigns/new': {
       id: '/_authenticated/campaigns/new'
       path: '/campaigns/new'
@@ -774,6 +794,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAnalyticsCampaignsRoute: typeof AuthenticatedAnalyticsCampaignsRoute
   AuthenticatedAnalyticsInfluencersRoute: typeof AuthenticatedAnalyticsInfluencersRoute
   AuthenticatedCampaignsNewRoute: typeof AuthenticatedCampaignsNewRoute
+  AuthenticatedInfluencersIdRoute: typeof AuthenticatedInfluencersIdRoute
   AuthenticatedInfluencersAppliedRoute: typeof AuthenticatedInfluencersAppliedRoute
   AuthenticatedInfluencersCurrentRoute: typeof AuthenticatedInfluencersCurrentRoute
   AuthenticatedInfluencersFavoritesRoute: typeof AuthenticatedInfluencersFavoritesRoute
@@ -808,6 +829,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAnalyticsInfluencersRoute:
     AuthenticatedAnalyticsInfluencersRoute,
   AuthenticatedCampaignsNewRoute: AuthenticatedCampaignsNewRoute,
+  AuthenticatedInfluencersIdRoute: AuthenticatedInfluencersIdRoute,
   AuthenticatedInfluencersAppliedRoute: AuthenticatedInfluencersAppliedRoute,
   AuthenticatedInfluencersCurrentRoute: AuthenticatedInfluencersCurrentRoute,
   AuthenticatedInfluencersFavoritesRoute:
