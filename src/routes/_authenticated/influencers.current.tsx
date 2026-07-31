@@ -3,10 +3,11 @@ import { CreatorsListPage } from "@/components/app/CreatorsListPage";
 import { creatorsListQueryOptions } from "@/lib/creators-list";
 
 export const Route = createFileRoute("/_authenticated/influencers/current")({
-  loader: ({ context }) =>
-    context.queryClient.ensureQueryData(
-      creatorsListQueryOptions({ status: ["applied", "hired"] }),
-    ),
+  loader: ({ context }) => {
+    void context.queryClient
+      .prefetchQuery(creatorsListQueryOptions({ status: ["applied", "hired"] }))
+      .catch(() => {});
+  },
   component: () => (
     <CreatorsListPage
       titleKey="creatorsList.titleCurrent"
