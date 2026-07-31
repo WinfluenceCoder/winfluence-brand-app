@@ -56,11 +56,20 @@ async function fetchCreators(
     if (!brandId) return [];
   }
 
+  const creatorFields =
+    "creators!inner(id, nick_name, first_name, last_name, foto_url, e_mail_address, mobile, insta_url, tiktok_url, youtube_url, linkedin_url)";
+
+  // Der campaigns-Join wird nur für die brand-gefilterten Listen gebraucht.
+  // Global (/influencers/current) würde ein inner join zusätzlich durch die
+  // campaigns-RLS eingeschränkt.
   let query = supabase
     .from("collabs")
     .select(
-      "status, created_at, campaigns!inner(brand_id), creators!inner(id, nick_name, first_name, last_name, foto_url, e_mail_address, mobile, insta_url, tiktok_url, youtube_url, linkedin_url)",
+      brandId != null
+        ? `status, created_at, campaigns!inner(brand_id), ${creatorFields}`
+        : `status, created_at, ${creatorFields}`,
     );
+
 
   if (params.status && params.status.length > 0) {
     query = query.in("status", params.status as unknown as string[]);
