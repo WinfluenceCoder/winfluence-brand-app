@@ -1,53 +1,74 @@
-# Influencer-Listen bleiben leer: Zugriff auf `collabs` / `creators`
+# Influencer-Listen: GRANTs + RLS-Policies für `collabs` / `creators`
 
-## Was ich geprüft habe
+Die Zählabfragen liefern Daten, die API-Reads liefern leere Arrays → es fehlen Data-API-GRANTs bzw. SELECT-Policies für die Rolle `authenticated`. Zusätzlich soll `/influencers/current` global sein (alle Collabs mit Status `applied`/`hired`, nicht brand-gefiltert), also brauchen wir eine breitere Lese-Policy.
 
-Ein direkter Lesetest gegen das verbundene Supabase-Projekt (mit dem Publishable Key, also ohne Login) ergab:
+## SQL-Snippet
 
-- `campaigns` → HTTP 200 mit Datensätzen (Lesen funktioniert)
-- `collabs` → HTTP 200, aber leeres Array
-- `creators` → HTTP 200, aber leeres Array
-
-HTTP 200 statt 403 heißt: die Data-API-GRANTs sind vorhanden, aber es kommen keine Zeilen zurück. Das hat genau zwei mögliche Ursachen, die ich ohne einen eingeloggten Test bzw. ohne dich nicht unterscheiden kann:
-
-1. Die Tabellen `collabs` / `creators` enthalten (für diesen Brand) tatsächlich keine Daten.
-2. RLS ist aktiv, es gibt aber keine SELECT-Policy, die einem eingeloggten Brand-User die relevanten Zeilen zeigt.
-
-Wichtig: Beim Join-Query der Liste (`collabs → campaigns!inner, creators!inner`) filtert RLS auf **jeder** beteiligten Tabelle. Auch wenn `collabs` sichtbar wäre, würde ein fehlender Lesezugriff auf `creators` die Zeilen komplett herausfiltern.
-
-## Vorgehen
-
-### Schritt 1 — Ursache eindeutig bestimmen (zuerst)
-
-Du führst im Supabase-SQL-Editor (dort gilt RLS nicht) aus:
+Ich lege den folgenden Inhalt unter `.lovable/external-supabase-creators-read-policies.sql` ab; du führst ihn im Supabase-SQL-Editor des Projekts `rssnbsduduboxlrvpodw` aus.
 
 ```sql
-select count(*) from public.collabs;
-select count(*) from public.creators;
-select c.status, count(*) from public.collabs c group by 1;
-select tablename, policyname, cmd, roles, qual
-  from pg_policies
- where schemaname = 'public' and tablename in ('collabs','creators');
+-- 1) Data-API-Zugriff (PostgREST) — nur lesend, nur für eingeloggte Nutzer.
+--    Kein anon: Creator-Daten sind personenbezogen.
+GRANT SELECT ON public.collabs   TO authenticated;
+GRANT SELECT ON public.creators  TO authenticated;
+GRANT ALL    ON public.collabs   TO service_role;
+GRANT ALL    ON public.creators  TO service_role;
+
+-- 2) RLS aktiv lassen/einschalten
+ALTER TABLE public.collabs  ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.creators ENABLE ROW LEVEL SECURITY;
+
+-- 3) Hilfsfunktion: ist der eingeloggte User ein Brand-User?
+CREATE OR REPLACE FUNCTION public.is_brand_user()
+RETURNS boolean
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.brands b
+     WHERE b.user_id = auth.uid()
+  )
+$$;
+
+REVOKE ALL ON FUNCTION public.is_brand_user() FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.is_brand_user() TO authenticated;
+
+-- 4) collabs: Brand-User dürfen alle aktiven Collabs lesen (global),
+--    damit /influencers/current nicht brand-gefiltert ist.
+DROP POLICY IF EXISTS "brand users read active collabs" ON public.collabs;
+CREATE POLICY "brand users read active collabs"
+  ON public.collabs FOR SELECT
+  TO authenticated
+  USING (public.is_brand_user() AND status IN ('applied','hired'));
+
+-- 5) creators: Brand-User dürfen Creators lesen, die mindestens einen
+--    aktiven Collab haben.
+DROP POLICY IF EXISTS "brand users read active creators" ON public.creators;
+CREATE POLICY "brand users read active creators"
+  ON public.creators FOR SELECT
+  TO authenticated
+  USING (
+    public.is_brand_user()
+    AND EXISTS (
+      SELECT 1 FROM public.collabs c
+       WHERE c.creator_id = creators.id
+         AND c.status IN ('applied','hired')
+    )
+  );
 ```
 
-- Counts = 0 → es fehlen schlicht Testdaten, kein Code- oder Policy-Problem.
-- Counts > 0 und keine passende SELECT-Policy für `authenticated` → weiter mit Schritt 2.
+Hinweise zum Anpassen:
 
-### Schritt 2 — Policies nachziehen (nur falls Daten vorhanden sind)
+- Falls `collabs.status` ein Enum-Typ ist, muss verglichen werden mit `status IN ('applied','hired')::` bzw. `status::text IN ('applied','hired')` — beim Ausführen zeigt Postgres den Fehler sofort, ich liefere dann die Enum-Variante nach.
+- Falls die Fremdschlüsselspalte in `collabs` nicht `creator_id` heißt, muss Punkt 5 entsprechend angepasst werden.
+- `campaigns` ist bereits lesbar, deshalb keine Änderung dort — der `campaigns!inner`-Join für `/influencers/applied` und `/influencers/hired` funktioniert damit weiterhin.
 
-Ich lege ein SQL-Snippet unter `.lovable/external-supabase-creators-read-policies.sql` ab, das du im Supabase-SQL-Editor ausführst. Inhalt (Entwurf, wird an die tatsächlichen Policies aus Schritt 1 angepasst):
+## Frontend
 
-- `collabs`: SELECT für `authenticated`, eingeschränkt auf Collabs, deren Kampagne dem Brand des eingeloggten Users gehört (`campaign_id → campaigns.brand_id → brands.user_id = auth.uid()`), gekapselt in einer `security definer`-Funktion, um Rekursion zu vermeiden.
-- `creators`: SELECT für `authenticated`, eingeschränkt auf Creators, die mindestens einen Collab zu einer Kampagne dieses Brands haben (gleiche Hilfsfunktion).
-- Dazu die nötigen GRANTs (`GRANT SELECT ... TO authenticated`), falls noch nicht gesetzt. Kein `anon`-Zugriff — Creator-Daten sind PII.
+`/influencers/current` bleibt wie gebaut global (`brandScoped` nicht gesetzt), `/influencers/applied` und `/influencers/hired` bleiben brand-gefiltert über `campaigns.brand_id`. Am Code ist voraussichtlich keine Änderung nötig; sollte der Join nach dem SQL-Lauf immer noch leer bleiben, prüfe ich die tatsächlichen Spaltennamen von `collabs` und passe `src/lib/creators-list.ts` an.
 
-Da `/influencers/current` laut Spezifikation global (nicht brand-gefiltert) ist, wird diese Liste durch die brand-scoped Policy dieselben Zeilen zeigen wie die brand-gefilterten Listen. Sag Bescheid, falls „current" bewusst alle Creators projektweit zeigen soll — dann brauchen wir eine breitere Policy.
+## Verifikation
 
-### Schritt 3 — Verifikation
-
-Nach dem Ausführen prüfe ich die Listen `/influencers/current`, `/influencers/applied` und `/influencers/hired` eingeloggt im Preview und melde das Ergebnis. Erst dann gilt das als behoben.
-
-## Technische Hinweise
-
-- Keine Schema-Änderungen, keine Lovable Cloud, keine Migration durch mich — das externe Projekt (rssnbsduduboxlrvpodw) wird ausschließlich per SQL-Snippet von dir angepasst.
-- Am Frontend-Code (`src/lib/creators-list.ts`, `CreatorsTable.tsx`) ist voraussichtlich keine Änderung nötig; falls Schritt 1 zeigt, dass die Daten anders verknüpft sind als angenommen, passe ich den Join dort an.
+Nach dem Ausführen des SQL prüfe ich eingeloggt im Preview die drei Listen (`current`, `applied`, `hired`) sowie die Detailseite `/influencers/:id` und melde das Ergebnis. Keine Schema-Änderungen, kein Lovable Cloud — nur GRANTs, Policies und eine Hilfsfunktion im bestehenden externen Projekt.
