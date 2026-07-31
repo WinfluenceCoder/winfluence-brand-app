@@ -31,6 +31,29 @@ REVOKE ALL ON FUNCTION public.is_brand_user() FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.is_brand_user() FROM anon;
 GRANT EXECUTE ON FUNCTION public.is_brand_user() TO authenticated;
 
+-- Rekursionsfreie Prüfung für die creators-Policy.
+-- SECURITY DEFINER ist hier erforderlich: Eine direkte Abfrage auf collabs
+-- innerhalb der creators-Policy würde beim Embed collabs -> creators erneut
+-- die RLS-Policies auswerten und PostgreSQL-Fehler 42P17 auslösen.
+CREATE OR REPLACE FUNCTION public.creator_has_active_collab(_creator_id bigint)
+RETURNS boolean
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1
+      FROM public.collabs c
+     WHERE c.creator_id = _creator_id
+       AND c.status::text IN ('applied','hired')
+  )
+$$;
+
+REVOKE ALL ON FUNCTION public.creator_has_active_collab(bigint) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.creator_has_active_collab(bigint) FROM anon;
+GRANT EXECUTE ON FUNCTION public.creator_has_active_collab(bigint) TO authenticated;
+
 -- 4) collabs: Brand-User dürfen alle aktiven Collabs lesen (global),
 --    damit /influencers/current nicht brand-gefiltert ist.
 DROP POLICY IF EXISTS "brand users read active collabs" ON public.collabs;
@@ -43,18 +66,15 @@ CREATE POLICY "brand users read active collabs"
   );
 
 -- 5) creators: Brand-User dürfen Creators lesen, die mindestens einen
---    aktiven Collab haben.
+--    aktiven Collab haben. Die Collab-Prüfung läuft über eine SECURITY
+--    DEFINER-Funktion, damit keine RLS-Rekursion entsteht.
 DROP POLICY IF EXISTS "brand users read active creators" ON public.creators;
 CREATE POLICY "brand users read active creators"
   ON public.creators FOR SELECT
   TO authenticated
   USING (
     public.is_brand_user()
-    AND EXISTS (
-      SELECT 1 FROM public.collabs c
-       WHERE c.creator_id = creators.id
-         AND c.status::text IN ('applied','hired')
-    )
+    AND public.creator_has_active_collab(id)
   );
 
 -- Prüfung (als eingeloggter Brand-User über die App, nicht im SQL-Editor):
