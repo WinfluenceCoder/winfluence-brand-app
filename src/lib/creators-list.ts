@@ -82,7 +82,16 @@ async function fetchCreators(
     .order("created_at", { ascending: false })
     .returns<CollabRow[]>();
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    console.error("[creators-list] collabs query failed", error);
+    const parts = [
+      error.message,
+      error.code ? `code: ${error.code}` : null,
+      error.details ? `details: ${error.details}` : null,
+      error.hint ? `hint: ${error.hint}` : null,
+    ].filter(Boolean);
+    throw new Error(parts.join(" | "));
+  }
 
   const seen = new Set<number>();
   const rows: CreatorListRow[] = [];

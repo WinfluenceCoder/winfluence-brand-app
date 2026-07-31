@@ -3,10 +3,13 @@ import { CreatorsListPage } from "@/components/app/CreatorsListPage";
 import { creatorsListQueryOptions } from "@/lib/creators-list";
 
 export const Route = createFileRoute("/_authenticated/influencers/applied")({
-  loader: ({ context }) =>
-    context.queryClient.ensureQueryData(
-      creatorsListQueryOptions({ status: ["applied"], brandScoped: true }),
-    ),
+  loader: ({ context }) => {
+    void context.queryClient
+      .prefetchQuery(
+        creatorsListQueryOptions({ status: ["applied"], brandScoped: true }),
+      )
+      .catch(() => {});
+  },
   component: () => (
     <CreatorsListPage
       titleKey="creatorsList.titleApplied"
