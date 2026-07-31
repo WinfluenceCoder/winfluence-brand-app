@@ -1,6 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Placeholder } from "@/components/app/Placeholder";
+import { CreatorsListPage } from "@/components/app/CreatorsListPage";
+import { creatorsListQueryOptions } from "@/lib/creators-list";
 
 export const Route = createFileRoute("/_authenticated/influencers/current")({
-  component: () => <Placeholder titleKey="placeholders.influencersCurrent" />,
+  loader: ({ context }) =>
+    context.queryClient.ensureQueryData(
+      creatorsListQueryOptions({ status: ["applied", "hired"] }),
+    ),
+  component: () => (
+    <CreatorsListPage
+      titleKey="creatorsList.titleCurrent"
+      statuses={["applied", "hired"]}
+    />
+  ),
 });
