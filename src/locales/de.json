@@ -110,7 +110,8 @@
     "messagesNotifications": "Notifikationen",
     "messagesPersonal": "Persönliche",
     "messagesSystem": "System",
-    "settings": "Einstellungen"
+    "settings": "Einstellungen",
+    "influencersApplied": "Bewerbungen"
   },
   "footer": {
     "imprint": "Impressum",
@@ -368,7 +369,6 @@
     "title": "AGB",
     "placeholder": "Inhalt folgt."
   },
-
   "industry": {
     "beauty_cosmetics": "Beauty & Kosmetik",
     "fashion_accessories": "Mode & Accessoires",
@@ -390,7 +390,40 @@
     "luxury": "Luxus",
     "real_estate": "Immobilien",
     "b2b_business": "B2B & Business"
+  },
+  "creatorsList": {
+    "titleCurrent": "Aktuelle Influencer",
+    "titleApplied": "Bewerbungen",
+    "titleHired": "Beauftragte Influencer",
+    "empty": "Keine Einträge",
+    "showAll": "Alle anzeigen",
+    "filterAll": "Alle Status",
+    "notFound": "Influencer nicht gefunden",
+    "columns": {
+      "nickname": "Nickname",
+      "email": "E-Mail",
+      "mobile": "Mobile",
+      "instagram": "Instagram",
+      "tiktok": "TikTok",
+      "youtube": "YouTube",
+      "linkedin": "LinkedIn",
+      "status": "Status"
+    },
+    "status": {
+      "applied": "Beworben",
+      "hired": "Beauftragt"
+    },
+    "actions": {
+      "openMenu": "Menü öffnen",
+      "sendMessage": "Nachricht schicken"
+    },
+    "detail": {
+      "contact": "Kontakt",
+      "socials": "Social Media",
+      "name": "Name",
+      "address": "Adresse",
+      "company": "Firma",
+      "noSocials": "Keine Social-Media-Profile hinterlegt"
+    }
   }
 }
-
-

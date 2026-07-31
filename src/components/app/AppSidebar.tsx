@@ -62,7 +62,9 @@ const groups: Group[] = [
     items: [
       { titleKey: "nav.influencersSearch", to: "/influencers/search" },
       { titleKey: "nav.influencersCurrent", to: "/influencers/current" },
+      { titleKey: "nav.influencersApplied", to: "/influencers/applied" },
       { titleKey: "nav.influencersHired", to: "/influencers/hired" },
+
       { titleKey: "nav.influencersFavorites", to: "/influencers/favorites" },
     ],
   },
