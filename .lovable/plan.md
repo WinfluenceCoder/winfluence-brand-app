@@ -38,4 +38,4 @@ Ziel: `/campaigns/preview/:id` wird eine login-freie, rein lesende, ruhig gestal
 - Roboto wird per `<link>` im Root-Route-Head geladen und über ein `--font-roboto`-Theme-Token in `src/styles.css` nutzbar gemacht; angewendet nur auf den Preview-Container, damit andere Seiten unverändert bleiben.
 - Datums-/Währungsformatierung als kleine lokale Helper (`Intl.DateTimeFormat('de-CH')`, `Intl.NumberFormat('de-CH', { currency: 'CHF', maximumFractionDigits: 0 })`).
 - Nur shadcn/ui-Bausteine (Card, Badge, Button, Skeleton, Separator) und bestehende Design-Tokens; keine hartcodierten Farben.
-- Berührte Dateien: neue `src/routes/campaigns.preview.$id.tsx`, Löschung von `src/routes/_authenticated/campaigns.preview.$id.tsx`, `src/locales/de.json`, `src/routes/__root.tsx` (Font-Link), `src/styles.css` (Font-Token), neues SQL-Snippet in `.lovable/`.
+- Berührte Dateien: neue `src/routes/campaigns.preview.$id.tsx`, Löschung von `src/routes/_authenticated/campaigns.preview.$id.tsx`, `src/components/app/CampaignCard.tsx` (Link → neuer Tab), `src/locales/de.json`, `src/routes/__root.tsx` (Font-Link), `src/styles.css` (Font-Token), neues SQL-Snippet in `.lovable/`.
