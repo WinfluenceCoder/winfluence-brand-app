@@ -187,7 +187,12 @@ function PublishCampaignPage() {
       </div>
 
       {/* Read-only campaign data */}
-      <CampaignCard campaign={campaign} />
+      <CampaignCard
+        campaign={campaign}
+        id={campaignId}
+        status={campaign.status ?? null}
+      />
+
 
 
       {/* Schedule */}
