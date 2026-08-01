@@ -134,7 +134,64 @@
   --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.551 0.027 264.364);
+  --match-green-1: oklch(0.9 0.09 150);
+  --match-green-2: oklch(0.78 0.13 150);
+  --match-green-3: oklch(0.64 0.15 150);
+  --match-green-4: oklch(0.5 0.13 150);
+  --match-green-5: oklch(0.38 0.1 150);
+  --match-green-fg-light: oklch(0.24 0.05 150);
+  --match-green-fg-dark: oklch(0.98 0.01 150);
+  --match-gray-1: oklch(0.88 0.005 260);
+  --match-gray-2: oklch(0.74 0.005 260);
+  --match-gray-3: oklch(0.6 0.005 260);
+  --match-gray-4: oklch(0.45 0.005 260);
+  --match-gray-5: oklch(0.32 0.005 260);
+  --match-gray-fg-light: oklch(0.22 0.005 260);
+  --match-gray-fg-dark: oklch(0.98 0 0);
 }
+
+@utility match-green-1 {
+  background-color: var(--match-green-1);
+  color: var(--match-green-fg-light);
+}
+@utility match-green-2 {
+  background-color: var(--match-green-2);
+  color: var(--match-green-fg-light);
+}
+@utility match-green-3 {
+  background-color: var(--match-green-3);
+  color: var(--match-green-fg-dark);
+}
+@utility match-green-4 {
+  background-color: var(--match-green-4);
+  color: var(--match-green-fg-dark);
+}
+@utility match-green-5 {
+  background-color: var(--match-green-5);
+  color: var(--match-green-fg-dark);
+}
+@utility match-gray-1 {
+  background-color: var(--match-gray-1);
+  color: var(--match-gray-fg-light);
+}
+@utility match-gray-2 {
+  background-color: var(--match-gray-2);
+  color: var(--match-gray-fg-light);
+}
+@utility match-gray-3 {
+  background-color: var(--match-gray-3);
+  color: var(--match-gray-fg-dark);
+}
+@utility match-gray-4 {
+  background-color: var(--match-gray-4);
+  color: var(--match-gray-fg-dark);
+}
+@utility match-gray-5 {
+  background-color: var(--match-gray-5);
+  color: var(--match-gray-fg-dark);
+}
+
+
 
 @layer base {
   * {
