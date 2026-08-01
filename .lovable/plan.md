@@ -32,7 +32,9 @@ Die `CampaignCard` auf `/campaigns/curate/$id` soll:
 
 
 ## Akzeptanzkriterien
-- Auf `/campaigns/curate/$id` wird rechts im Card-Header ein Button mit Icon "Live Version anzeigen" angezeigt.
+- Auf `/campaigns/curate/$id` wird rechts im Card-Header ein Button mit Icon "Live Version anzeigen" angezeigt, sofern `status !== "draft"`.
+- Bei `status === "draft"` fehlt der Button im Header komplett; der Rest der Card bleibt unverändert.
 - Klick auf den Button navigiert zu `/campaigns/preview/$id`.
 - Der Briefing-Text wird nach 9 Zeilen mit Ellipse abgeschnitten.
 - Keine Broken-Link/Type-Fehler im Build.
+
