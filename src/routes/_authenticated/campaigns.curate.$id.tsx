@@ -33,7 +33,9 @@ function CurateCampaignPage() {
     briefing: string | null;
     campaign_visual_url: string | null;
     barter_value: number | null;
+    status: string | null;
   } | null;
+
 
   const curation = useQuery(curationQueryOptions(campaignId));
 
