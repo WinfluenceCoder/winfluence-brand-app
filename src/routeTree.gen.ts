@@ -21,6 +21,7 @@ import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedSecurityRouteImport } from './routes/_authenticated/security'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedCampaignsIndexRouteImport } from './routes/_authenticated/campaigns.index'
+import { Route as CampaignsPreviewIdRouteImport } from './routes/campaigns.preview.$id'
 import { Route as AuthenticatedMessagesSystemRouteImport } from './routes/_authenticated/messages.system'
 import { Route as AuthenticatedMessagesPersonalRouteImport } from './routes/_authenticated/messages.personal'
 import { Route as AuthenticatedMessagesNotificationsRouteImport } from './routes/_authenticated/messages.notifications'
@@ -39,7 +40,6 @@ import { Route as AuthenticatedCampaignsRevokeIdRouteImport } from './routes/_au
 import { Route as AuthenticatedCampaignsReStartIdRouteImport } from './routes/_authenticated/campaigns.re-start.$id'
 import { Route as AuthenticatedCampaignsRateIdRouteImport } from './routes/_authenticated/campaigns.rate.$id'
 import { Route as AuthenticatedCampaignsPublishIdRouteImport } from './routes/_authenticated/campaigns.publish.$id'
-import { Route as AuthenticatedCampaignsPreviewIdRouteImport } from './routes/_authenticated/campaigns.preview.$id'
 import { Route as AuthenticatedCampaignsMonitorIdRouteImport } from './routes/_authenticated/campaigns.monitor.$id'
 import { Route as AuthenticatedCampaignsExtendIdRouteImport } from './routes/_authenticated/campaigns.extend.$id'
 import { Route as AuthenticatedCampaignsEndIdRouteImport } from './routes/_authenticated/campaigns.end.$id'
@@ -108,6 +108,11 @@ const AuthenticatedCampaignsIndexRoute =
     path: '/campaigns/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const CampaignsPreviewIdRoute = CampaignsPreviewIdRouteImport.update({
+  id: '/campaigns/preview/$id',
+  path: '/campaigns/preview/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedMessagesSystemRoute =
   AuthenticatedMessagesSystemRouteImport.update({
     id: '/messages/system',
@@ -216,12 +221,6 @@ const AuthenticatedCampaignsPublishIdRoute =
     path: '/campaigns/publish/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedCampaignsPreviewIdRoute =
-  AuthenticatedCampaignsPreviewIdRouteImport.update({
-    id: '/campaigns/preview/$id',
-    path: '/campaigns/preview/$id',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedCampaignsMonitorIdRoute =
   AuthenticatedCampaignsMonitorIdRouteImport.update({
     id: '/campaigns/monitor/$id',
@@ -288,6 +287,7 @@ export interface FileRoutesByFullPath {
   '/messages/notifications': typeof AuthenticatedMessagesNotificationsRoute
   '/messages/personal': typeof AuthenticatedMessagesPersonalRoute
   '/messages/system': typeof AuthenticatedMessagesSystemRoute
+  '/campaigns/preview/$id': typeof CampaignsPreviewIdRoute
   '/campaigns/': typeof AuthenticatedCampaignsIndexRoute
   '/campaigns/$id/edit': typeof AuthenticatedCampaignsIdEditRoute
   '/campaigns/approve/$id': typeof AuthenticatedCampaignsApproveIdRoute
@@ -296,7 +296,6 @@ export interface FileRoutesByFullPath {
   '/campaigns/end/$id': typeof AuthenticatedCampaignsEndIdRoute
   '/campaigns/extend/$id': typeof AuthenticatedCampaignsExtendIdRoute
   '/campaigns/monitor/$id': typeof AuthenticatedCampaignsMonitorIdRoute
-  '/campaigns/preview/$id': typeof AuthenticatedCampaignsPreviewIdRoute
   '/campaigns/publish/$id': typeof AuthenticatedCampaignsPublishIdRoute
   '/campaigns/rate/$id': typeof AuthenticatedCampaignsRateIdRoute
   '/campaigns/re-start/$id': typeof AuthenticatedCampaignsReStartIdRoute
@@ -327,6 +326,7 @@ export interface FileRoutesByTo {
   '/messages/notifications': typeof AuthenticatedMessagesNotificationsRoute
   '/messages/personal': typeof AuthenticatedMessagesPersonalRoute
   '/messages/system': typeof AuthenticatedMessagesSystemRoute
+  '/campaigns/preview/$id': typeof CampaignsPreviewIdRoute
   '/campaigns': typeof AuthenticatedCampaignsIndexRoute
   '/campaigns/$id/edit': typeof AuthenticatedCampaignsIdEditRoute
   '/campaigns/approve/$id': typeof AuthenticatedCampaignsApproveIdRoute
@@ -335,7 +335,6 @@ export interface FileRoutesByTo {
   '/campaigns/end/$id': typeof AuthenticatedCampaignsEndIdRoute
   '/campaigns/extend/$id': typeof AuthenticatedCampaignsExtendIdRoute
   '/campaigns/monitor/$id': typeof AuthenticatedCampaignsMonitorIdRoute
-  '/campaigns/preview/$id': typeof AuthenticatedCampaignsPreviewIdRoute
   '/campaigns/publish/$id': typeof AuthenticatedCampaignsPublishIdRoute
   '/campaigns/rate/$id': typeof AuthenticatedCampaignsRateIdRoute
   '/campaigns/re-start/$id': typeof AuthenticatedCampaignsReStartIdRoute
@@ -368,6 +367,7 @@ export interface FileRoutesById {
   '/_authenticated/messages/notifications': typeof AuthenticatedMessagesNotificationsRoute
   '/_authenticated/messages/personal': typeof AuthenticatedMessagesPersonalRoute
   '/_authenticated/messages/system': typeof AuthenticatedMessagesSystemRoute
+  '/campaigns/preview/$id': typeof CampaignsPreviewIdRoute
   '/_authenticated/campaigns/': typeof AuthenticatedCampaignsIndexRoute
   '/_authenticated/campaigns/$id/edit': typeof AuthenticatedCampaignsIdEditRoute
   '/_authenticated/campaigns/approve/$id': typeof AuthenticatedCampaignsApproveIdRoute
@@ -376,7 +376,6 @@ export interface FileRoutesById {
   '/_authenticated/campaigns/end/$id': typeof AuthenticatedCampaignsEndIdRoute
   '/_authenticated/campaigns/extend/$id': typeof AuthenticatedCampaignsExtendIdRoute
   '/_authenticated/campaigns/monitor/$id': typeof AuthenticatedCampaignsMonitorIdRoute
-  '/_authenticated/campaigns/preview/$id': typeof AuthenticatedCampaignsPreviewIdRoute
   '/_authenticated/campaigns/publish/$id': typeof AuthenticatedCampaignsPublishIdRoute
   '/_authenticated/campaigns/rate/$id': typeof AuthenticatedCampaignsRateIdRoute
   '/_authenticated/campaigns/re-start/$id': typeof AuthenticatedCampaignsReStartIdRoute
@@ -409,6 +408,7 @@ export interface FileRouteTypes {
     | '/messages/notifications'
     | '/messages/personal'
     | '/messages/system'
+    | '/campaigns/preview/$id'
     | '/campaigns/'
     | '/campaigns/$id/edit'
     | '/campaigns/approve/$id'
@@ -417,7 +417,6 @@ export interface FileRouteTypes {
     | '/campaigns/end/$id'
     | '/campaigns/extend/$id'
     | '/campaigns/monitor/$id'
-    | '/campaigns/preview/$id'
     | '/campaigns/publish/$id'
     | '/campaigns/rate/$id'
     | '/campaigns/re-start/$id'
@@ -448,6 +447,7 @@ export interface FileRouteTypes {
     | '/messages/notifications'
     | '/messages/personal'
     | '/messages/system'
+    | '/campaigns/preview/$id'
     | '/campaigns'
     | '/campaigns/$id/edit'
     | '/campaigns/approve/$id'
@@ -456,7 +456,6 @@ export interface FileRouteTypes {
     | '/campaigns/end/$id'
     | '/campaigns/extend/$id'
     | '/campaigns/monitor/$id'
-    | '/campaigns/preview/$id'
     | '/campaigns/publish/$id'
     | '/campaigns/rate/$id'
     | '/campaigns/re-start/$id'
@@ -488,6 +487,7 @@ export interface FileRouteTypes {
     | '/_authenticated/messages/notifications'
     | '/_authenticated/messages/personal'
     | '/_authenticated/messages/system'
+    | '/campaigns/preview/$id'
     | '/_authenticated/campaigns/'
     | '/_authenticated/campaigns/$id/edit'
     | '/_authenticated/campaigns/approve/$id'
@@ -496,7 +496,6 @@ export interface FileRouteTypes {
     | '/_authenticated/campaigns/end/$id'
     | '/_authenticated/campaigns/extend/$id'
     | '/_authenticated/campaigns/monitor/$id'
-    | '/_authenticated/campaigns/preview/$id'
     | '/_authenticated/campaigns/publish/$id'
     | '/_authenticated/campaigns/rate/$id'
     | '/_authenticated/campaigns/re-start/$id'
@@ -513,6 +512,7 @@ export interface RootRouteChildren {
   SignedOutRoute: typeof SignedOutRoute
   TermsRoute: typeof TermsRoute
   WelcomeRoute: typeof WelcomeRoute
+  CampaignsPreviewIdRoute: typeof CampaignsPreviewIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -600,6 +600,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/campaigns/'
       preLoaderRoute: typeof AuthenticatedCampaignsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/campaigns/preview/$id': {
+      id: '/campaigns/preview/$id'
+      path: '/campaigns/preview/$id'
+      fullPath: '/campaigns/preview/$id'
+      preLoaderRoute: typeof CampaignsPreviewIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/messages/system': {
       id: '/_authenticated/messages/system'
@@ -727,13 +734,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCampaignsPublishIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/campaigns/preview/$id': {
-      id: '/_authenticated/campaigns/preview/$id'
-      path: '/campaigns/preview/$id'
-      fullPath: '/campaigns/preview/$id'
-      preLoaderRoute: typeof AuthenticatedCampaignsPreviewIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/campaigns/monitor/$id': {
       id: '/_authenticated/campaigns/monitor/$id'
       path: '/campaigns/monitor/$id'
@@ -811,7 +811,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCampaignsEndIdRoute: typeof AuthenticatedCampaignsEndIdRoute
   AuthenticatedCampaignsExtendIdRoute: typeof AuthenticatedCampaignsExtendIdRoute
   AuthenticatedCampaignsMonitorIdRoute: typeof AuthenticatedCampaignsMonitorIdRoute
-  AuthenticatedCampaignsPreviewIdRoute: typeof AuthenticatedCampaignsPreviewIdRoute
   AuthenticatedCampaignsPublishIdRoute: typeof AuthenticatedCampaignsPublishIdRoute
   AuthenticatedCampaignsRateIdRoute: typeof AuthenticatedCampaignsRateIdRoute
   AuthenticatedCampaignsReStartIdRoute: typeof AuthenticatedCampaignsReStartIdRoute
@@ -848,7 +847,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCampaignsEndIdRoute: AuthenticatedCampaignsEndIdRoute,
   AuthenticatedCampaignsExtendIdRoute: AuthenticatedCampaignsExtendIdRoute,
   AuthenticatedCampaignsMonitorIdRoute: AuthenticatedCampaignsMonitorIdRoute,
-  AuthenticatedCampaignsPreviewIdRoute: AuthenticatedCampaignsPreviewIdRoute,
   AuthenticatedCampaignsPublishIdRoute: AuthenticatedCampaignsPublishIdRoute,
   AuthenticatedCampaignsRateIdRoute: AuthenticatedCampaignsRateIdRoute,
   AuthenticatedCampaignsReStartIdRoute: AuthenticatedCampaignsReStartIdRoute,
@@ -868,17 +866,8 @@ const rootRouteChildren: RootRouteChildren = {
   SignedOutRoute: SignedOutRoute,
   TermsRoute: TermsRoute,
   WelcomeRoute: WelcomeRoute,
+  CampaignsPreviewIdRoute: CampaignsPreviewIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

@@ -454,6 +454,29 @@
         "cpm": "Cost per Mille (CPM)",
         "cpe": "Cost per Engagement (CPE)"
       }
+    },
+    "preview": {
+      "close": "Schliessen",
+      "notFound": "Kampagne nicht gefunden",
+      "period": "Zeitraum",
+      "applyTill": "Bewerbung bis",
+      "budget": "Budget",
+      "barterValue": "Barter-Wert",
+      "product": "Produkt",
+      "goal": "Ziel",
+      "targetgroup": "Zielgruppe",
+      "keyMessage": "Kernbotschaft",
+      "briefing": "Briefing",
+      "requirements": "Anforderungen",
+      "postType": "Post-Typ",
+      "hashtags": "Hashtags",
+      "links": "Links",
+      "coupon": "Coupon",
+      "barter": "Barter-Deal",
+      "barterOrderUrl": "Bestell-Link",
+      "barterOrderCoupon": "Bestell-Coupon",
+      "createdAt": "Erstellt am",
+      "updatedAt": "Aktualisiert am"
     }
   }
 }
