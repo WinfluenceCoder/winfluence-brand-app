@@ -26,6 +26,8 @@ import type { CampaignStatus } from "@/lib/campaigns-list";
 export type WorkflowActionKey =
   | "edit"
   | "preview"
+  | "liveView"
+  | "view"
   | "publish"
   | "delete"
   | "start"
@@ -75,6 +77,20 @@ const ACTIONS: Record<WorkflowActionKey, WorkflowAction> = {
   preview: {
     key: "preview",
     labelKey: "campaignsList.actions.preview",
+    icon: Eye,
+    route: { to: "/campaigns/preview/$id" },
+    openInNewTab: true,
+  },
+  liveView: {
+    key: "liveView",
+    labelKey: "campaignsList.actions.liveView",
+    icon: Eye,
+    route: { to: "/campaigns/preview/$id" },
+    openInNewTab: true,
+  },
+  view: {
+    key: "view",
+    labelKey: "campaignsList.actions.view",
     icon: Eye,
     route: { to: "/campaigns/preview/$id" },
     openInNewTab: true,
@@ -175,37 +191,43 @@ const DRAFT: CampaignWorkflow = {
 const PUBLISHED: CampaignWorkflow = {
   rowClick: { to: "/campaigns/curate/$id" },
   nextStep: ACTIONS.start,
-  menu: [ACTIONS.edit, ACTIONS.curate, ACTIONS.revoke, ACTIONS.start],
+  menu: [
+    ACTIONS.edit,
+    ACTIONS.liveView,
+    ACTIONS.curate,
+    ACTIONS.revoke,
+    ACTIONS.start,
+  ],
 };
 
 const RUNNING: CampaignWorkflow = {
   rowClick: { to: "/campaigns/monitor/$id" },
   nextStep: ACTIONS.end,
-  menu: [ACTIONS.monitor, ACTIONS.rate, ACTIONS.end],
+  menu: [ACTIONS.monitor, ACTIONS.liveView, ACTIONS.rate, ACTIONS.end],
 };
 
 const EXPIRED: CampaignWorkflow = {
   rowClick: { to: "/campaigns/monitor/$id" },
   nextStep: ACTIONS.extend,
-  menu: [ACTIONS.monitor, ACTIONS.rate, ACTIONS.end],
+  menu: [ACTIONS.monitor, ACTIONS.liveView, ACTIONS.rate, ACTIONS.end],
 };
 
 const ENDED: CampaignWorkflow = {
   rowClick: { to: "/campaigns/rate/$id" },
   nextStep: ACTIONS.approve,
-  menu: [ACTIONS.monitor, ACTIONS.rate, ACTIONS.approve],
+  menu: [ACTIONS.monitor, ACTIONS.liveView, ACTIONS.rate, ACTIONS.approve],
 };
 
 const APPROVED: CampaignWorkflow = {
   rowClick: { to: "/campaigns/stats/$id" },
   nextStep: ACTIONS.archive,
-  menu: [ACTIONS.stats, ACTIONS.archive],
+  menu: [ACTIONS.stats, ACTIONS.view, ACTIONS.archive],
 };
 
 const ARCHIVED: CampaignWorkflow = {
   rowClick: { to: "/campaigns/stats/$id" },
   nextStep: ACTIONS.restart,
-  menu: [ACTIONS.stats, ACTIONS.restart],
+  menu: [ACTIONS.stats, ACTIONS.view, ACTIONS.restart],
 };
 
 const WORKFLOW: Record<CampaignStatus, CampaignWorkflow> = {
