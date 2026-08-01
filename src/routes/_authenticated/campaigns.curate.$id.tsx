@@ -1,8 +1,9 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft } from "lucide-react";
+
 import { getMyCampaign } from "@/lib/campaigns.functions";
 import { CampaignCard } from "@/components/app/CampaignCard";
 import { CurationBoard } from "@/components/app/CurationBoard";
