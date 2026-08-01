@@ -32,6 +32,7 @@ In der verbundenen Datenbank (rssnbsduduboxlrvpodw) fehlen in `collabs` noch die
 - Zeile 2: `collabs.pitch` mit `line-clamp-3`.
 - Klick auf die Card öffnet das Creator-Profil als Dialog-Overlay (read-only, gleiche Felder wie `/influencers/$id`).
 - Social-Icon-Klicks öffnen neuen Tab und stoppen Propagation sowie Drag-Start.
+- Drag-Kennzeichnung: links auf der Card ein Griff-Icon (`GripVertical` aus lucide-react) in gedämpfter Farbe, das beim Hover deutlicher wird; Cursor `grab` bzw. `grabbing` beim Ziehen. Das Icon ist der dnd-kit Drag-Handle, sodass Ziehen bewusst darüber startet und der Card-Klick (Profil-Overlay) davon unberührt bleibt. Tooltip/`aria-label` «Zum Verschieben ziehen».
 
 ## Technische Umsetzung
 
