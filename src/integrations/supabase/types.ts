@@ -231,10 +231,12 @@ export type Database = {
           id: number
           kpi_list: string | null
           link_list: string | null
+          match: number | null
           media_files_url_list: string | null
           pitch: string | null
           post_type: string | null
           price: number | null
+          rank: number | null
           status: string | null
           updated_at: string
         }
@@ -248,10 +250,12 @@ export type Database = {
           id?: never
           kpi_list?: string | null
           link_list?: string | null
+          match?: number | null
           media_files_url_list?: string | null
           pitch?: string | null
           post_type?: string | null
           price?: number | null
+          rank?: number | null
           status?: string | null
           updated_at?: string
         }
@@ -265,10 +269,12 @@ export type Database = {
           id?: never
           kpi_list?: string | null
           link_list?: string | null
+          match?: number | null
           media_files_url_list?: string | null
           pitch?: string | null
           post_type?: string | null
           price?: number | null
+          rank?: number | null
           status?: string | null
           updated_at?: string
         }
