@@ -1,8 +1,9 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft } from "lucide-react";
+
 import { getMyCampaign } from "@/lib/campaigns.functions";
 import { CampaignCard } from "@/components/app/CampaignCard";
 import { CurationBoard } from "@/components/app/CurationBoard";
@@ -81,11 +82,19 @@ function CurateCampaignPage() {
           </CardContent>
         </Card>
       ) : (
-        <CurationBoard
-          campaignId={campaignId}
-          collabs={curation.data ?? []}
-          barterValue={campaign?.barter_value ?? null}
-        />
+        <>
+          <CurationBoard
+            campaignId={campaignId}
+            collabs={curation.data ?? []}
+            barterValue={campaign?.barter_value ?? null}
+          />
+          <div className="flex justify-start pt-4">
+            <Link to="/campaigns/start/$id" params={{ id }}>
+              <Button size="lg">{t("campaigns.actions.start")}</Button>
+            </Link>
+          </div>
+        </>
+
       )}
     </div>
   );
