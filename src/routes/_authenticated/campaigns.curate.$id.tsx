@@ -21,10 +21,18 @@ function CurateCampaignPage() {
   const { t } = useTranslation();
   const fetchCampaign = useServerFn(getMyCampaign);
 
-  const { data: campaign } = useSuspenseQuery({
+  const { data } = useSuspenseQuery({
     queryKey: ["campaign", campaignId],
     queryFn: () => fetchCampaign({ data: { id: campaignId } }),
   });
+
+  // `title` existiert in der DB, fehlt aber in den generierten Typen.
+  const campaign = data as unknown as {
+    title: string | null;
+    briefing: string | null;
+    campaign_visual_url: string | null;
+    barter_value: number | null;
+  } | null;
 
   const curation = useQuery(curationQueryOptions(campaignId));
 
@@ -45,7 +53,7 @@ function CurateCampaignPage() {
       {campaign ? (
         <CampaignCard
           campaign={{
-            title: campaign.name ?? null,
+            title: campaign.title ?? null,
             briefing: campaign.briefing,
             campaign_visual_url: campaign.campaign_visual_url,
           }}
