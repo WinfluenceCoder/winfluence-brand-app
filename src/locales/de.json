@@ -417,6 +417,7 @@
     },
     "status": {
       "applied": "Beworben",
+      "selected": "Ausgewählt",
       "hired": "Beauftragt"
     },
     "actions": {

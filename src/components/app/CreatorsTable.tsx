@@ -53,6 +53,8 @@ export function creatorStatusLabel(t: (k: string) => string, s: string | null) {
   switch (s) {
     case "applied":
       return t("creatorsList.status.applied");
+    case "selected":
+      return t("creatorsList.status.selected");
     case "hired":
       return t("creatorsList.status.hired");
     default:

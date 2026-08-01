@@ -5,13 +5,13 @@ import { creatorsListQueryOptions } from "@/lib/creators-list";
 export const Route = createFileRoute("/_authenticated/influencers/current")({
   loader: ({ context }) => {
     void context.queryClient
-      .prefetchQuery(creatorsListQueryOptions({ status: ["applied", "hired"] }))
+      .prefetchQuery(creatorsListQueryOptions({ status: ["applied", "selected", "hired"] }))
       .catch(() => {});
   },
   component: () => (
     <CreatorsListPage
       titleKey="creatorsList.titleCurrent"
-      statuses={["applied", "hired"]}
+      statuses={["applied", "selected", "hired"]}
     />
   ),
 });

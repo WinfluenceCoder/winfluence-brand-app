@@ -46,7 +46,7 @@ AS $$
     SELECT 1
       FROM public.collabs c
      WHERE c.creator_id = _creator_id
-       AND c.status::text IN ('applied','hired')
+       AND c.status::text IN ('applied','selected','hired')
   )
 $$;
 
@@ -62,7 +62,7 @@ CREATE POLICY "brand users read active collabs"
   TO authenticated
   USING (
     public.is_brand_user()
-    AND status::text IN ('applied','hired')
+    AND status::text IN ('applied','selected','hired')
   );
 
 -- 5) creators: Brand-User dürfen Creators lesen, die mindestens einen
