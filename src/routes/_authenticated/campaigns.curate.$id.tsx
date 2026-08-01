@@ -90,7 +90,7 @@ function CurateCampaignPage() {
           />
           <div className="flex justify-start pt-4">
             <Link to="/campaigns/start/$id" params={{ id }}>
-              <Button size="lg">{t("campaigns.actions.start")}</Button>
+              <Button size="lg">{t("campaignsList.actions.start")}</Button>
             </Link>
           </div>
         </>
