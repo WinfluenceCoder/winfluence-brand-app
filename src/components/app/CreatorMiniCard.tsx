@@ -52,6 +52,8 @@ export function CreatorMiniCardBody({
 }) {
   const c = collab.creator;
   const fullName = [c.first_name, c.last_name].filter(Boolean).join(" ");
+  const matchLabel = formatMatchPercent(collab.match);
+
   return (
     <div className="flex gap-3 p-3">
       {dragHandle}
