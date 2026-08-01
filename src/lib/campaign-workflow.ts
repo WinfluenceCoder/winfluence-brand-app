@@ -26,6 +26,8 @@ import type { CampaignStatus } from "@/lib/campaigns-list";
 export type WorkflowActionKey =
   | "edit"
   | "preview"
+  | "liveView"
+  | "view"
   | "publish"
   | "delete"
   | "start"
@@ -75,6 +77,20 @@ const ACTIONS: Record<WorkflowActionKey, WorkflowAction> = {
   preview: {
     key: "preview",
     labelKey: "campaignsList.actions.preview",
+    icon: Eye,
+    route: { to: "/campaigns/preview/$id" },
+    openInNewTab: true,
+  },
+  liveView: {
+    key: "liveView",
+    labelKey: "campaignsList.actions.liveView",
+    icon: Eye,
+    route: { to: "/campaigns/preview/$id" },
+    openInNewTab: true,
+  },
+  view: {
+    key: "view",
+    labelKey: "campaignsList.actions.view",
     icon: Eye,
     route: { to: "/campaigns/preview/$id" },
     openInNewTab: true,
