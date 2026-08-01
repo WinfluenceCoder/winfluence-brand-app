@@ -218,6 +218,7 @@ export function CampaignsTable({ rows, statusFilter }: Props) {
               )}
             </TableHead>
             <TableHead>{t("campaignsList.actions.nextStep")}</TableHead>
+            <TableHead>{t("home.tableApplyTill")}</TableHead>
             <TableHead>{t("home.tableStart")}</TableHead>
             <TableHead>{t("home.tableEnd")}</TableHead>
             <TableHead className="text-right">{t("home.tableBudget")}</TableHead>
@@ -272,6 +273,15 @@ export function CampaignsTable({ rows, statusFilter }: Props) {
                   ) : (
                     "–"
                   )}
+                </TableCell>
+                <TableCell
+                  className={
+                    row.apply_till && new Date(row.apply_till) < new Date()
+                      ? "text-destructive"
+                      : undefined
+                  }
+                >
+                  {formatDate(row.apply_till)}
                 </TableCell>
                 <TableCell>{formatDate(row.start)}</TableCell>
                 <TableCell>{formatDate(row.ende)}</TableCell>

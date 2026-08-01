@@ -17,6 +17,7 @@ export type CampaignListRow = {
   id: number;
   title: string | null;
   status: string | null;
+  apply_till: string | null;
   start: string | null;
   ende: string | null;
   budget: number | null;
@@ -43,7 +44,7 @@ async function fetchCampaigns(params: CampaignsListParams): Promise<CampaignList
 
   let query = supabase
     .from("campaigns")
-    .select("id, title, status, start, ende, budget, campaign_visual_url")
+    .select("id, title, status, apply_till, start, ende, budget, campaign_visual_url")
     .eq("brand_id", brand.id);
 
   if (params.status) {
