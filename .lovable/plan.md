@@ -3,7 +3,8 @@ CampaignCard auf /curate erweitern
 ## Ziel
 Die `CampaignCard` auf `/campaigns/curate/$id` soll:
 1. Den Briefing-Text auf maximal 9 Zeilen begrenzen.
-2. Oben rechts einen Button "Live Version anzeigen" mit einem externen Link-Icon erhalten, der auf `/campaigns/preview/$id` verweist.
+2. Oben rechts einen Button "Live Version anzeigen" mit einem externen Link-Icon erhalten, der auf `/campaigns/preview/$id` verweist — aber nur, wenn der Kampagnenstatus nicht `draft` ist.
+
 
 ## Aktueller Stand
 - `src/components/app/CampaignCard.tsx` zeigt Titel, Bild und unbeschränkten Briefing-Text.
