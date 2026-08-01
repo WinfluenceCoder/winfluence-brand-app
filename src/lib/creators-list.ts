@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-export const COLLAB_STATUSES = ["applied", "hired"] as const;
+export const COLLAB_STATUSES = ["applied", "selected", "hired"] as const;
 
 export type CollabStatus = (typeof COLLAB_STATUSES)[number];
 
