@@ -33,7 +33,9 @@ function CurateCampaignPage() {
     briefing: string | null;
     campaign_visual_url: string | null;
     barter_value: number | null;
+    status: string | null;
   } | null;
+
 
   const curation = useQuery(curationQueryOptions(campaignId));
 
@@ -58,8 +60,11 @@ function CurateCampaignPage() {
             briefing: campaign.briefing,
             campaign_visual_url: campaign.campaign_visual_url,
           }}
+          id={campaignId}
+          status={campaign.status ?? null}
         />
       ) : null}
+
 
       {curation.isLoading ? (
         <Card>

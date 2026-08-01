@@ -1,6 +1,8 @@
 import { useTranslation } from "react-i18next";
-import { Megaphone } from "lucide-react";
+import { Megaphone, ExternalLink } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export type CampaignCardData = {
   title: string | null;
@@ -8,12 +10,28 @@ export type CampaignCardData = {
   campaign_visual_url: string | null;
 };
 
-export function CampaignCard({ campaign }: { campaign: CampaignCardData }) {
+export function CampaignCard({
+  campaign,
+  id,
+  status,
+}: {
+  campaign: CampaignCardData;
+  id: number;
+  status: string | null;
+}) {
   const { t } = useTranslation();
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0">
         <CardTitle>{t("campaignPublish.sections.campaign")}</CardTitle>
+        {status !== "draft" && (
+          <Link to="/campaigns/preview/$id" params={{ id: String(id) }}>
+            <Button variant="outline" size="sm">
+              <ExternalLink className="mr-2 h-4 w-4" />
+              {t("campaignForm.viewLive")}
+            </Button>
+          </Link>
+        )}
       </CardHeader>
       <CardContent>
         <div className="flex flex-col gap-4 sm:flex-row">
@@ -35,7 +53,7 @@ export function CampaignCard({ campaign }: { campaign: CampaignCardData }) {
               {campaign.title ?? "–"}
             </h2>
             {campaign.briefing && (
-              <p className="whitespace-pre-wrap text-sm text-muted-foreground">
+              <p className="line-clamp-9 whitespace-pre-wrap text-sm text-muted-foreground">
                 {campaign.briefing}
               </p>
             )}

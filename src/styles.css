@@ -206,12 +206,20 @@
   color: var(--match-gray-fg-dark);
 }
 
+@utility line-clamp-9 {
+  display: -webkit-box;
+  -webkit-line-clamp: 9;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 
 
 @layer base {
   * {
     border-color: var(--color-border);
   }
+
 
   body {
     background-color: var(--color-background);
