@@ -25,12 +25,16 @@ export function CampaignCard({
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
         <CardTitle>{t("campaignPublish.sections.campaign")}</CardTitle>
         {status !== "draft" && (
-          <Link to="/campaigns/preview/$id" params={{ id: String(id) }}>
-            <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" asChild>
+            <a
+              href={`/campaigns/preview/${id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <ExternalLink className="mr-2 h-4 w-4" />
               {t("campaignForm.viewLive")}
-            </Button>
-          </Link>
+            </a>
+          </Button>
         )}
       </CardHeader>
       <CardContent>
