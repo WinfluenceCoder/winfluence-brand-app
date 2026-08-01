@@ -3,14 +3,18 @@ import { CSS } from "@dnd-kit/utilities";
 import { useTranslation } from "react-i18next";
 import { GripVertical, Instagram, User, Youtube } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { TikTokIcon } from "@/components/app/CreatorsTable";
 import {
   FOLLOWER_PLACEHOLDER,
   formatChf,
+  formatMatchPercent,
   formatNumberCh,
+  matchBadgeClasses,
   type CurationCollab,
 } from "@/lib/campaign-curation";
+
 import { cn } from "@/lib/utils";
 
 function SocialStat({
