@@ -82,11 +82,19 @@ function CurateCampaignPage() {
           </CardContent>
         </Card>
       ) : (
-        <CurationBoard
-          campaignId={campaignId}
-          collabs={curation.data ?? []}
-          barterValue={campaign?.barter_value ?? null}
-        />
+        <>
+          <CurationBoard
+            campaignId={campaignId}
+            collabs={curation.data ?? []}
+            barterValue={campaign?.barter_value ?? null}
+          />
+          <div className="flex justify-start pt-4">
+            <Link to="/campaigns/start/$id" params={{ id }}>
+              <Button size="lg">{t("campaigns.actions.start")}</Button>
+            </Link>
+          </div>
+        </>
+
       )}
     </div>
   );
