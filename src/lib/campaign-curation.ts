@@ -130,6 +130,33 @@ export function formatChf(value: number | null | undefined): string {
   return cf.format(value ?? 0);
 }
 
+/** Match-Wert (0..1) als Prozent mit einer Dezimalstelle, z. B. 0.765 -> "76.5%". */
+export function formatMatchPercent(value: number | null | undefined): string | null {
+  if (value === null || value === undefined || Number.isNaN(value)) return null;
+  return `${new Intl.NumberFormat("de-CH", {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  }).format(value * 100)}%`;
+}
+
+/** Farbstufe des Match-Badges: >=0.5 grün (dunkler = höher), <0.5 grau (dunkler = kleiner). */
+export function matchBadgeClasses(value: number | null | undefined): string {
+  const v = value ?? 0;
+  if (v >= 0.5) {
+    if (v >= 0.9) return "match-green-5";
+    if (v >= 0.75) return "match-green-4";
+    if (v >= 0.65) return "match-green-3";
+    if (v >= 0.55) return "match-green-2";
+    return "match-green-1";
+  }
+  if (v < 0.1) return "match-gray-5";
+  if (v < 0.2) return "match-gray-4";
+  if (v < 0.3) return "match-gray-3";
+  if (v < 0.4) return "match-gray-2";
+  return "match-gray-1";
+}
+
+
 /** Lokale (nur Browser-)Reihenfolge der rechten Liste. */
 export function loadAppliedOrder(campaignId: number): number[] {
   if (typeof window === "undefined") return [];
