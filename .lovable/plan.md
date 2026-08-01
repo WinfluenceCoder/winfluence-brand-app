@@ -27,9 +27,15 @@ Ziel: `/campaigns/preview/:id` wird eine login-freie, rein lesende, ruhig gestal
 - Ladezustand: Skeletons im gleichen Layout. Fehler/nicht gefunden: freundliche Meldung «Kampagne nicht gefunden», keine Aktionen.
 - Alle Texte auf Deutsch über `de.json` unter `campaigns.preview.*`.
 
+**5. Alle Aufrufe öffnen in neuem Tab**
+- Kontextmenü der Kampagnenliste («Vorschau», «Live Ansicht», «Ansicht»): öffnet bereits in neuem Tab (`openInNewTab` in `campaign-workflow.ts`, ausgewertet in `CampaignsTable.tsx`) – bleibt so.
+- Publish-Seite («Vorschau») und Kampagnen-Formular («Live Version anzeigen»): nutzen bereits `target="_blank"` mit `rel="noopener noreferrer"` – bleiben so.
+- `CampaignCard` («Live Version anzeigen»): nutzt heute einen normalen `Link` und öffnet im gleichen Tab. Wird auf `<a href target="_blank" rel="noopener noreferrer">` umgestellt, damit sowohl auf `/campaigns/curate/:id` als auch auf `/campaigns/publish/:id` ein neuer Tab aufgeht.
+- Ergebnis: jeder Aufruf der Preview-Route öffnet in einem neuen Tab, damit der «Schliessen»-Button (`window.close()`) zuverlässig funktioniert.
+
 ## Technische Details
 
 - Roboto wird per `<link>` im Root-Route-Head geladen und über ein `--font-roboto`-Theme-Token in `src/styles.css` nutzbar gemacht; angewendet nur auf den Preview-Container, damit andere Seiten unverändert bleiben.
 - Datums-/Währungsformatierung als kleine lokale Helper (`Intl.DateTimeFormat('de-CH')`, `Intl.NumberFormat('de-CH', { currency: 'CHF', maximumFractionDigits: 0 })`).
 - Nur shadcn/ui-Bausteine (Card, Badge, Button, Skeleton, Separator) und bestehende Design-Tokens; keine hartcodierten Farben.
-- Berührte Dateien: neue `src/routes/campaigns.preview.$id.tsx`, Löschung von `src/routes/_authenticated/campaigns.preview.$id.tsx`, `src/locales/de.json`, `src/routes/__root.tsx` (Font-Link), `src/styles.css` (Font-Token), neues SQL-Snippet in `.lovable/`.
+- Berührte Dateien: neue `src/routes/campaigns.preview.$id.tsx`, Löschung von `src/routes/_authenticated/campaigns.preview.$id.tsx`, `src/components/app/CampaignCard.tsx` (Link → neuer Tab), `src/locales/de.json`, `src/routes/__root.tsx` (Font-Link), `src/styles.css` (Font-Token), neues SQL-Snippet in `.lovable/`.
