@@ -428,5 +428,30 @@
       "company": "Firma",
       "noSocials": "Keine Social-Media-Profile hinterlegt"
     }
+  },
+  "campaigns": {
+    "curate": {
+      "title": "Kampagne kuratieren",
+      "loading": "Bewerbungen werden geladen …",
+      "errorTitle": "Bewerbungen konnten nicht geladen werden",
+      "retry": "Erneut versuchen",
+      "saveError": "Änderung konnte nicht gespeichert werden",
+      "dragHandle": "Zum Verschieben ziehen",
+      "selectedTitle": "ausgewählt sind",
+      "appliedTitle": "beworben haben sich",
+      "selectedEmpty": "Influencers per Drag & Drop für die Kampagne auswählen",
+      "appliedEmpty": "Influencers per Drag & Drop zurückstellen",
+      "calculation": {
+        "title": "Kennzahlen und erwartete Performance",
+        "followers": "# erreichte Followers",
+        "engagementRate": "Engagement Rate",
+        "matchingAudience": "Matching Zielgruppe",
+        "matchingRegion": "Matching Region",
+        "costCash": "Kosten Cash",
+        "costBarter": "Kosten Barter",
+        "cpm": "Cost per Mille (CPM)",
+        "cpe": "Cost per Engagement (CPE)"
+      }
+    }
   }
 }
