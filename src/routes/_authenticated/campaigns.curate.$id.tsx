@@ -60,8 +60,11 @@ function CurateCampaignPage() {
             briefing: campaign.briefing,
             campaign_visual_url: campaign.campaign_visual_url,
           }}
+          id={campaignId}
+          status={campaign.status ?? null}
         />
       ) : null}
+
 
       {curation.isLoading ? (
         <Card>
