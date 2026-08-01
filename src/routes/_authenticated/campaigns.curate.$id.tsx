@@ -45,7 +45,7 @@ function CurateCampaignPage() {
       {campaign ? (
         <CampaignCard
           campaign={{
-            title: campaign.title ?? null,
+            title: campaign.name ?? null,
             briefing: campaign.briefing,
             campaign_visual_url: campaign.campaign_visual_url,
           }}
