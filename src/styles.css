@@ -99,7 +99,22 @@
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
+  --match-green-1: oklch(0.9 0.09 150);
+  --match-green-2: oklch(0.78 0.13 150);
+  --match-green-3: oklch(0.64 0.15 150);
+  --match-green-4: oklch(0.5 0.13 150);
+  --match-green-5: oklch(0.38 0.1 150);
+  --match-green-fg-light: oklch(0.24 0.05 150);
+  --match-green-fg-dark: oklch(0.98 0.01 150);
+  --match-gray-1: oklch(0.88 0.005 260);
+  --match-gray-2: oklch(0.74 0.005 260);
+  --match-gray-3: oklch(0.6 0.005 260);
+  --match-gray-4: oklch(0.45 0.005 260);
+  --match-gray-5: oklch(0.32 0.005 260);
+  --match-gray-fg-light: oklch(0.22 0.005 260);
+  --match-gray-fg-dark: oklch(0.98 0 0);
 }
+
 
 .dark {
   --background: oklch(0.129 0.042 264.695);
@@ -134,19 +149,19 @@
   --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.551 0.027 264.364);
-  --match-green-1: oklch(0.9 0.09 150);
-  --match-green-2: oklch(0.78 0.13 150);
-  --match-green-3: oklch(0.64 0.15 150);
-  --match-green-4: oklch(0.5 0.13 150);
-  --match-green-5: oklch(0.38 0.1 150);
-  --match-green-fg-light: oklch(0.24 0.05 150);
+  --match-green-1: oklch(0.85 0.09 150);
+  --match-green-2: oklch(0.75 0.13 150);
+  --match-green-3: oklch(0.65 0.15 150);
+  --match-green-4: oklch(0.55 0.14 150);
+  --match-green-5: oklch(0.46 0.12 150);
+  --match-green-fg-light: oklch(0.2 0.05 150);
   --match-green-fg-dark: oklch(0.98 0.01 150);
-  --match-gray-1: oklch(0.88 0.005 260);
-  --match-gray-2: oklch(0.74 0.005 260);
-  --match-gray-3: oklch(0.6 0.005 260);
-  --match-gray-4: oklch(0.45 0.005 260);
-  --match-gray-5: oklch(0.32 0.005 260);
-  --match-gray-fg-light: oklch(0.22 0.005 260);
+  --match-gray-1: oklch(0.8 0.005 260);
+  --match-gray-2: oklch(0.68 0.005 260);
+  --match-gray-3: oklch(0.56 0.005 260);
+  --match-gray-4: oklch(0.44 0.005 260);
+  --match-gray-5: oklch(0.34 0.005 260);
+  --match-gray-fg-light: oklch(0.18 0.005 260);
   --match-gray-fg-dark: oklch(0.98 0 0);
 }
 

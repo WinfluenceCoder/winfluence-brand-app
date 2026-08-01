@@ -66,7 +66,7 @@ export function CreatorMiniCardBody({
         </Avatar>
         {matchLabel ? (
           <Badge
-            variant="secondary"
+            variant="outline"
             className={cn(
               "border-transparent px-1.5 py-0 text-[10px] font-semibold tabular-nums",
               matchBadgeClasses(collab.match),
