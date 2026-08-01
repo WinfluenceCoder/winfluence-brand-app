@@ -42,7 +42,15 @@ function CurateCampaignPage() {
         {t("campaigns.curate.title")}
       </h1>
 
-      {campaign ? <CampaignCard campaign={campaign} /> : null}
+      {campaign ? (
+        <CampaignCard
+          campaign={{
+            title: campaign.name ?? null,
+            briefing: campaign.briefing,
+            campaign_visual_url: campaign.campaign_visual_url,
+          }}
+        />
+      ) : null}
 
       {curation.isLoading ? (
         <Card>
