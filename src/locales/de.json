@@ -479,6 +479,31 @@
       "barterOrderCoupon": "Bestell-Coupon",
       "createdAt": "Erstellt am",
       "updatedAt": "Aktualisiert am"
+    },
+    "start": {
+      "title": "Kampagne starten und Influencer beauftragen",
+      "selectedInfluencers": "Ausgewählte Influencers",
+      "columns": {
+        "photo": "Foto",
+        "nickName": "Nickname",
+        "firstName": "Vorname",
+        "lastName": "Nachname",
+        "email": "Email-Adresse",
+        "mobile": "Mobile",
+        "price": "Preis"
+      },
+      "totalCost": "Total Kosten der Kampagne: {{amount}}",
+      "empty": "Keine ausgewählten Influencer vorhanden",
+      "sectionTitle": "Starten und beauftragen",
+      "explanation": "Sobald die Kampagne gestartet ist, werden die ausgewählten Influencer verbindlich beauftragt. Die Rechnung über {{amount}} wird erzeugt und per Email zugestellt. Bitte per QR Code überweisen bis {{date}}.",
+      "agbBefore": "Ich habe die ",
+      "agbLinkLabel": "AGB",
+      "agbAfter": " gelesen und bin damit einverstanden.",
+      "ctaButton": "Starten & Beauftragen",
+      "cancelButton": "Abbrechen",
+      "successToast": "Kampagne gestartet.",
+      "errorMessage": "Kampagne konnte nicht gestartet werden.",
+      "loadError": "Ausgewählte Influencer konnten nicht geladen werden."
     }
   }
 }
