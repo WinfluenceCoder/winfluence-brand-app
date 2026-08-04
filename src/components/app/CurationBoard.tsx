@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { useQueryClient } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import {
   DndContext,
@@ -20,6 +21,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { CreatorMiniCard, CreatorMiniCardBody } from "@/components/app/CreatorMiniCard";
 import { CreatorProfileDialog } from "@/components/app/CreatorProfileDialog";
 import { CampaignCalculationCard } from "@/components/app/CampaignCalculationCard";
@@ -60,18 +62,21 @@ function Column({
   emptyText,
   items,
   onOpen,
+  action,
 }: {
   id: string;
   title: string;
   emptyText: string;
   items: CurationCollab[];
   onOpen: (c: CurationCollab) => void;
+  action?: ReactNode;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id, data: { containerId: id } });
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0">
         <CardTitle className="text-base">{title}</CardTitle>
+        {action ? <div className="shrink-0">{action}</div> : null}
       </CardHeader>
       <CardContent>
         <div
@@ -280,6 +285,13 @@ export function CurationBoard({
             emptyText={t("campaigns.curate.appliedEmpty")}
             items={right}
             onOpen={setProfile}
+            action={
+              <Link to="/invite/$id" params={{ id: String(campaignId) }}>
+                <Button variant="outline" size="sm">
+                  {t("campaigns.curate.inviteInfluencers")}
+                </Button>
+              </Link>
+            }
           />
         </div>
         <DragOverlay>
