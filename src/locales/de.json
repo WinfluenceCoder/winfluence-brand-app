@@ -505,5 +505,44 @@
       "errorMessage": "Kampagne konnte nicht gestartet werden.",
       "loadError": "Ausgewählte Influencer konnten nicht geladen werden."
     }
+  },
+  "invite": {
+    "title": "Creators einladen",
+    "loading": "Creators werden geladen …",
+    "errorTitle": "Creators konnten nicht geladen werden",
+    "retry": "Erneut versuchen",
+    "empty": "Keine Creators gefunden",
+    "columns": {
+      "invite": "Einladen",
+      "photo": "Foto",
+      "nickName": "Nickname",
+      "followersInsta": "Followers Instagram",
+      "followersTiktok": "Followers TikTok",
+      "followersYoutube": "Followers YouTube",
+      "rating": "Bewertung Ø"
+    },
+    "filters": {
+      "hasInsta": "Instagram vorhanden",
+      "hasTiktok": "TikTok vorhanden",
+      "hasYoutube": "YouTube vorhanden",
+      "minRating": "Mindest-Bewertung",
+      "ratingFrom": "ab {{value}}",
+      "collabStatus": "Collab-Status",
+      "any": "Alle"
+    },
+    "collabStatus": {
+      "none": "Keine Collab",
+      "invited": "Eingeladen",
+      "applied": "Beworben",
+      "selected": "Ausgewählt",
+      "hired": "Beauftragt"
+    },
+    "pageInfo": "Seite {{page}} von {{pages}} · {{total}} Creators",
+    "prevPage": "Zurück",
+    "nextPage": "Weiter",
+    "cta": "{{count}} ausgewählte einladen",
+    "successToast": "{{count}} Creators eingeladen",
+    "errorToast": "Einladungen konnten nicht gesendet werden."
   }
 }
+
