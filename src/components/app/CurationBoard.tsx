@@ -285,6 +285,13 @@ export function CurationBoard({
             emptyText={t("campaigns.curate.appliedEmpty")}
             items={right}
             onOpen={setProfile}
+            action={
+              <Link to="/invite/$id" params={{ id: String(campaignId) }}>
+                <Button variant="outline" size="sm">
+                  {t("campaigns.curate.inviteInfluencers")}
+                </Button>
+              </Link>
+            }
           />
         </div>
         <DragOverlay>
