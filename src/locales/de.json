@@ -508,7 +508,7 @@
     }
   },
   "invite": {
-    "title": "Creators einladen",
+    "title": "Influencer einladen",
     "loading": "Creators werden geladen …",
     "errorTitle": "Creators konnten nicht geladen werden",
     "retry": "Erneut versuchen",
@@ -546,4 +546,3 @@
     "errorToast": "Einladungen konnten nicht gesendet werden."
   }
 }
-
