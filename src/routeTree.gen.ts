@@ -15,6 +15,7 @@ import { Route as SignedOutRouteImport } from './routes/signed-out'
 import { Route as SetPasswordRouteImport } from './routes/set-password'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as OverlayRouteImport } from './routes/_overlay'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
@@ -79,6 +80,10 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OverlayRoute = OverlayRouteImport.update({
+  id: '/_overlay',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -115,9 +120,9 @@ const CampaignsPreviewIdRoute = CampaignsPreviewIdRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const OverlayInviteIdRoute = OverlayInviteIdRouteImport.update({
-  id: '/_overlay/invite/$id',
+  id: '/invite/$id',
   path: '/invite/$id',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => OverlayRoute,
 } as any)
 const AuthenticatedMessagesSystemRoute =
   AuthenticatedMessagesSystemRouteImport.update({
@@ -311,6 +316,7 @@ export interface FileRoutesByFullPath {
   '/campaigns/stats/$id': typeof AuthenticatedCampaignsStatsIdRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/set-password': typeof SetPasswordRoute
@@ -320,7 +326,6 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/security': typeof AuthenticatedSecurityRoute
   '/settings': typeof AuthenticatedSettingsRoute
-  '/': typeof AuthenticatedIndexRoute
   '/analytics/campaigns': typeof AuthenticatedAnalyticsCampaignsRoute
   '/analytics/influencers': typeof AuthenticatedAnalyticsInfluencersRoute
   '/campaigns/new': typeof AuthenticatedCampaignsNewRoute
@@ -353,6 +358,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/_overlay': typeof OverlayRouteWithChildren
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/set-password': typeof SetPasswordRoute
@@ -435,6 +441,7 @@ export interface FileRouteTypes {
     | '/campaigns/stats/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
     | '/login'
     | '/reset-password'
     | '/set-password'
@@ -444,7 +451,6 @@ export interface FileRouteTypes {
     | '/profile'
     | '/security'
     | '/settings'
-    | '/'
     | '/analytics/campaigns'
     | '/analytics/influencers'
     | '/campaigns/new'
@@ -476,6 +482,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_authenticated'
+    | '/_overlay'
     | '/login'
     | '/reset-password'
     | '/set-password'
@@ -518,13 +525,13 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  OverlayRoute: typeof OverlayRouteWithChildren
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SetPasswordRoute: typeof SetPasswordRoute
   SignedOutRoute: typeof SignedOutRoute
   TermsRoute: typeof TermsRoute
   WelcomeRoute: typeof WelcomeRoute
-  OverlayInviteIdRoute: typeof OverlayInviteIdRoute
   CampaignsPreviewIdRoute: typeof CampaignsPreviewIdRoute
 }
 
@@ -570,6 +577,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_overlay': {
+      id: '/_overlay'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof OverlayRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -626,7 +640,7 @@ declare module '@tanstack/react-router' {
       path: '/invite/$id'
       fullPath: '/invite/$id'
       preLoaderRoute: typeof OverlayInviteIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof OverlayRoute
     }
     '/_authenticated/messages/system': {
       id: '/_authenticated/messages/system'
@@ -878,15 +892,26 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface OverlayRouteChildren {
+  OverlayInviteIdRoute: typeof OverlayInviteIdRoute
+}
+
+const OverlayRouteChildren: OverlayRouteChildren = {
+  OverlayInviteIdRoute: OverlayInviteIdRoute,
+}
+
+const OverlayRouteWithChildren =
+  OverlayRoute._addFileChildren(OverlayRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  OverlayRoute: OverlayRouteWithChildren,
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SetPasswordRoute: SetPasswordRoute,
   SignedOutRoute: SignedOutRoute,
   TermsRoute: TermsRoute,
   WelcomeRoute: WelcomeRoute,
-  OverlayInviteIdRoute: OverlayInviteIdRoute,
   CampaignsPreviewIdRoute: CampaignsPreviewIdRoute,
 }
 export const routeTree = rootRouteImport
