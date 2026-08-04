@@ -328,9 +328,10 @@ function InviteCreatorsOverlay() {
                       size="lg"
                       disabled={selected.size === 0 || mutation.isPending}
                       onClick={() => mutation.mutate()}
-                    {
-                      mutation.isPending ? t("invite.ctaLoading") : t("invite.cta", { count: selected.size })
-                    }
+                    >
+                      {mutation.isPending
+                        ? t("invite.ctaLoading")
+                        : t("invite.cta", { count: selected.size })}
                     </Button>
                   </div>
                 </>
