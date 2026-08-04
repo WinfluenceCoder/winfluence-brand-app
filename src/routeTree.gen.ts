@@ -15,6 +15,7 @@ import { Route as SignedOutRouteImport } from './routes/signed-out'
 import { Route as SetPasswordRouteImport } from './routes/set-password'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as OverlayRouteImport } from './routes/_overlay'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
@@ -22,10 +23,10 @@ import { Route as AuthenticatedSecurityRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedCampaignsIndexRouteImport } from './routes/_authenticated/campaigns.index'
 import { Route as CampaignsPreviewIdRouteImport } from './routes/campaigns.preview.$id'
+import { Route as OverlayInviteIdRouteImport } from './routes/_overlay/invite.$id'
 import { Route as AuthenticatedMessagesSystemRouteImport } from './routes/_authenticated/messages.system'
 import { Route as AuthenticatedMessagesPersonalRouteImport } from './routes/_authenticated/messages.personal'
 import { Route as AuthenticatedMessagesNotificationsRouteImport } from './routes/_authenticated/messages.notifications'
-import { Route as AuthenticatedInviteIdRouteImport } from './routes/_authenticated/invite.$id'
 import { Route as AuthenticatedInfluencersSearchRouteImport } from './routes/_authenticated/influencers.search'
 import { Route as AuthenticatedInfluencersHiredRouteImport } from './routes/_authenticated/influencers.hired'
 import { Route as AuthenticatedInfluencersFavoritesRouteImport } from './routes/_authenticated/influencers.favorites'
@@ -79,6 +80,10 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OverlayRoute = OverlayRouteImport.update({
+  id: '/_overlay',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -114,6 +119,11 @@ const CampaignsPreviewIdRoute = CampaignsPreviewIdRouteImport.update({
   path: '/campaigns/preview/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OverlayInviteIdRoute = OverlayInviteIdRouteImport.update({
+  id: '/invite/$id',
+  path: '/invite/$id',
+  getParentRoute: () => OverlayRoute,
+} as any)
 const AuthenticatedMessagesSystemRoute =
   AuthenticatedMessagesSystemRouteImport.update({
     id: '/messages/system',
@@ -132,11 +142,6 @@ const AuthenticatedMessagesNotificationsRoute =
     path: '/messages/notifications',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedInviteIdRoute = AuthenticatedInviteIdRouteImport.update({
-  id: '/invite/$id',
-  path: '/invite/$id',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedInfluencersSearchRoute =
   AuthenticatedInfluencersSearchRouteImport.update({
     id: '/influencers/search',
@@ -290,10 +295,10 @@ export interface FileRoutesByFullPath {
   '/influencers/favorites': typeof AuthenticatedInfluencersFavoritesRoute
   '/influencers/hired': typeof AuthenticatedInfluencersHiredRoute
   '/influencers/search': typeof AuthenticatedInfluencersSearchRoute
-  '/invite/$id': typeof AuthenticatedInviteIdRoute
   '/messages/notifications': typeof AuthenticatedMessagesNotificationsRoute
   '/messages/personal': typeof AuthenticatedMessagesPersonalRoute
   '/messages/system': typeof AuthenticatedMessagesSystemRoute
+  '/invite/$id': typeof OverlayInviteIdRoute
   '/campaigns/preview/$id': typeof CampaignsPreviewIdRoute
   '/campaigns/': typeof AuthenticatedCampaignsIndexRoute
   '/campaigns/$id/edit': typeof AuthenticatedCampaignsIdEditRoute
@@ -311,6 +316,7 @@ export interface FileRoutesByFullPath {
   '/campaigns/stats/$id': typeof AuthenticatedCampaignsStatsIdRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/set-password': typeof SetPasswordRoute
@@ -320,7 +326,6 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/security': typeof AuthenticatedSecurityRoute
   '/settings': typeof AuthenticatedSettingsRoute
-  '/': typeof AuthenticatedIndexRoute
   '/analytics/campaigns': typeof AuthenticatedAnalyticsCampaignsRoute
   '/analytics/influencers': typeof AuthenticatedAnalyticsInfluencersRoute
   '/campaigns/new': typeof AuthenticatedCampaignsNewRoute
@@ -330,10 +335,10 @@ export interface FileRoutesByTo {
   '/influencers/favorites': typeof AuthenticatedInfluencersFavoritesRoute
   '/influencers/hired': typeof AuthenticatedInfluencersHiredRoute
   '/influencers/search': typeof AuthenticatedInfluencersSearchRoute
-  '/invite/$id': typeof AuthenticatedInviteIdRoute
   '/messages/notifications': typeof AuthenticatedMessagesNotificationsRoute
   '/messages/personal': typeof AuthenticatedMessagesPersonalRoute
   '/messages/system': typeof AuthenticatedMessagesSystemRoute
+  '/invite/$id': typeof OverlayInviteIdRoute
   '/campaigns/preview/$id': typeof CampaignsPreviewIdRoute
   '/campaigns': typeof AuthenticatedCampaignsIndexRoute
   '/campaigns/$id/edit': typeof AuthenticatedCampaignsIdEditRoute
@@ -353,6 +358,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/_overlay': typeof OverlayRouteWithChildren
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/set-password': typeof SetPasswordRoute
@@ -372,10 +378,10 @@ export interface FileRoutesById {
   '/_authenticated/influencers/favorites': typeof AuthenticatedInfluencersFavoritesRoute
   '/_authenticated/influencers/hired': typeof AuthenticatedInfluencersHiredRoute
   '/_authenticated/influencers/search': typeof AuthenticatedInfluencersSearchRoute
-  '/_authenticated/invite/$id': typeof AuthenticatedInviteIdRoute
   '/_authenticated/messages/notifications': typeof AuthenticatedMessagesNotificationsRoute
   '/_authenticated/messages/personal': typeof AuthenticatedMessagesPersonalRoute
   '/_authenticated/messages/system': typeof AuthenticatedMessagesSystemRoute
+  '/_overlay/invite/$id': typeof OverlayInviteIdRoute
   '/campaigns/preview/$id': typeof CampaignsPreviewIdRoute
   '/_authenticated/campaigns/': typeof AuthenticatedCampaignsIndexRoute
   '/_authenticated/campaigns/$id/edit': typeof AuthenticatedCampaignsIdEditRoute
@@ -414,10 +420,10 @@ export interface FileRouteTypes {
     | '/influencers/favorites'
     | '/influencers/hired'
     | '/influencers/search'
-    | '/invite/$id'
     | '/messages/notifications'
     | '/messages/personal'
     | '/messages/system'
+    | '/invite/$id'
     | '/campaigns/preview/$id'
     | '/campaigns/'
     | '/campaigns/$id/edit'
@@ -435,6 +441,7 @@ export interface FileRouteTypes {
     | '/campaigns/stats/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
     | '/login'
     | '/reset-password'
     | '/set-password'
@@ -444,7 +451,6 @@ export interface FileRouteTypes {
     | '/profile'
     | '/security'
     | '/settings'
-    | '/'
     | '/analytics/campaigns'
     | '/analytics/influencers'
     | '/campaigns/new'
@@ -454,10 +460,10 @@ export interface FileRouteTypes {
     | '/influencers/favorites'
     | '/influencers/hired'
     | '/influencers/search'
-    | '/invite/$id'
     | '/messages/notifications'
     | '/messages/personal'
     | '/messages/system'
+    | '/invite/$id'
     | '/campaigns/preview/$id'
     | '/campaigns'
     | '/campaigns/$id/edit'
@@ -476,6 +482,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_authenticated'
+    | '/_overlay'
     | '/login'
     | '/reset-password'
     | '/set-password'
@@ -495,10 +502,10 @@ export interface FileRouteTypes {
     | '/_authenticated/influencers/favorites'
     | '/_authenticated/influencers/hired'
     | '/_authenticated/influencers/search'
-    | '/_authenticated/invite/$id'
     | '/_authenticated/messages/notifications'
     | '/_authenticated/messages/personal'
     | '/_authenticated/messages/system'
+    | '/_overlay/invite/$id'
     | '/campaigns/preview/$id'
     | '/_authenticated/campaigns/'
     | '/_authenticated/campaigns/$id/edit'
@@ -518,6 +525,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  OverlayRoute: typeof OverlayRouteWithChildren
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SetPasswordRoute: typeof SetPasswordRoute
@@ -571,6 +579,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_overlay': {
+      id: '/_overlay'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof OverlayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -620,6 +635,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CampaignsPreviewIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_overlay/invite/$id': {
+      id: '/_overlay/invite/$id'
+      path: '/invite/$id'
+      fullPath: '/invite/$id'
+      preLoaderRoute: typeof OverlayInviteIdRouteImport
+      parentRoute: typeof OverlayRoute
+    }
     '/_authenticated/messages/system': {
       id: '/_authenticated/messages/system'
       path: '/messages/system'
@@ -639,13 +661,6 @@ declare module '@tanstack/react-router' {
       path: '/messages/notifications'
       fullPath: '/messages/notifications'
       preLoaderRoute: typeof AuthenticatedMessagesNotificationsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/invite/$id': {
-      id: '/_authenticated/invite/$id'
-      path: '/invite/$id'
-      fullPath: '/invite/$id'
-      preLoaderRoute: typeof AuthenticatedInviteIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/influencers/search': {
@@ -819,7 +834,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedInfluencersFavoritesRoute: typeof AuthenticatedInfluencersFavoritesRoute
   AuthenticatedInfluencersHiredRoute: typeof AuthenticatedInfluencersHiredRoute
   AuthenticatedInfluencersSearchRoute: typeof AuthenticatedInfluencersSearchRoute
-  AuthenticatedInviteIdRoute: typeof AuthenticatedInviteIdRoute
   AuthenticatedMessagesNotificationsRoute: typeof AuthenticatedMessagesNotificationsRoute
   AuthenticatedMessagesPersonalRoute: typeof AuthenticatedMessagesPersonalRoute
   AuthenticatedMessagesSystemRoute: typeof AuthenticatedMessagesSystemRoute
@@ -855,7 +869,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedInfluencersFavoritesRoute,
   AuthenticatedInfluencersHiredRoute: AuthenticatedInfluencersHiredRoute,
   AuthenticatedInfluencersSearchRoute: AuthenticatedInfluencersSearchRoute,
-  AuthenticatedInviteIdRoute: AuthenticatedInviteIdRoute,
   AuthenticatedMessagesNotificationsRoute:
     AuthenticatedMessagesNotificationsRoute,
   AuthenticatedMessagesPersonalRoute: AuthenticatedMessagesPersonalRoute,
@@ -879,8 +892,20 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface OverlayRouteChildren {
+  OverlayInviteIdRoute: typeof OverlayInviteIdRoute
+}
+
+const OverlayRouteChildren: OverlayRouteChildren = {
+  OverlayInviteIdRoute: OverlayInviteIdRoute,
+}
+
+const OverlayRouteWithChildren =
+  OverlayRoute._addFileChildren(OverlayRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  OverlayRoute: OverlayRouteWithChildren,
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SetPasswordRoute: SetPasswordRoute,
@@ -892,13 +917,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
