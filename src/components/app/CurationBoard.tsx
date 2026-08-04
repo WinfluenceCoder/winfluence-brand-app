@@ -62,18 +62,21 @@ function Column({
   emptyText,
   items,
   onOpen,
+  action,
 }: {
   id: string;
   title: string;
   emptyText: string;
   items: CurationCollab[];
   onOpen: (c: CurationCollab) => void;
+  action?: ReactNode;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id, data: { containerId: id } });
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0">
         <CardTitle className="text-base">{title}</CardTitle>
+        {action ? <div className="shrink-0">{action}</div> : null}
       </CardHeader>
       <CardContent>
         <div
