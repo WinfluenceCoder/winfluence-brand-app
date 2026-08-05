@@ -410,7 +410,33 @@ function ProfilePage() {
       <div className="mt-4 flex items-center gap-2">
         <span className="text-sm text-muted-foreground">{t("profile.status")}:</span>
         <Badge variant="secondary">{status || "—"}</Badge>
+        <div className="ml-auto flex items-center gap-2">
+          <Label htmlFor="is_stealth" className="text-sm text-muted-foreground">
+            {t("profile.hideProfile")}
+          </Label>
+          <Switch
+            id="is_stealth"
+            checked={isStealth}
+            onCheckedChange={(v) => {
+              setIsStealth(v);
+              stealthMutation.mutate(
+                { data: { is_stealth: v } },
+                {
+                  onError: (err) => {
+                    console.error(err);
+                    setIsStealth(!v);
+                    toast.error(t("profile.saveError"));
+                  },
+                  onSuccess: () => {
+                    void qc.invalidateQueries({ queryKey: ["my-brand"] });
+                  },
+                },
+              );
+            }}
+          />
+        </div>
       </div>
+
 
       <form onSubmit={onSubmitWrapped} className="mt-8 space-y-10" noValidate>
         {/* Meine Firma */}
