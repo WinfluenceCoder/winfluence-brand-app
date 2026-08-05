@@ -196,6 +196,14 @@ function ProfilePage() {
   const mwstNr = brand?.mwst_nr ?? "";
   const status = brand?.status ?? "";
 
+  const [isStealth, setIsStealth] = useState<boolean>(
+    Boolean((brand as { is_stealth?: boolean | null } | null)?.is_stealth),
+  );
+  const saveStealth = useServerFn(setMyBrandStealth);
+  const stealthMutation = useMutation({ mutationFn: saveStealth });
+
+
+
   const [logoDialogOpen, setLogoDialogOpen] = useState(false);
   const [photoDialogOpen, setPhotoDialogOpen] = useState(false);
 
