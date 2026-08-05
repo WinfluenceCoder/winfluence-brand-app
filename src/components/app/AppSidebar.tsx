@@ -108,7 +108,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon" className="border-r">
-      <SidebarHeader className="h-14 px-4 flex items-center justify-start">
+      <SidebarHeader className="h-14 px-4 flex items-start justify-start pt-3">
         <Link to="/" className="flex items-center justify-start">
           {collapsed ? (
             <img
@@ -125,6 +125,7 @@ export function AppSidebar() {
           )}
         </Link>
       </SidebarHeader>
+
 
       <SidebarContent>
         <SidebarGroup>
