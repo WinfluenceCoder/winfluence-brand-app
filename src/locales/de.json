@@ -143,6 +143,7 @@
   "profile": {
     "title": "Mein Profil",
     "status": "Status",
+    "hideProfile": "Profil verbergen",
     "completeness": "Vollständigkeit",
     "companySection": "Meine Firma",
     "brandSection": "Mein Brand",
