@@ -1,5 +1,5 @@
 import { createFileRoute, useRouter, useNavigate } from "@tanstack/react-router";
-import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
+import { useSuspenseQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,7 +7,7 @@ import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { toast } from "sonner";
-import { getMyBrand, updateMyBrand } from "@/lib/brands.functions";
+import { getMyBrand, updateMyBrand, setMyBrandStealth } from "@/lib/brands.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,6 +26,8 @@ import { ChevronLeft, Upload, User as UserIcon, CheckCircle2 } from "lucide-reac
 import { PhotoCropDialog } from "@/components/app/PhotoCropDialog";
 import { UrlInputWithLink } from "@/components/app/UrlInputWithLink";
 import { Progress } from "@/components/ui/progress";
+import { Switch } from "@/components/ui/switch";
+
 
 export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
@@ -193,6 +195,14 @@ function ProfilePage() {
   const legalName = brand?.legal_name ?? "";
   const mwstNr = brand?.mwst_nr ?? "";
   const status = brand?.status ?? "";
+
+  const [isStealth, setIsStealth] = useState<boolean>(
+    Boolean((brand as { is_stealth?: boolean | null } | null)?.is_stealth),
+  );
+  const saveStealth = useServerFn(setMyBrandStealth);
+  const stealthMutation = useMutation({ mutationFn: saveStealth });
+
+
 
   const [logoDialogOpen, setLogoDialogOpen] = useState(false);
   const [photoDialogOpen, setPhotoDialogOpen] = useState(false);
@@ -410,7 +420,33 @@ function ProfilePage() {
       <div className="mt-4 flex items-center gap-2">
         <span className="text-sm text-muted-foreground">{t("profile.status")}:</span>
         <Badge variant="secondary">{status || "—"}</Badge>
+        <div className="ml-auto flex items-center gap-2">
+          <Label htmlFor="is_stealth" className="text-sm text-muted-foreground">
+            {t("profile.hideProfile")}
+          </Label>
+          <Switch
+            id="is_stealth"
+            checked={isStealth}
+            onCheckedChange={(v) => {
+              setIsStealth(v);
+              stealthMutation.mutate(
+                { data: { is_stealth: v } },
+                {
+                  onError: (err) => {
+                    console.error(err);
+                    setIsStealth(!v);
+                    toast.error(t("profile.saveError"));
+                  },
+                  onSuccess: () => {
+                    void qc.invalidateQueries({ queryKey: ["my-brand"] });
+                  },
+                },
+              );
+            }}
+          />
+        </div>
       </div>
+
 
       <form onSubmit={onSubmitWrapped} className="mt-8 space-y-10" noValidate>
         {/* Meine Firma */}

@@ -97,6 +97,19 @@ export const getMyBrand = createServerFn({ method: "GET" })
     return data;
   });
 
+export const setMyBrandStealth = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => z.object({ is_stealth: z.boolean() }).parse(data))
+  .handler(async ({ context, data }) => {
+    const { error } = await context.supabase
+      .from("brands")
+      .update({ is_stealth: data.is_stealth } as never)
+      .eq("user_id", context.userId);
+    if (error) throw new Error(error.message);
+    return { is_stealth: data.is_stealth };
+  });
+
+
 function computeProfileQuality(row: Record<string, unknown>, colCount: number): number {
   if (!colCount || colCount <= 0) return 1;
   let n = 0;
