@@ -26,6 +26,8 @@ import { ChevronLeft, Upload, User as UserIcon, CheckCircle2 } from "lucide-reac
 import { PhotoCropDialog } from "@/components/app/PhotoCropDialog";
 import { UrlInputWithLink } from "@/components/app/UrlInputWithLink";
 import { Progress } from "@/components/ui/progress";
+import { Switch } from "@/components/ui/switch";
+
 
 export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
