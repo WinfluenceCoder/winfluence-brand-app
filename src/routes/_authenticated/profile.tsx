@@ -7,7 +7,7 @@ import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { toast } from "sonner";
-import { getMyBrand, updateMyBrand } from "@/lib/brands.functions";
+import { getMyBrand, updateMyBrand, setMyBrandStealth } from "@/lib/brands.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
