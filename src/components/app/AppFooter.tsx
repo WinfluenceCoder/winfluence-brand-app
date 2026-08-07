@@ -3,10 +3,10 @@ import { useTranslation } from "react-i18next";
 export function AppFooter() {
   const { t } = useTranslation();
   const links = [
-    { key: "footer.imprint", href: "#" },
-    { key: "footer.terms", href: "#" },
-    { key: "footer.privacy", href: "#" },
-    { key: "footer.about", href: "https://winfluence.net/about.html" },
+    { key: "footer.imprint", href: "https://winfluence.net/impressum" },
+    { key: "footer.terms", href: "https://winfluence.net/nutzungsbedingungen" },
+    { key: "footer.privacy", href: "https://winfluence.net/datenschutz" },
+    { key: "footer.about", href: "https://winfluence.net" },
   ];
   return (
     <footer className="border-t bg-background px-6 py-3 text-xs text-muted-foreground">
