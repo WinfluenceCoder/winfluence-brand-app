@@ -1,10 +1,12 @@
 import { Suspense, useState } from "react";
 import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
-import { useSuspenseQuery, useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery, useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
-import { ChevronLeft } from "lucide-react";
+import { toast } from "sonner";
+import { ChevronLeft, Loader2 } from "lucide-react";
 
+import { supabase } from "@/integrations/supabase/client";
 import { getMyCampaign } from "@/lib/campaigns.functions";
 import { startSelectionQueryOptions, formatChf } from "@/lib/campaign-curation";
 import { Button } from "@/components/ui/button";
@@ -22,6 +24,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { CampaignCard } from "@/components/app/CampaignCard";
+
 
 export const Route = createFileRoute("/_authenticated/campaigns/start/$id")({
   component: StartCampaignPage,
@@ -101,6 +104,45 @@ function StartCampaignContent() {
   const rows = selection.data ?? [];
   const total = rows.reduce((sum, r) => sum + (r.price ?? 0), 0);
   const hasRows = rows.length > 0;
+
+  const qc = useQueryClient();
+  const [failureDetail, setFailureDetail] = useState<string | null>(null);
+
+  const startMutation = useMutation({
+    mutationFn: async () => {
+      // start_campaign ist nicht in den generierten Typen enthalten (externe DB)
+      const rpc = supabase.rpc as unknown as (
+        fn: string,
+        args: Record<string, unknown>,
+      ) => Promise<{ data: unknown; error: { message: string } | null }>;
+      const { data: result, error } = await rpc("start_campaign", {
+        p_campaign_id: campaignId,
+      });
+      if (error) throw new Error(error.message);
+      return result;
+    },
+
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["campaigns"] });
+      qc.invalidateQueries({ queryKey: ["home", "campaigns"] });
+      qc.invalidateQueries({ queryKey: ["campaign", campaignId] });
+      toast.success(t("campaigns.start.successToast"));
+      router.navigate({ to: "/campaigns", search: { status: "running" } });
+    },
+    onError: (e: unknown) => {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[start_campaign]", e);
+      setFailureDetail(msg);
+    },
+  });
+
+  const locked = startMutation.isPending || failureDetail !== null;
+
+  const handleStart = () => {
+    if (locked || !agbAccepted || !hasRows) return;
+    startMutation.mutate();
+  };
+
 
   return (
     <>
@@ -197,6 +239,7 @@ function StartCampaignContent() {
             <Checkbox
               id="agb-start"
               checked={agbAccepted}
+              disabled={locked}
               onCheckedChange={(v) => setAgbAccepted(v === true)}
             />
             <Label htmlFor="agb-start" className="text-sm font-normal leading-snug">
@@ -208,12 +251,24 @@ function StartCampaignContent() {
             </Label>
           </div>
           <div className="flex items-center gap-3">
-            <Button type="button" disabled={!agbAccepted || !hasRows}>
-              {t("campaigns.start.ctaButton")}
+            <Button
+              type="button"
+              onClick={handleStart}
+              disabled={locked || !agbAccepted || !hasRows}
+            >
+              {startMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {t("campaigns.start.loading")}
+                </>
+              ) : (
+                t("campaigns.start.ctaButton")
+              )}
             </Button>
             <Button
               type="button"
               variant="outline"
+              disabled={locked}
               onClick={() => router.history.back()}
             >
               {t("campaigns.start.cancelButton")}
@@ -221,6 +276,18 @@ function StartCampaignContent() {
           </div>
         </CardContent>
       </Card>
+
+      {failureDetail !== null && (
+        <div className="space-y-1">
+          <p className="text-sm font-medium text-destructive">
+            {t("campaigns.start.errorMessage")}
+          </p>
+          {failureDetail && (
+            <p className="text-xs text-muted-foreground">{failureDetail}</p>
+          )}
+        </div>
+      )}
+
     </>
   );
 }

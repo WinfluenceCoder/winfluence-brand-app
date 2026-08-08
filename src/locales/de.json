@@ -503,9 +503,10 @@
       "agbAfter": " gelesen und bin damit einverstanden.",
       "ctaButton": "Starten & Beauftragen",
       "cancelButton": "Abbrechen",
-      "successToast": "Kampagne gestartet.",
-      "errorMessage": "Kampagne konnte nicht gestartet werden.",
-      "loadError": "Ausgewählte Influencer konnten nicht geladen werden."
+      "successToast": "Kampagne gestartet – die Influencer werden benachrichtigt.",
+      "errorMessage": "Die Kampagne konnte nicht gestartet werden. Bitte kontaktiere den Support.",
+      "loadError": "Ausgewählte Influencer konnten nicht geladen werden.",
+      "loading": "Wird gestartet…"
     }
   },
   "invite": {
