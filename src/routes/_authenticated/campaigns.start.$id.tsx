@@ -1,10 +1,12 @@
 import { Suspense, useState } from "react";
 import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
-import { useSuspenseQuery, useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery, useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
-import { ChevronLeft } from "lucide-react";
+import { toast } from "sonner";
+import { ChevronLeft, Loader2 } from "lucide-react";
 
+import { supabase } from "@/integrations/supabase/client";
 import { getMyCampaign } from "@/lib/campaigns.functions";
 import { startSelectionQueryOptions, formatChf } from "@/lib/campaign-curation";
 import { Button } from "@/components/ui/button";
@@ -22,6 +24,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { CampaignCard } from "@/components/app/CampaignCard";
+
 
 export const Route = createFileRoute("/_authenticated/campaigns/start/$id")({
   component: StartCampaignPage,
