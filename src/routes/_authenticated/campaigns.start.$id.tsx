@@ -239,6 +239,7 @@ function StartCampaignContent() {
             <Checkbox
               id="agb-start"
               checked={agbAccepted}
+              disabled={locked}
               onCheckedChange={(v) => setAgbAccepted(v === true)}
             />
             <Label htmlFor="agb-start" className="text-sm font-normal leading-snug">
@@ -250,12 +251,24 @@ function StartCampaignContent() {
             </Label>
           </div>
           <div className="flex items-center gap-3">
-            <Button type="button" disabled={!agbAccepted || !hasRows}>
-              {t("campaigns.start.ctaButton")}
+            <Button
+              type="button"
+              onClick={handleStart}
+              disabled={locked || !agbAccepted || !hasRows}
+            >
+              {startMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {t("campaigns.start.loading")}
+                </>
+              ) : (
+                t("campaigns.start.ctaButton")
+              )}
             </Button>
             <Button
               type="button"
               variant="outline"
+              disabled={locked}
               onClick={() => router.history.back()}
             >
               {t("campaigns.start.cancelButton")}
@@ -263,6 +276,18 @@ function StartCampaignContent() {
           </div>
         </CardContent>
       </Card>
+
+      {failureDetail !== null && (
+        <div className="space-y-1">
+          <p className="text-sm font-medium text-destructive">
+            {t("campaigns.start.errorMessage")}
+          </p>
+          {failureDetail && (
+            <p className="text-xs text-muted-foreground">{failureDetail}</p>
+          )}
+        </div>
+      )}
+
     </>
   );
 }
