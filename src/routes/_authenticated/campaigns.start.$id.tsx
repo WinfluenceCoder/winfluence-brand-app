@@ -111,16 +111,18 @@ function StartCampaignContent() {
   const startMutation = useMutation({
     mutationFn: async () => {
       // start_campaign ist nicht in den generierten Typen enthalten (externe DB)
-      const rpc = supabase.rpc as unknown as (
-        fn: string,
-        args: Record<string, unknown>,
-      ) => Promise<{ data: unknown; error: { message: string } | null }>;
-      const { data: result, error } = await rpc("start_campaign", {
+      const { data: result, error } = await (
+        supabase.rpc as unknown as (
+          fn: string,
+          args: Record<string, unknown>,
+        ) => Promise<{ data: unknown; error: { message: string } | null }>
+      )("start_campaign", {
         p_campaign_id: campaignId,
       });
       if (error) throw new Error(error.message);
       return result;
     },
+
 
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["campaigns"] });
