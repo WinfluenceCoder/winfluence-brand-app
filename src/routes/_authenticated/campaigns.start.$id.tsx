@@ -105,6 +105,39 @@ function StartCampaignContent() {
   const total = rows.reduce((sum, r) => sum + (r.price ?? 0), 0);
   const hasRows = rows.length > 0;
 
+  const qc = useQueryClient();
+  const [failureDetail, setFailureDetail] = useState<string | null>(null);
+
+  const startMutation = useMutation({
+    mutationFn: async () => {
+      const { data: result, error } = await supabase.rpc("start_campaign", {
+        p_campaign_id: campaignId,
+      } as never);
+      if (error) throw error;
+      return result;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["campaigns"] });
+      qc.invalidateQueries({ queryKey: ["home", "campaigns"] });
+      qc.invalidateQueries({ queryKey: ["campaign", campaignId] });
+      toast.success(t("campaigns.start.successToast"));
+      router.navigate({ to: "/campaigns", search: { status: "running" } });
+    },
+    onError: (e: unknown) => {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[start_campaign]", e);
+      setFailureDetail(msg);
+    },
+  });
+
+  const locked = startMutation.isPending || failureDetail !== null;
+
+  const handleStart = () => {
+    if (locked || !agbAccepted || !hasRows) return;
+    startMutation.mutate();
+  };
+
+
   return (
     <>
       <h1 className="text-2xl font-semibold tracking-tight">
