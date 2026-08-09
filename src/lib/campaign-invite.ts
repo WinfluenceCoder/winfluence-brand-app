@@ -105,16 +105,30 @@ export function inviteCreatorsQueryOptions(campaignId: number) {
   });
 }
 
-export async function inviteCreators(campaignId: number, creatorIds: number[]) {
-  if (creatorIds.length === 0) return;
-  const { error } = await supabase.from("collabs").insert(
-    creatorIds.map((creator_id) => ({
-      campaign_id: campaignId,
-      creator_id,
-      status: "invited",
-    })),
-  );
+export type InviteResult = {
+  campaign_id: number;
+  invited: number;
+  skipped: number;
+};
+
+export async function inviteCreators(
+  campaignId: number,
+  creatorIds: number[],
+): Promise<InviteResult> {
+  if (creatorIds.length === 0) {
+    return { campaign_id: campaignId, invited: 0, skipped: 0 };
+  }
+  const { data, error } = await (
+    supabase.rpc as unknown as (
+      fn: string,
+      args: Record<string, unknown>,
+    ) => Promise<{ data: unknown; error: { message: string } | null }>
+  )("invite_creators", {
+    p_campaign_id: campaignId,
+    p_creator_ids: creatorIds,
+  });
   if (error) throw new Error(describe(error));
+  return data as InviteResult;
 }
 
 const rf = new Intl.NumberFormat("de-CH", {
