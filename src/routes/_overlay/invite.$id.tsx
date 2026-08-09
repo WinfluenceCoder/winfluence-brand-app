@@ -112,8 +112,10 @@ function InviteCreatorsOverlay() {
 
   const mutation = useMutation({
     mutationFn: () => inviteCreators(campaignId, [...selected]),
-    onSuccess: () => {
-      toast.success(t("invite.successToast", { count: selected.size }));
+    onSuccess: (result) => {
+      toast.success(
+        t("invite.successToast", { count: result?.invited ?? selected.size }),
+      );
       router.history.back();
     },
     onError: (error) => {
