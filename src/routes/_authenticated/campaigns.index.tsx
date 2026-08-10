@@ -38,7 +38,7 @@ function CampaignsListPage() {
   const { t } = useTranslation();
   const rawSearch = Route.useSearch();
   const status = normalizeStatus(rawSearch.status);
-  const navigate = useNavigate({ from: "/campaigns" });
+  const navigate = useNavigate({ from: "/campaigns/" });
 
   const { data } = useSuspenseQuery(
     campaignsListQueryOptions(status === "all" ? {} : { status }),
