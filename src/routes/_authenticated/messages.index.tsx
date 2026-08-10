@@ -152,8 +152,25 @@ function MessagesPage() {
           ))}
         </TabsList>
       </Tabs>
+      {listError && (
+        <Alert variant="destructive" className="mt-4">
+          <AlertTitle>Nachrichten konnten nicht geladen werden</AlertTitle>
+          <AlertDescription className="break-words">
+            {(listError as Error).message}
+          </AlertDescription>
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-3"
+            onClick={() => void refetch()}
+          >
+            Erneut versuchen
+          </Button>
+        </Alert>
+      )}
 
       <div className="mt-4 flex gap-4">
+
         <Card
           className={`w-full overflow-hidden p-0 md:w-[400px] md:shrink-0 ${
             selected ? "hidden md:block" : "block"
