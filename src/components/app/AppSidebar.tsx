@@ -80,9 +80,9 @@ const groups: Group[] = [
     titleKey: "nav.messages",
     icon: MessageSquare,
     items: [
-      { titleKey: "nav.messagesNotifications", to: "/messages/notifications" },
-      { titleKey: "nav.messagesPersonal", to: "/messages/personal" },
-      { titleKey: "nav.messagesSystem", to: "/messages/system" },
+      { titleKey: "messages.nav.notifications", to: "/messages", search: { type: "system" } },
+      { titleKey: "messages.nav.personal", to: "/messages", search: { type: "user" } },
+      { titleKey: "messages.nav.winfluence", to: "/messages", search: { type: "moderator" } },
     ],
   },
   { titleKey: "nav.settings", icon: SettingsIcon, to: "/settings" },
