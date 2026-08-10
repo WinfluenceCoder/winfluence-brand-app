@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Bell, Settings as SettingsIcon, ChevronDown, User, Shield, LogOut } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +12,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { supabase } from "@/integrations/supabase/client";
+import { unreadCountsQueryOptions } from "@/lib/messages";
+import { Badge } from "@/components/ui/badge";
 
 type Props = { displayName: string; logoUrl?: string | null };
 
