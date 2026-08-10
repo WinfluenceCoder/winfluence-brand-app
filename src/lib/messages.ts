@@ -131,10 +131,10 @@ export function messagesListQueryOptions(params: { type?: MessageType } = {}) {
       const { data, error } = await query;
       if (error) {
         console.error("[messages] list failed", error);
-        throw new Error(error.message);
+        throw new Error(describeMessagesError(error));
       }
 
-      const rows = (data ?? []) as MessageRow[];
+      const rows = ((data ?? []) as Record<string, unknown>[]).map(normalizeRow);
       const senderIds = Array.from(
         new Set(
           rows
@@ -183,6 +183,6 @@ export async function setMessageStatus(
   const { error } = await messagesTable().update({ status }).eq("id", id);
   if (error) {
     console.error("[messages] status update failed", error);
-    throw new Error(error.message);
+    throw new Error(describeMessagesError(error));
   }
 }
