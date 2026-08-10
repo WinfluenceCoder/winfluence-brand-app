@@ -135,7 +135,7 @@ function ProfilePage() {
   const { t } = useTranslation();
   const qc = useQueryClient();
   const router = useRouter();
-  const navigate = useNavigate({ from: "/_authenticated/profile" });
+  const navigate = useNavigate({ from: "/profile" });
   const fetchBrand = useServerFn(getMyBrand);
   const saveBrand = useServerFn(updateMyBrand);
 

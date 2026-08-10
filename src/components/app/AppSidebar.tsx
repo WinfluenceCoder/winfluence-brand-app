@@ -31,6 +31,9 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { ChevronRight } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Badge } from "@/components/ui/badge";
+import { unreadCountsQueryOptions, type MessageType } from "@/lib/messages";
 
 type SubItem = { titleKey: string; to: string; search?: Record<string, string> };
 type Group = {
@@ -80,9 +83,9 @@ const groups: Group[] = [
     titleKey: "nav.messages",
     icon: MessageSquare,
     items: [
-      { titleKey: "nav.messagesNotifications", to: "/messages/notifications" },
-      { titleKey: "nav.messagesPersonal", to: "/messages/personal" },
-      { titleKey: "nav.messagesSystem", to: "/messages/system" },
+      { titleKey: "messages.nav.notifications", to: "/messages", search: { type: "system" } },
+      { titleKey: "messages.nav.personal", to: "/messages", search: { type: "user" } },
+      { titleKey: "messages.nav.winfluence", to: "/messages", search: { type: "moderator" } },
     ],
   },
   { titleKey: "nav.settings", icon: SettingsIcon, to: "/settings" },
@@ -93,18 +96,26 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const pathname = useRouterState({ select: (r) => r.location.pathname });
-  const searchStatus = useRouterState({
-    select: (r) => (r.location.search as { status?: string } | undefined)?.status ?? "all",
+  const currentSearch = useRouterState({
+    select: (r) => (r.location.search as Record<string, unknown> | undefined) ?? {},
   });
+  const { data: unread } = useQuery(unreadCountsQueryOptions());
 
   const isSubActive = (item: SubItem) => {
     if (pathname !== item.to) return false;
     if (!item.search) return true;
-    return item.search.status === searchStatus;
+    return Object.entries(item.search).every(
+      ([key, value]) => String(currentSearch[key] ?? "") === value,
+    );
   };
   const isActive = (to: string) => (to === "/" ? pathname === "/" : pathname === to);
   const isGroupActive = (g: Group) =>
     g.items ? g.items.some((i) => isSubActive(i)) : false;
+  const unreadFor = (item: SubItem) => {
+    const type = item.search?.type as MessageType | undefined;
+    if (item.to !== "/messages" || !type) return 0;
+    return unread?.[type] ?? 0;
+  };
 
   return (
     <Sidebar collapsible="icon" className="border-r">
@@ -160,13 +171,20 @@ export function AppSidebar() {
                         <SidebarMenuButton tooltip={t(group.titleKey)}>
                           <group.icon className="h-4 w-4" />
                           <span>{t(group.titleKey)}</span>
+                          {group.titleKey === "nav.messages" && (unread?.all ?? 0) > 0 && (
+                            <Badge variant="secondary" className="px-1.5 py-0 text-[10px]">
+                              {unread?.all}
+                            </Badge>
+                          )}
                           <ChevronRight className="ml-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-90" />
                         </SidebarMenuButton>
                       </CollapsibleTrigger>
                       <CollapsibleContent>
                         <SidebarMenuSub>
                           {group.items.map((item) => (
-                            <SidebarMenuSubItem key={`${item.to}-${item.search?.status ?? ""}`}>
+                            <SidebarMenuSubItem
+                              key={`${item.to}-${Object.values(item.search ?? {}).join("-")}`}
+                            >
                               <SidebarMenuSubButton
                                 asChild
                                 isActive={isSubActive(item)}
@@ -174,8 +192,17 @@ export function AppSidebar() {
                                 <Link
                                   to={item.to}
                                   search={item.search as never}
+                                  className="flex items-center"
                                 >
-                                  {t(item.titleKey)}
+                                  <span>{t(item.titleKey)}</span>
+                                  {unreadFor(item) > 0 && (
+                                    <Badge
+                                      variant="secondary"
+                                      className="ml-auto px-1.5 py-0 text-[10px]"
+                                    >
+                                      {unreadFor(item)}
+                                    </Badge>
+                                  )}
                                 </Link>
                               </SidebarMenuSubButton>
                             </SidebarMenuSubItem>
