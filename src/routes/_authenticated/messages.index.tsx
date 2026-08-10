@@ -2,8 +2,6 @@ import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { fallback, zodValidator } from "@tanstack/zod-adapter";
-import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 import { toast } from "sonner";
@@ -20,10 +18,22 @@ import {
   unreadCountsQueryOptions,
 } from "@/lib/messages";
 
-const searchSchema = z.object({
-  type: fallback(z.string(), "all").default("all"),
-  id: fallback(z.number().optional(), undefined),
-});
+type MessagesSearch = { type: string; id: number | undefined };
+
+function validateMessagesSearch(raw: Record<string, unknown>): MessagesSearch {
+  const type = typeof raw.type === "string" && raw.type ? raw.type : "all";
+  const rawId = raw.id;
+  const parsedId =
+    typeof rawId === "number"
+      ? rawId
+      : typeof rawId === "string" && rawId.trim() !== ""
+        ? Number(rawId)
+        : Number.NaN;
+  return {
+    type,
+    id: Number.isFinite(parsedId) ? parsedId : undefined,
+  };
+}
 
 function normalizeType(raw: string): "all" | MessageType {
   return (MESSAGE_TYPES as readonly string[]).includes(raw)
@@ -32,7 +42,7 @@ function normalizeType(raw: string): "all" | MessageType {
 }
 
 export const Route = createFileRoute("/_authenticated/messages/")({
-  validateSearch: zodValidator(searchSchema),
+  validateSearch: validateMessagesSearch,
   component: MessagesPage,
   errorComponent: MessagesError,
   notFoundComponent: MessagesNotFound,
