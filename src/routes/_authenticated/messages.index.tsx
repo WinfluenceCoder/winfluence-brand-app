@@ -1,4 +1,6 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { fallback, zodValidator } from "@tanstack/zod-adapter";
 import { z } from "zod";
@@ -32,7 +34,40 @@ function normalizeType(raw: string): "all" | MessageType {
 export const Route = createFileRoute("/_authenticated/messages/")({
   validateSearch: zodValidator(searchSchema),
   component: MessagesPage,
+  errorComponent: MessagesError,
+  notFoundComponent: MessagesNotFound,
 });
+
+function MessagesError({ error, reset }: { error: Error; reset: () => void }) {
+  const router = useRouter();
+  return (
+    <div className="p-8">
+      <h1 className="text-2xl font-semibold tracking-tight">Nachrichten</h1>
+      <Alert variant="destructive" className="mt-6">
+        <AlertTitle>Nachrichten konnten nicht geladen werden</AlertTitle>
+        <AlertDescription className="break-words">{error.message}</AlertDescription>
+      </Alert>
+      <Button
+        variant="outline"
+        className="mt-4"
+        onClick={() => {
+          void router.invalidate();
+          reset();
+        }}
+      >
+        Erneut versuchen
+      </Button>
+    </div>
+  );
+}
+
+function MessagesNotFound() {
+  return (
+    <div className="p-8 text-sm text-muted-foreground">
+      Diese Nachricht existiert nicht (mehr).
+    </div>
+  );
+}
 
 function MessagesPage() {
   const { t } = useTranslation();
@@ -42,7 +77,12 @@ function MessagesPage() {
   const qc = useQueryClient();
 
   const listOptions = messagesListQueryOptions(type === "all" ? {} : { type });
-  const { data: messages = [], isLoading, refetch } = useQuery(listOptions);
+  const {
+    data: messages = [],
+    isLoading,
+    refetch,
+    error: listError,
+  } = useQuery(listOptions);
   const { data: unread } = useQuery(unreadCountsQueryOptions());
 
   const selected = messages.find((m) => m.id === search.id) ?? null;
@@ -112,8 +152,25 @@ function MessagesPage() {
           ))}
         </TabsList>
       </Tabs>
+      {listError && (
+        <Alert variant="destructive" className="mt-4">
+          <AlertTitle>Nachrichten konnten nicht geladen werden</AlertTitle>
+          <AlertDescription className="break-words">
+            {(listError as Error).message}
+          </AlertDescription>
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-3"
+            onClick={() => void refetch()}
+          >
+            Erneut versuchen
+          </Button>
+        </Alert>
+      )}
 
       <div className="mt-4 flex gap-4">
+
         <Card
           className={`w-full overflow-hidden p-0 md:w-[400px] md:shrink-0 ${
             selected ? "hidden md:block" : "block"
