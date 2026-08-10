@@ -31,9 +31,57 @@ const messagesTable = () => (supabase as unknown as {
   from: (table: string) => any;
 }).from("messages");
 
+/** Turn a Supabase error into a readable message incl. details/hint/code. */
+export function describeMessagesError(error: unknown): string {
+  if (!error) return "Unbekannter Fehler";
+  const e = error as {
+    message?: string;
+    details?: string;
+    hint?: string;
+    code?: string;
+  };
+  const parts = [e.message, e.details, e.hint].filter(
+    (p): p is string => Boolean(p && p.trim()),
+  );
+  const text = parts.length > 0 ? parts.join(" – ") : String(error);
+  return e.code ? `${text} (Code ${e.code})` : text;
+}
+
+function normalizeRow(row: Record<string, unknown>): MessageRow {
+  const rawType = String(row.type ?? "");
+  const type = (MESSAGE_TYPES as readonly string[]).includes(rawType)
+    ? (rawType as MessageType)
+    : "system";
+  const rawPrio = String(row.prio ?? "");
+  const prio: MessagePrio =
+    rawPrio === "high" || rawPrio === "low" ? rawPrio : "normal";
+  const rawStatus = String(row.status ?? "");
+  const status: MessageStatus =
+    rawStatus === "read" || rawStatus === "deleted"
+      ? (rawStatus as MessageStatus)
+      : "new";
+
+  return {
+    id: Number(row.id),
+    type,
+    prio,
+    status,
+    from_user_id: (row.from_user_id as string | null) ?? null,
+    to_user_id: String(row.to_user_id ?? ""),
+    subject: (row.subject as string | null) ?? null,
+    body: (row.body as string | null) ?? null,
+    sent_at: (row.sent_at as string | null) ?? null,
+    updated_at: (row.updated_at as string | null) ?? null,
+  };
+}
+
 async function currentUserId(): Promise<string> {
   const { data, error } = await supabase.auth.getUser();
-  if (error || !data.user) throw new Error(error?.message ?? "Not authenticated");
+  if (error || !data.user) {
+    throw new Error(
+      error ? describeMessagesError(error) : "Nicht angemeldet",
+    );
+  }
   return data.user.id;
 }
 
