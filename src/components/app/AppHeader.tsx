@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Bell, Settings as SettingsIcon, ChevronDown, User, Shield, LogOut } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +12,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { supabase } from "@/integrations/supabase/client";
+import { unreadCountsQueryOptions } from "@/lib/messages";
+import { Badge } from "@/components/ui/badge";
 
 type Props = { displayName: string; logoUrl?: string | null };
 
@@ -19,6 +21,8 @@ export function AppHeader({ displayName, logoUrl }: Props) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { data: unread } = useQuery(unreadCountsQueryOptions());
+  const systemUnread = unread?.system ?? 0;
 
   const handleLogout = async () => {
     await queryClient.cancelQueries();
@@ -36,9 +40,18 @@ export function AppHeader({ displayName, logoUrl }: Props) {
         size="icon"
         asChild
         aria-label={t("header.notifications")}
+        className="relative"
       >
-        <Link to="/messages/notifications">
+        <Link to="/messages" search={{ type: "system", id: undefined }}>
           <Bell className="h-4 w-4" />
+          {systemUnread > 0 && (
+            <Badge
+              variant="destructive"
+              className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center px-1 text-[10px]"
+            >
+              {systemUnread > 99 ? "99+" : systemUnread}
+            </Badge>
+          )}
         </Link>
       </Button>
       <Button
