@@ -546,5 +546,28 @@
     "cta": "{{count}} ausgewählte einladen",
     "successToast": "{{count}} Creators eingeladen",
     "errorToast": "Einladungen konnten nicht gesendet werden."
+  },
+  "messages": {
+    "title": "Nachrichten",
+    "empty": "Keine Nachrichten vorhanden.",
+    "noSelection": "Wähle links eine Nachricht aus.",
+    "markUnread": "Als ungelesen markieren",
+    "delete": "Löschen",
+    "deleteConfirm": "Diese Nachricht wirklich löschen?",
+    "refresh": "Aktualisieren",
+    "back": "Zurück",
+    "prioHigh": "Hohe Priorität",
+    "prioLow": "Niedrige Priorität",
+    "senderSystem": "System",
+    "senderTeam": "Winfluence Team",
+    "senderUnknown": "Unbekannt",
+    "filter": {
+      "all": "Alle"
+    },
+    "nav": {
+      "notifications": "Notifikationen",
+      "personal": "Persönliche",
+      "winfluence": "Winfluence"
+    }
   }
 }
