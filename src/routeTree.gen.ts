@@ -21,6 +21,7 @@ import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedSecurityRouteImport } from './routes/_authenticated/security'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedMessagesIndexRouteImport } from './routes/_authenticated/messages.index'
 import { Route as AuthenticatedCampaignsIndexRouteImport } from './routes/_authenticated/campaigns.index'
 import { Route as CampaignsPreviewIdRouteImport } from './routes/campaigns.preview.$id'
 import { Route as OverlayInviteIdRouteImport } from './routes/_overlay/invite.$id'
@@ -108,6 +109,12 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMessagesIndexRoute =
+  AuthenticatedMessagesIndexRouteImport.update({
+    id: '/messages/',
+    path: '/messages/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCampaignsIndexRoute =
   AuthenticatedCampaignsIndexRouteImport.update({
     id: '/campaigns/',
@@ -301,6 +308,7 @@ export interface FileRoutesByFullPath {
   '/invite/$id': typeof OverlayInviteIdRoute
   '/campaigns/preview/$id': typeof CampaignsPreviewIdRoute
   '/campaigns/': typeof AuthenticatedCampaignsIndexRoute
+  '/messages/': typeof AuthenticatedMessagesIndexRoute
   '/campaigns/$id/edit': typeof AuthenticatedCampaignsIdEditRoute
   '/campaigns/approve/$id': typeof AuthenticatedCampaignsApproveIdRoute
   '/campaigns/archive/$id': typeof AuthenticatedCampaignsArchiveIdRoute
@@ -341,6 +349,7 @@ export interface FileRoutesByTo {
   '/invite/$id': typeof OverlayInviteIdRoute
   '/campaigns/preview/$id': typeof CampaignsPreviewIdRoute
   '/campaigns': typeof AuthenticatedCampaignsIndexRoute
+  '/messages': typeof AuthenticatedMessagesIndexRoute
   '/campaigns/$id/edit': typeof AuthenticatedCampaignsIdEditRoute
   '/campaigns/approve/$id': typeof AuthenticatedCampaignsApproveIdRoute
   '/campaigns/archive/$id': typeof AuthenticatedCampaignsArchiveIdRoute
@@ -384,6 +393,7 @@ export interface FileRoutesById {
   '/_overlay/invite/$id': typeof OverlayInviteIdRoute
   '/campaigns/preview/$id': typeof CampaignsPreviewIdRoute
   '/_authenticated/campaigns/': typeof AuthenticatedCampaignsIndexRoute
+  '/_authenticated/messages/': typeof AuthenticatedMessagesIndexRoute
   '/_authenticated/campaigns/$id/edit': typeof AuthenticatedCampaignsIdEditRoute
   '/_authenticated/campaigns/approve/$id': typeof AuthenticatedCampaignsApproveIdRoute
   '/_authenticated/campaigns/archive/$id': typeof AuthenticatedCampaignsArchiveIdRoute
@@ -426,6 +436,7 @@ export interface FileRouteTypes {
     | '/invite/$id'
     | '/campaigns/preview/$id'
     | '/campaigns/'
+    | '/messages/'
     | '/campaigns/$id/edit'
     | '/campaigns/approve/$id'
     | '/campaigns/archive/$id'
@@ -466,6 +477,7 @@ export interface FileRouteTypes {
     | '/invite/$id'
     | '/campaigns/preview/$id'
     | '/campaigns'
+    | '/messages'
     | '/campaigns/$id/edit'
     | '/campaigns/approve/$id'
     | '/campaigns/archive/$id'
@@ -508,6 +520,7 @@ export interface FileRouteTypes {
     | '/_overlay/invite/$id'
     | '/campaigns/preview/$id'
     | '/_authenticated/campaigns/'
+    | '/_authenticated/messages/'
     | '/_authenticated/campaigns/$id/edit'
     | '/_authenticated/campaigns/approve/$id'
     | '/_authenticated/campaigns/archive/$id'
@@ -619,6 +632,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/messages/': {
+      id: '/_authenticated/messages/'
+      path: '/messages'
+      fullPath: '/messages/'
+      preLoaderRoute: typeof AuthenticatedMessagesIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/campaigns/': {
@@ -838,6 +858,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMessagesPersonalRoute: typeof AuthenticatedMessagesPersonalRoute
   AuthenticatedMessagesSystemRoute: typeof AuthenticatedMessagesSystemRoute
   AuthenticatedCampaignsIndexRoute: typeof AuthenticatedCampaignsIndexRoute
+  AuthenticatedMessagesIndexRoute: typeof AuthenticatedMessagesIndexRoute
   AuthenticatedCampaignsIdEditRoute: typeof AuthenticatedCampaignsIdEditRoute
   AuthenticatedCampaignsApproveIdRoute: typeof AuthenticatedCampaignsApproveIdRoute
   AuthenticatedCampaignsArchiveIdRoute: typeof AuthenticatedCampaignsArchiveIdRoute
@@ -874,6 +895,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMessagesPersonalRoute: AuthenticatedMessagesPersonalRoute,
   AuthenticatedMessagesSystemRoute: AuthenticatedMessagesSystemRoute,
   AuthenticatedCampaignsIndexRoute: AuthenticatedCampaignsIndexRoute,
+  AuthenticatedMessagesIndexRoute: AuthenticatedMessagesIndexRoute,
   AuthenticatedCampaignsIdEditRoute: AuthenticatedCampaignsIdEditRoute,
   AuthenticatedCampaignsApproveIdRoute: AuthenticatedCampaignsApproveIdRoute,
   AuthenticatedCampaignsArchiveIdRoute: AuthenticatedCampaignsArchiveIdRoute,

@@ -1,6 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Placeholder } from "@/components/app/Placeholder";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/messages/personal")({
-  component: () => <Placeholder titleKey="placeholders.messagesPersonal" />,
+  beforeLoad: () => {
+    throw redirect({ to: "/messages", search: { type: "user" } });
+  },
+  component: () => null,
 });
