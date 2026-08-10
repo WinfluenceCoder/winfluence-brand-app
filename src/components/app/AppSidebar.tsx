@@ -171,13 +171,20 @@ export function AppSidebar() {
                         <SidebarMenuButton tooltip={t(group.titleKey)}>
                           <group.icon className="h-4 w-4" />
                           <span>{t(group.titleKey)}</span>
+                          {group.titleKey === "nav.messages" && (unread?.all ?? 0) > 0 && (
+                            <Badge variant="secondary" className="px-1.5 py-0 text-[10px]">
+                              {unread?.all}
+                            </Badge>
+                          )}
                           <ChevronRight className="ml-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-90" />
                         </SidebarMenuButton>
                       </CollapsibleTrigger>
                       <CollapsibleContent>
                         <SidebarMenuSub>
                           {group.items.map((item) => (
-                            <SidebarMenuSubItem key={`${item.to}-${item.search?.status ?? ""}`}>
+                            <SidebarMenuSubItem
+                              key={`${item.to}-${Object.values(item.search ?? {}).join("-")}`}
+                            >
                               <SidebarMenuSubButton
                                 asChild
                                 isActive={isSubActive(item)}
@@ -185,8 +192,17 @@ export function AppSidebar() {
                                 <Link
                                   to={item.to}
                                   search={item.search as never}
+                                  className="flex items-center"
                                 >
-                                  {t(item.titleKey)}
+                                  <span>{t(item.titleKey)}</span>
+                                  {unreadFor(item) > 0 && (
+                                    <Badge
+                                      variant="secondary"
+                                      className="ml-auto px-1.5 py-0 text-[10px]"
+                                    >
+                                      {unreadFor(item)}
+                                    </Badge>
+                                  )}
                                 </Link>
                               </SidebarMenuSubButton>
                             </SidebarMenuSubItem>
