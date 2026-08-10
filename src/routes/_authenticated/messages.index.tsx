@@ -32,7 +32,40 @@ function normalizeType(raw: string): "all" | MessageType {
 export const Route = createFileRoute("/_authenticated/messages/")({
   validateSearch: zodValidator(searchSchema),
   component: MessagesPage,
+  errorComponent: MessagesError,
+  notFoundComponent: MessagesNotFound,
 });
+
+function MessagesError({ error, reset }: { error: Error; reset: () => void }) {
+  const router = useRouter();
+  return (
+    <div className="p-8">
+      <h1 className="text-2xl font-semibold tracking-tight">Nachrichten</h1>
+      <Alert variant="destructive" className="mt-6">
+        <AlertTitle>Nachrichten konnten nicht geladen werden</AlertTitle>
+        <AlertDescription className="break-words">{error.message}</AlertDescription>
+      </Alert>
+      <Button
+        variant="outline"
+        className="mt-4"
+        onClick={() => {
+          void router.invalidate();
+          reset();
+        }}
+      >
+        Erneut versuchen
+      </Button>
+    </div>
+  );
+}
+
+function MessagesNotFound() {
+  return (
+    <div className="p-8 text-sm text-muted-foreground">
+      Diese Nachricht existiert nicht (mehr).
+    </div>
+  );
+}
 
 function MessagesPage() {
   const { t } = useTranslation();
