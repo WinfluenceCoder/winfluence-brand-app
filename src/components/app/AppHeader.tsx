@@ -42,7 +42,7 @@ export function AppHeader({ displayName, logoUrl }: Props) {
         aria-label={t("header.notifications")}
         className="relative"
       >
-        <Link to="/messages" search={{ type: "system" }}>
+        <Link to="/messages" search={{ type: "system", id: undefined }}>
           <Bell className="h-4 w-4" />
           {systemUnread > 0 && (
             <Badge
