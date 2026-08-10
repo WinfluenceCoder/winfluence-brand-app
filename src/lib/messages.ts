@@ -1,0 +1,140 @@
+import { queryOptions } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+
+export const MESSAGE_TYPES = ["system", "user", "moderator"] as const;
+export type MessageType = (typeof MESSAGE_TYPES)[number];
+export type MessagePrio = "high" | "normal" | "low";
+export type MessageStatus = "new" | "read" | "deleted";
+
+export type MessageRow = {
+  id: number;
+  type: MessageType;
+  prio: MessagePrio;
+  from_user_id: string | null;
+  to_user_id: string;
+  subject: string | null;
+  body: string | null;
+  status: MessageStatus;
+  sent_at: string | null;
+  updated_at: string | null;
+};
+
+export type MessageSender = {
+  name: string | null;
+  photoUrl: string | null;
+};
+
+export type MessageListItem = MessageRow & { sender: MessageSender | null };
+
+// The generated Supabase types do not include `messages` yet; cast locally.
+const messagesTable = () => (supabase as unknown as {
+  from: (table: string) => any;
+}).from("messages");
+
+async function currentUserId(): Promise<string> {
+  const { data, error } = await supabase.auth.getUser();
+  if (error || !data.user) throw new Error(error?.message ?? "Not authenticated");
+  return data.user.id;
+}
+
+async function resolveSenders(
+  userIds: string[],
+): Promise<Map<string, MessageSender>> {
+  const map = new Map<string, MessageSender>();
+  if (userIds.length === 0) return map;
+
+  const { data, error } = await supabase
+    .from("creators")
+    .select("user_id, nick_name, first_name, last_name, foto_url")
+    .in("user_id", userIds);
+
+  if (error) {
+    console.error("[messages] sender lookup failed", error);
+    return map;
+  }
+
+  for (const row of data ?? []) {
+    if (!row.user_id) continue;
+    const fullName = [row.first_name, row.last_name].filter(Boolean).join(" ").trim();
+    map.set(row.user_id, {
+      name: row.nick_name?.trim() || fullName || null,
+      photoUrl: row.foto_url ?? null,
+    });
+  }
+  return map;
+}
+
+export function messagesListQueryOptions(params: { type?: MessageType } = {}) {
+  return queryOptions({
+    queryKey: ["messages", "list", params.type ?? "all"] as const,
+    queryFn: async (): Promise<MessageListItem[]> => {
+      const userId = await currentUserId();
+
+      let query = messagesTable()
+        .select(
+          "id, type, prio, from_user_id, to_user_id, subject, body, status, sent_at, updated_at",
+        )
+        .eq("to_user_id", userId)
+        .neq("status", "deleted")
+        .order("sent_at", { ascending: false });
+
+      if (params.type) query = query.eq("type", params.type);
+
+      const { data, error } = await query;
+      if (error) {
+        console.error("[messages] list failed", error);
+        throw new Error(error.message);
+      }
+
+      const rows = (data ?? []) as MessageRow[];
+      const senderIds = Array.from(
+        new Set(
+          rows
+            .filter((r) => r.type === "user" && r.from_user_id)
+            .map((r) => r.from_user_id as string),
+        ),
+      );
+      const senders = await resolveSenders(senderIds);
+
+      return rows.map((row) => ({
+        ...row,
+        sender: row.from_user_id ? senders.get(row.from_user_id) ?? null : null,
+      }));
+    },
+  });
+}
+
+export function unreadCountsQueryOptions() {
+  return queryOptions({
+    queryKey: ["messages", "unread"] as const,
+    queryFn: async (): Promise<Record<MessageType, number> & { all: number }> => {
+      const userId = await currentUserId();
+      const { data, error } = await messagesTable()
+        .select("type")
+        .eq("to_user_id", userId)
+        .eq("status", "new");
+
+      const counts = { all: 0, system: 0, user: 0, moderator: 0 };
+      if (error) {
+        console.error("[messages] unread counts failed", error);
+        return counts;
+      }
+      for (const row of (data ?? []) as { type: MessageType }[]) {
+        counts.all += 1;
+        if (row.type in counts) counts[row.type] += 1;
+      }
+      return counts;
+    },
+  });
+}
+
+export async function setMessageStatus(
+  id: number,
+  status: MessageStatus,
+): Promise<void> {
+  const { error } = await messagesTable().update({ status }).eq("id", id);
+  if (error) {
+    console.error("[messages] status update failed", error);
+    throw new Error(error.message);
+  }
+}
