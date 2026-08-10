@@ -93,18 +93,26 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const pathname = useRouterState({ select: (r) => r.location.pathname });
-  const searchStatus = useRouterState({
-    select: (r) => (r.location.search as { status?: string } | undefined)?.status ?? "all",
+  const currentSearch = useRouterState({
+    select: (r) => (r.location.search as Record<string, unknown> | undefined) ?? {},
   });
+  const { data: unread } = useQuery(unreadCountsQueryOptions());
 
   const isSubActive = (item: SubItem) => {
     if (pathname !== item.to) return false;
     if (!item.search) return true;
-    return item.search.status === searchStatus;
+    return Object.entries(item.search).every(
+      ([key, value]) => String(currentSearch[key] ?? "") === value,
+    );
   };
   const isActive = (to: string) => (to === "/" ? pathname === "/" : pathname === to);
   const isGroupActive = (g: Group) =>
     g.items ? g.items.some((i) => isSubActive(i)) : false;
+  const unreadFor = (item: SubItem) => {
+    const type = item.search?.type as MessageType | undefined;
+    if (item.to !== "/messages" || !type) return 0;
+    return unread?.[type] ?? 0;
+  };
 
   return (
     <Sidebar collapsible="icon" className="border-r">
