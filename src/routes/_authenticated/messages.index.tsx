@@ -20,10 +20,22 @@ import {
   unreadCountsQueryOptions,
 } from "@/lib/messages";
 
-const searchSchema = z.object({
-  type: fallback(z.string(), "all").default("all"),
-  id: fallback(z.number().optional(), undefined),
-});
+type MessagesSearch = { type: string; id: number | undefined };
+
+function validateMessagesSearch(raw: Record<string, unknown>): MessagesSearch {
+  const type = typeof raw.type === "string" && raw.type ? raw.type : "all";
+  const rawId = raw.id;
+  const parsedId =
+    typeof rawId === "number"
+      ? rawId
+      : typeof rawId === "string" && rawId.trim() !== ""
+        ? Number(rawId)
+        : Number.NaN;
+  return {
+    type,
+    id: Number.isFinite(parsedId) ? parsedId : undefined,
+  };
+}
 
 function normalizeType(raw: string): "all" | MessageType {
   return (MESSAGE_TYPES as readonly string[]).includes(raw)
@@ -32,7 +44,7 @@ function normalizeType(raw: string): "all" | MessageType {
 }
 
 export const Route = createFileRoute("/_authenticated/messages/")({
-  validateSearch: zodValidator(searchSchema),
+  validateSearch: validateMessagesSearch,
   component: MessagesPage,
   errorComponent: MessagesError,
   notFoundComponent: MessagesNotFound,
