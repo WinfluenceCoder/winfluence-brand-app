@@ -77,7 +77,12 @@ function MessagesPage() {
   const qc = useQueryClient();
 
   const listOptions = messagesListQueryOptions(type === "all" ? {} : { type });
-  const { data: messages = [], isLoading, refetch } = useQuery(listOptions);
+  const {
+    data: messages = [],
+    isLoading,
+    refetch,
+    error: listError,
+  } = useQuery(listOptions);
   const { data: unread } = useQuery(unreadCountsQueryOptions());
 
   const selected = messages.find((m) => m.id === search.id) ?? null;
