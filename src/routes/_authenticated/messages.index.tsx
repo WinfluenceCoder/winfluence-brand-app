@@ -54,7 +54,7 @@ function MessagesPage() {
   };
 
   const select = (id: number | undefined) => {
-    navigate({ search: (prev) => ({ ...(prev as object), id }) as never });
+    navigate({ search: () => ({ type: search.type, id }) as never });
   };
 
   const invalidate = () => {
