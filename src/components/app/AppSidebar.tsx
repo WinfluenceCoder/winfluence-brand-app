@@ -31,6 +31,9 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { ChevronRight } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Badge } from "@/components/ui/badge";
+import { unreadCountsQueryOptions, type MessageType } from "@/lib/messages";
 
 type SubItem = { titleKey: string; to: string; search?: Record<string, string> };
 type Group = {
