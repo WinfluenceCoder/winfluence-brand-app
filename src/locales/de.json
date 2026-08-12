@@ -419,7 +419,9 @@
     "status": {
       "applied": "Beworben",
       "selected": "Ausgewählt",
-      "hired": "Beauftragt"
+      "hired": "Beauftragt",
+      "working": "In Arbeit",
+      "delivered": "Geliefert"
     },
     "actions": {
       "openMenu": "Menü öffnen",
