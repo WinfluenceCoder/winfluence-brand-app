@@ -591,14 +591,16 @@
       "avgLikes": "Ø Likes / Beitrag",
       "avgComments": "Ø Kommentare / Beitrag",
       "growthFollowers": "Wachstum (30 Tage)",
-      "growthRate": "Wachstumsrate (30 Tage)"
+      "growthRate": "Wachstumsrate (30 Tage)",
+      "growth": "Wachstum (30 Tage)"
     },
     "sections": {
       "kpis": "Kennzahlen",
       "profile": "Profil",
       "categories": "Kategorien",
       "mentions": "Marken-Erwähnungen",
-      "content": "Inhalte"
+      "content": "Inhalte",
+      "bio": "Bio"
     },
     "profile": {
       "bio": "Bio",
@@ -689,6 +691,30 @@
       "skippedFresh": "Daten sind bereits aktuell",
       "skippedAudienceFresh": "Audience-Report ist bereits aktuell",
       "error": "Sync fehlgeschlagen"
+    },
+    "allDetails": "Alle Details",
+    "showLess": "Weniger anzeigen",
+    "content": {
+      "post": "Beitrag",
+      "reel": "Reel",
+      "likes": "Likes",
+      "comments": "Kommentare",
+      "plays": "Plays",
+      "positivity": "Kommentar-Positivität",
+      "open": "Öffnen"
+    },
+    "mentions": {
+      "brand": "Marke",
+      "posts": "Beiträge",
+      "reels": "Reels",
+      "stories": "Stories"
+    },
+    "details": {
+      "isPrivate": "Privates Konto",
+      "isBrandAccount": "Marken-Konto",
+      "isVerified": "influData verifiziert",
+      "agency": "Agentur",
+      "stars": "Sterne"
     }
   }
 }
