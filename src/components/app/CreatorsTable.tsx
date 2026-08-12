@@ -57,13 +57,25 @@ export function creatorStatusLabel(t: (k: string) => string, s: string | null) {
       return t("creatorsList.status.selected");
     case "hired":
       return t("creatorsList.status.hired");
+    case "working":
+      return t("creatorsList.status.working");
+    case "delivered":
+      return t("creatorsList.status.delivered");
     default:
       return s ?? "–";
   }
 }
 
 function statusVariant(s: string | null): "default" | "secondary" | "outline" {
-  return s === "hired" ? "default" : "secondary";
+  switch (s) {
+    case "hired":
+    case "working":
+      return "default";
+    case "delivered":
+      return "outline";
+    default:
+      return "secondary";
+  }
 }
 
 const FOLLOWERS_PLACEHOLDER = 1234;
