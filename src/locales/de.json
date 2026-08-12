@@ -569,5 +569,126 @@
       "personal": "Persönliche",
       "winfluence": "Winfluence"
     }
+  },
+  "creatorProfile": {
+    "asOf": "Stand: {{date}}",
+    "showAll": "Alle anzeigen",
+    "noProfile": "Kein Profil verknüpft",
+    "typeScore": "Score {{score}}",
+    "platform": {
+      "instagram": "Instagram",
+      "tiktok": "TikTok",
+      "youtube": "YouTube"
+    },
+    "kpi": {
+      "followers": "Follower",
+      "following": "Folgt",
+      "posts": "Beiträge",
+      "engagementRate": "Engagement-Rate",
+      "engagementReels": "Engagement Reels",
+      "medianViews": "Median Views / Beitrag",
+      "medianPlays": "Median Plays / Reel",
+      "avgLikes": "Ø Likes / Beitrag",
+      "avgComments": "Ø Kommentare / Beitrag",
+      "growthFollowers": "Wachstum (30 Tage)",
+      "growthRate": "Wachstumsrate (30 Tage)"
+    },
+    "sections": {
+      "kpis": "Kennzahlen",
+      "profile": "Profil",
+      "categories": "Kategorien",
+      "mentions": "Marken-Erwähnungen",
+      "content": "Inhalte"
+    },
+    "profile": {
+      "bio": "Bio",
+      "email": "Öffentliche E-Mail",
+      "website": "Website",
+      "handle": "Handle",
+      "language": "Sprache",
+      "gender": "Geschlecht",
+      "country": "Land",
+      "city": "Stadt",
+      "private": "Privates Konto",
+      "brandAccount": "Marken-Konto",
+      "verified": "influData verifiziert",
+      "agency": "Agentur",
+      "stars": "Sterne"
+    },
+    "mentionsTable": {
+      "brand": "Marke",
+      "posts": "Beiträge",
+      "reels": "Reels",
+      "stories": "Stories",
+      "total": "Total"
+    },
+    "contentTable": {
+      "type": "Typ",
+      "post": "Beitrag",
+      "reel": "Reel",
+      "uploaded": "Datum",
+      "likes": "Likes",
+      "comments": "Kommentare",
+      "plays": "Plays",
+      "reach": "Reichweite",
+      "positivity": "Kommentar-Positivität",
+      "open": "Öffnen"
+    },
+    "refresh": "Aktualisieren",
+    "empty": {
+      "title": "Für diese Plattform liegen noch keine Daten vor.",
+      "load": "Daten laden"
+    },
+    "pending": {
+      "title": "Daten werden aufbereitet",
+      "checked": "Letzte Prüfung: {{date}}",
+      "recheck": "Erneut prüfen"
+    },
+    "notFound": {
+      "title": "Profil nicht gefunden",
+      "handle": "Der Handle «{{handle}}» konnte bei influData nicht gefunden werden."
+    },
+    "error": {
+      "title": "Daten konnten nicht geladen werden",
+      "retry": "Erneut versuchen"
+    },
+    "audience": {
+      "title": "Audience-Analyse",
+      "availableTitle": "Audience-Report verfügbar",
+      "costHint": "Der Audience-Report wird separat abgerufen und ist kostenpflichtig.",
+      "loadReport": "Audience-Report laden",
+      "credibility": "Credibility Score",
+      "credibilityHint": "Einstufung: {{cls}}",
+      "realPeople": "Echte Personen",
+      "massFollowers": "Mass Followers",
+      "suspicious": "Verdächtig",
+      "demographics": "Demografie",
+      "medianBirthyear": "Median-Geburtsjahr",
+      "male": "Männlich",
+      "female": "Weiblich",
+      "geography": "Geografie",
+      "countries": "Länder",
+      "cities": "Städte",
+      "languages": "Sprachen",
+      "states": "Regionen anzeigen",
+      "interests": "Interessen & Marken",
+      "interestsLabel": "Interessen",
+      "brandAffinity": "Marken-Affinität",
+      "reachability": "Erreichbarkeit",
+      "lookalikes": "Ähnliche Profile",
+      "notable": "Bekannte Follower",
+      "likers": "Analyse der Liker anzeigen",
+      "cpm": "Preisindikation (CPM)",
+      "cpmType": "Typ",
+      "cpmPerMill": "pro 1'000",
+      "cpmPerContent": "pro Inhalt"
+    },
+    "toast": {
+      "synced": "Daten aktualisiert",
+      "audienceLoaded": "Audience-Report geladen",
+      "skippedFresh": "Daten sind bereits aktuell",
+      "skippedAudienceFresh": "Audience-Report ist bereits aktuell",
+      "error": "Sync fehlgeschlagen"
+    }
   }
 }
