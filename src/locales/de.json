@@ -577,6 +577,13 @@
     "showAll": "Alle anzeigen",
     "noProfile": "Kein Profil verknüpft",
     "typeScore": "Score {{score}}",
+    "claimPlaceholder": "Platzhalter Claim",
+    "bioPlaceholder": "Platzhalter für die Biographie",
+    "platformHeader": {
+      "username": "Benutzername",
+      "location": "Ort",
+      "language": "Sprache"
+    },
     "platform": {
       "instagram": "Instagram",
       "tiktok": "TikTok",
