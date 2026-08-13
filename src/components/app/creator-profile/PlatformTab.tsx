@@ -1,6 +1,8 @@
 import { useTranslation } from "react-i18next";
-import { AlertTriangle, Database, Loader2, RefreshCw } from "lucide-react";
+import { AlertTriangle, Database, Loader2, MapPin, RefreshCw, User } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatRelativeDate } from "@/lib/format";
