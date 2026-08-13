@@ -1,6 +1,8 @@
 import { useTranslation } from "react-i18next";
-import { AlertTriangle, Database, Loader2, RefreshCw } from "lucide-react";
+import { AlertTriangle, Database, Loader2, MapPin, RefreshCw, User } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatRelativeDate } from "@/lib/format";
@@ -97,6 +99,7 @@ export function PlatformTab({
 
   return (
     <div className="space-y-10">
+      <PlatformHeader stats={stats} />
       <PlatformStats
         stats={stats}
         platform={platform}
@@ -111,5 +114,45 @@ export function PlatformTab({
         />
       ) : null}
     </div>
+  );
+}
+
+function PlatformHeader({ stats }: { stats: CreatorSocialStats }) {
+  const { t } = useTranslation();
+  const username = stats.display_name || stats.handle || "–";
+  const location = [stats.city, stats.country].filter(Boolean).join(", ");
+
+  return (
+    <Card>
+      <CardContent className="flex flex-wrap items-center gap-4 p-4">
+        <Avatar className="h-16 w-16">
+          {stats.profile_pic_url ? (
+            <AvatarImage src={stats.profile_pic_url} alt="" />
+          ) : null}
+          <AvatarFallback>
+            <User className="h-6 w-6 text-muted-foreground" />
+          </AvatarFallback>
+        </Avatar>
+        <div className="min-w-0 flex-1 space-y-1">
+          <div className="truncate text-lg font-semibold tracking-tight">
+            {username}
+          </div>
+          {location ? (
+            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+              <MapPin className="h-3.5 w-3.5" />
+              {location}
+            </div>
+          ) : null}
+          {stats.language ? (
+            <div className="text-sm text-muted-foreground">{stats.language}</div>
+          ) : null}
+        </div>
+        {stats.type_score != null ? (
+          <Badge variant="secondary">
+            {t("creatorProfile.typeScore", { score: stats.type_score })}
+          </Badge>
+        ) : null}
+      </CardContent>
+    </Card>
   );
 }
