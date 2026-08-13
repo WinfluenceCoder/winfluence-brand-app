@@ -2,9 +2,8 @@ import { useMemo, useState } from "react";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { Instagram, MapPin, User, Youtube } from "lucide-react";
+import { Instagram, User, Youtube } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Tooltip,
@@ -50,7 +49,7 @@ export function CreatorProfile({ creatorId }: { creatorId: number }) {
   }, [data.stats, urls.instagram, urls.tiktok, urls.youtube]);
 
   const [tab, setTab] = useState<Platform>(defaultTab);
-  const activePlatform = tab;
+
 
   const sync = useMutation({
     mutationFn: (vars: { platform: Platform; includeAudience?: boolean }) =>
