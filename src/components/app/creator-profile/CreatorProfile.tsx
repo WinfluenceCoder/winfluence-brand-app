@@ -95,40 +95,37 @@ export function CreatorProfile({ creatorId }: { creatorId: number }) {
     );
   }
 
-  const activeStats = data.stats[activePlatform];
   const displayName =
     creator.nick_name ||
-    activeStats?.display_name ||
     [creator.first_name, creator.last_name].filter(Boolean).join(" ") ||
     "–";
-  const location = [activeStats?.city, activeStats?.country]
+  const fullName = [creator.first_name, creator.last_name]
     .filter(Boolean)
-    .join(", ");
+    .join(" ");
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-wrap items-center gap-4">
-        <Avatar className="h-16 w-16">
-          {creator.foto_url || activeStats?.profile_pic_url ? (
-            <AvatarImage
-              src={creator.foto_url || activeStats?.profile_pic_url || undefined}
-              alt=""
-            />
+      <section className="space-y-3">
+        <h1 className="text-2xl font-semibold tracking-tight">{displayName}</h1>
+        <Avatar className="h-20 w-20">
+          {creator.foto_url ? (
+            <AvatarImage src={creator.foto_url} alt="" />
           ) : null}
           <AvatarFallback>
-            <User className="h-6 w-6 text-muted-foreground" />
+            <User className="h-8 w-8 text-muted-foreground" />
           </AvatarFallback>
         </Avatar>
-        <div className="min-w-0 flex-1">
-          <h1 className="text-2xl font-semibold tracking-tight">{displayName}</h1>
-          <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-            {location ? (
-              <span className="inline-flex items-center gap-1">
-                <MapPin className="h-3.5 w-3.5" />
-                {location}
-              </span>
-            ) : null}
-            {activeStats?.language ? <span>{activeStats.language}</span> : null}
+        <div className="flex items-center justify-between gap-4">
+          <div className="text-sm font-medium">{fullName || "–"}</div>
+          <div className="text-sm italic text-muted-foreground">
+            {t("creatorProfile.claimPlaceholder")}
+          </div>
+        </div>
+        <p className="max-w-prose text-sm italic text-muted-foreground">
+          {t("creatorProfile.bioPlaceholder")}
+        </p>
+        {PLATFORMS.filter((p) => urls[p]).length > 0 ? (
+          <div className="flex items-center gap-3 text-primary">
             {PLATFORMS.filter((p) => urls[p]).map((p) => {
               const Icon = PLATFORM_ICONS[p];
               return (
@@ -137,7 +134,7 @@ export function CreatorProfile({ creatorId }: { creatorId: number }) {
                   href={urls[p] ?? undefined}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-primary hover:opacity-80"
+                  className="hover:opacity-80"
                   aria-label={p}
                 >
                   <Icon className="h-4 w-4" />
@@ -145,13 +142,9 @@ export function CreatorProfile({ creatorId }: { creatorId: number }) {
               );
             })}
           </div>
-        </div>
-        {activeStats?.type_score != null ? (
-          <Badge variant="secondary">
-            {t("creatorProfile.typeScore", { score: activeStats.type_score })}
-          </Badge>
         ) : null}
-      </div>
+      </section>
+
 
       <Tabs value={tab} onValueChange={(v) => setTab(v as Platform)}>
         <TabsList>
