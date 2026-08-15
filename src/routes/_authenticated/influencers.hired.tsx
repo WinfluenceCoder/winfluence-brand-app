@@ -6,14 +6,17 @@ export const Route = createFileRoute("/_authenticated/influencers/hired")({
   loader: ({ context }) => {
     void context.queryClient
       .prefetchQuery(
-        creatorsListQueryOptions({ status: ["hired"], brandScoped: true }),
+        creatorsListQueryOptions({
+          status: ["hired", "working", "delivered"],
+          brandScoped: true,
+        }),
       )
       .catch(() => {});
   },
   component: () => (
     <CreatorsListPage
       titleKey="creatorsList.titleHired"
-      statuses={["hired"]}
+      statuses={["hired", "working", "delivered"]}
       brandScoped
     />
   ),
