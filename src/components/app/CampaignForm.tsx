@@ -1,5 +1,18 @@
 import { useState } from "react";
-import { AlertTriangle, ChevronLeft, ExternalLink } from "lucide-react";
+import {
+  AlertTriangle,
+  Calendar,
+  ChevronDown,
+  ChevronLeft,
+  ChevronUp,
+  ExternalLink,
+  FileText,
+  Gift,
+  Megaphone,
+  Tag,
+  Users,
+  Wallet,
+} from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -36,7 +49,47 @@ import {
 import { ImageUploadField } from "@/components/app/ImageUploadField";
 import { cn } from "@/lib/utils";
 
-const CAMPAIGN_TYPES = ["Engagement mit Influencer"] as const;
+/** Werte des DB-Enums campaign_type (gespeichert wird der Key, angezeigt das Label). */
+const CAMPAIGN_TYPE_KEYS = [
+  "reach",
+  "engagement",
+  "click_through",
+  "subscription",
+  "download",
+  "lead_gen",
+] as const;
+const DEFAULT_CAMPAIGN_TYPE = "reach";
+
+/** Sprachneutrale, direkt gespeicherte Werte. */
+const POST_TYPE_VALUES = ["Post", "Reel", "Story"] as const;
+const PLATFORM_VALUES = ["Instagram"] as const;
+
+/** Sentinel für «keine Anforderung» (Radix Select erlaubt keinen leeren Wert). */
+const NONE = "__none__";
+
+const PROMOTION_FIELDS = ["target_url", "coupon"] as const;
+const BARTER_FIELDS = [
+  "barter_desc",
+  "barter_value",
+  "barter_order_url",
+  "barter_order_coupon",
+] as const;
+
+/** Ergänzt https:// falls kein Schema vorangestellt ist. */
+function withHttps(value: string): string {
+  const v = value.trim();
+  if (!v) return "";
+  return /^https?:\/\//i.test(v) ? v : `https://${v}`;
+}
+
+/** «sommer aktion» -> «#sommer #aktion» */
+function formatHashtags(value: string): string {
+  return value
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((w) => (w.startsWith("#") ? w : `#${w}`))
+    .join(" ");
+}
 
 const LOCKED_STATUSES = new Set(["running", "expired", "ended", "approved", "archived"]);
 const LIVE_STATUSES = new Set(["published", "running", "expired", "ended", "approved", "archived"]);
@@ -224,8 +277,16 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
       hashtags: initial?.hashtags ?? "",
       link_list: initial?.link_list ?? "",
       requirements: initial?.requirements ?? "",
-      post_type: initial?.post_type ?? "",
-      type: initial?.type ?? CAMPAIGN_TYPES[0],
+      post_type: POST_TYPE_VALUES.includes(
+        (initial?.post_type ?? "") as (typeof POST_TYPE_VALUES)[number],
+      )
+        ? (initial?.post_type as string)
+        : "",
+      type: CAMPAIGN_TYPE_KEYS.includes(
+        (initial?.type ?? "") as (typeof CAMPAIGN_TYPE_KEYS)[number],
+      )
+        ? (initial?.type as string)
+        : DEFAULT_CAMPAIGN_TYPE,
       target_url: initial?.target_url ?? "",
       coupon: initial?.coupon ?? "",
       apply_till: toLocal(initial?.apply_till as string | undefined),
@@ -238,6 +299,10 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
 
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [promotionOpen, setPromotionOpen] = useState(false);
+  const [barterOpen, setBarterOpen] = useState(false);
+  const [platform, setPlatform] = useState<string>("");
+  const [intent, setIntent] = useState<"draft" | "publish">("draft");
   const errors = form.formState.errors;
   const invalidCls = "border-destructive focus-visible:ring-destructive";
 
@@ -295,9 +360,14 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
       }
       return create({ data: payload });
     },
-    onSuccess: () => {
+    onSuccess: (row) => {
       qc.invalidateQueries({ queryKey: ["home", "campaigns"] });
       toast.success(mode === "edit" ? t("campaignForm.updated") : t("campaignForm.created"));
+      const newId = (row as { id?: number } | null)?.id;
+      if (mode === "create" && intent === "publish" && newId) {
+        router.navigate({ to: "/campaigns/publish/$id", params: { id: String(newId) } });
+        return;
+      }
       router.navigate({ to: "/" });
     },
     onError: (e) => {
@@ -306,7 +376,14 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
     },
   });
 
-  const onSubmit = form.handleSubmit((values) => mutation.mutate(values));
+  const onSubmit = form.handleSubmit(
+    (values) => mutation.mutate(values),
+    (formErrors) => {
+      const keys = Object.keys(formErrors);
+      if (PROMOTION_FIELDS.some((f) => keys.includes(f))) setPromotionOpen(true);
+      if (BARTER_FIELDS.some((f) => keys.includes(f))) setBarterOpen(true);
+    },
+  );
 
   const handleCancel = () => {
     if (form.formState.isDirty) {
@@ -371,7 +448,10 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
       {/* Section 1: Titel, Brand & Produkt */}
       <Card>
         <CardHeader>
-          <CardTitle>{t("campaignForm.sections.brand")}</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Tag className="h-5 w-5 text-primary" />
+            {t("campaignForm.sections.brand")}
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
@@ -439,7 +519,10 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
       {/* Section 2: Inhalt & Briefing */}
       <Card>
         <CardHeader>
-          <CardTitle>{t("campaignForm.sections.content")}</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5 text-primary" />
+            {t("campaignForm.sections.content")}
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
@@ -525,28 +608,82 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
               <ReadOnlyText value={form.getValues("key_message")} multiline />
             )}
           </div>
+          <div>
+            <Label htmlFor="hashtags">{t("campaignForm.labels.hashtags")}</Label>
+            {canEdit("hashtags") ? (
+              <Input
+                id="hashtags"
+                placeholder={t("campaignForm.placeholders.hashtags")}
+                {...form.register("hashtags", {
+                  onBlur: (e) =>
+                    form.setValue("hashtags", formatHashtags(e.target.value), {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    }),
+                })}
+              />
+            ) : (
+              <ReadOnlyText value={form.getValues("hashtags")} />
+            )}
+          </div>
+          <div>
+            <Label htmlFor="link_list">{t("campaignForm.labels.link_list")}</Label>
+            {canEdit("link_list") ? (
+              <Input
+                id="link_list"
+                placeholder={t("campaignForm.placeholders.link_list")}
+                {...form.register("link_list")}
+              />
+            ) : (
+              <ReadOnlyText value={form.getValues("link_list")} />
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Section 3: Budget */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Wallet className="h-5 w-5 text-primary" />
+            {t("campaignForm.sections.budget")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Label htmlFor="budget">{t("campaignForm.labels.budget")} *</Label>
+            {canEdit("budget") ? (
+              <>
+                <Input
+                  id="budget"
+                  inputMode="numeric"
+                  placeholder={t("campaignForm.placeholders.budget")}
+                  value={formatThousands(form.watch("budget"))}
+                  onChange={(e) => {
+                    const raw = e.target.value.replace(/\D/g, "");
+                    form.setValue("budget", raw, { shouldDirty: true, shouldValidate: true });
+                  }}
+                  className={cn(errors.budget && invalidCls)}
+                />
+                {fieldError("budget") && <p className="mt-1 text-sm text-destructive">{fieldError("budget")}</p>}
+              </>
+            ) : (
+              <ReadOnlyText value={formatThousands(form.getValues("budget"))} />
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Section 4: Laufzeit & Termine */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Calendar className="h-5 w-5 text-primary" />
+            {t("campaignForm.sections.schedule")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-3">
-            <div>
-              <Label htmlFor="budget">{t("campaignForm.labels.budget")} *</Label>
-              {canEdit("budget") ? (
-                <>
-                  <Input
-                    id="budget"
-                    inputMode="numeric"
-                    placeholder={t("campaignForm.placeholders.budget")}
-                    value={formatThousands(form.watch("budget"))}
-                    onChange={(e) => {
-                      const raw = e.target.value.replace(/\D/g, "");
-                      form.setValue("budget", raw, { shouldDirty: true, shouldValidate: true });
-                    }}
-                    className={cn(errors.budget && invalidCls)}
-                  />
-                  {fieldError("budget") && <p className="mt-1 text-sm text-destructive">{fieldError("budget")}</p>}
-                </>
-              ) : (
-                <ReadOnlyText value={formatThousands(form.getValues("budget"))} />
-              )}
-            </div>
             <div>
               <Label htmlFor="start">{t("campaignForm.labels.start")} *</Label>
               {canEdit("start") ? (
@@ -581,38 +718,35 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
                 <ReadOnlyText value={formatDateTime(fromLocal(form.getValues("ende") ?? ""))} />
               )}
             </div>
-          </div>
-          <div>
-            <Label htmlFor="hashtags">{t("campaignForm.labels.hashtags")}</Label>
-            {canEdit("hashtags") ? (
-              <Input
-                id="hashtags"
-                placeholder={t("campaignForm.placeholders.hashtags")}
-                {...form.register("hashtags")}
-              />
-            ) : (
-              <ReadOnlyText value={form.getValues("hashtags")} />
-            )}
-          </div>
-          <div>
-            <Label htmlFor="link_list">{t("campaignForm.labels.link_list")}</Label>
-            {canEdit("link_list") ? (
-              <Input
-                id="link_list"
-                placeholder={t("campaignForm.placeholders.link_list")}
-                {...form.register("link_list")}
-              />
-            ) : (
-              <ReadOnlyText value={form.getValues("link_list")} />
-            )}
+            <div>
+              <Label htmlFor="apply_till">{t("campaignForm.labels.apply_till")}</Label>
+              {canEdit("apply_till") ? (
+                <>
+                  <Input
+                    id="apply_till"
+                    type="datetime-local"
+                    placeholder={t("campaignForm.placeholders.apply_till")}
+                    {...form.register("apply_till")}
+                    className={cn(errors.apply_till && invalidCls)}
+                  />
+                  {fieldError("apply_till") && <p className="mt-1 text-sm text-destructive">{fieldError("apply_till")}</p>}
+                </>
+              ) : (
+                <ReadOnlyText value={formatDateTime(fromLocal(form.getValues("apply_till") ?? ""))} />
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Section 3: Influencer & Post */}
+
+      {/* Section 5: Influencer & Post */}
       <Card>
         <CardHeader>
-          <CardTitle>{t("campaignForm.sections.influencer")}</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5 text-primary" />
+            {t("campaignForm.sections.influencer")}
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
@@ -632,17 +766,55 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
               <ReadOnlyText value={form.getValues("requirements")} multiline />
             )}
           </div>
-          <div>
-            <Label htmlFor="post_type">{t("campaignForm.labels.post_type")}</Label>
-            {canEdit("post_type") ? (
-              <Input
-                id="post_type"
-                placeholder={t("campaignForm.placeholders.post_type")}
-                {...form.register("post_type")}
-              />
-            ) : (
-              <ReadOnlyText value={form.getValues("post_type")} />
-            )}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <Label htmlFor="platform">{t("campaignForm.labels.platform")}</Label>
+              {canEdit("platform") ? (
+                <Select value={platform || NONE} onValueChange={(v) => setPlatform(v === NONE ? "" : v)}>
+                  <SelectTrigger id="platform">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={NONE}>{t("campaignForm.options.noRequirement")}</SelectItem>
+                    {PLATFORM_VALUES.map((v) => (
+                      <SelectItem key={v} value={v}>
+                        {v}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <ReadOnlyText value={platform || t("campaignForm.options.noRequirement")} />
+              )}
+            </div>
+            <div>
+              <Label htmlFor="post_type">{t("campaignForm.labels.post_type")}</Label>
+              {canEdit("post_type") ? (
+                <Select
+                  value={form.watch("post_type") || NONE}
+                  onValueChange={(v) =>
+                    form.setValue("post_type", v === NONE ? "" : v, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    })
+                  }
+                >
+                  <SelectTrigger id="post_type">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={NONE}>{t("campaignForm.options.noRequirement")}</SelectItem>
+                    {POST_TYPE_VALUES.map((v) => (
+                      <SelectItem key={v} value={v}>
+                        {v}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <ReadOnlyText value={form.getValues("post_type") || t("campaignForm.options.noRequirement")} />
+              )}
+            </div>
           </div>
           <div>
             <Label htmlFor="type">{t("campaignForm.labels.type")} *</Label>
@@ -656,9 +828,9 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
                     <SelectValue placeholder={t("campaignForm.placeholders.type")} />
                   </SelectTrigger>
                   <SelectContent>
-                    {CAMPAIGN_TYPES.map((v) => (
+                    {CAMPAIGN_TYPE_KEYS.map((v) => (
                       <SelectItem key={v} value={v}>
-                        {v}
+                        {t(`campaignForm.typeOptions.${v}`)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -666,9 +838,41 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
                 {fieldError("type") && <p className="mt-1 text-sm text-destructive">{fieldError("type")}</p>}
               </>
             ) : (
-              <ReadOnlyText value={form.getValues("type")} />
+              <ReadOnlyText
+                value={
+                  form.getValues("type")
+                    ? t(`campaignForm.typeOptions.${form.getValues("type")}`, {
+                        defaultValue: form.getValues("type"),
+                      })
+                    : ""
+                }
+              />
             )}
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Section 6: Promotion (Akkordeon) */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between gap-2">
+            <CardTitle className="flex items-center gap-2">
+              <Megaphone className="h-5 w-5 text-primary" />
+              {t("campaignForm.sections.promotion")}
+            </CardTitle>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              aria-expanded={promotionOpen}
+              aria-label={t("campaignForm.toggleSection")}
+              onClick={() => setPromotionOpen((o) => !o)}
+            >
+              {promotionOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4" hidden={!promotionOpen}>
           <div>
             <Label htmlFor="target_url">{t("campaignForm.labels.target_url")}</Label>
             {canEdit("target_url") ? (
@@ -676,7 +880,13 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
                 <Input
                   id="target_url"
                   placeholder={t("campaignForm.placeholders.target_url")}
-                  {...form.register("target_url")}
+                  {...form.register("target_url", {
+                    onBlur: (e) =>
+                      form.setValue("target_url", withHttps(e.target.value), {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      }),
+                  })}
                   className={cn(errors.target_url && invalidCls)}
                 />
                 {fieldError("target_url") && <p className="mt-1 text-sm text-destructive">{fieldError("target_url")}</p>}
@@ -697,32 +907,30 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
               <ReadOnlyText value={form.getValues("coupon")} />
             )}
           </div>
-          <div>
-            <Label htmlFor="apply_till">{t("campaignForm.labels.apply_till")}</Label>
-            {canEdit("apply_till") ? (
-              <>
-                <Input
-                  id="apply_till"
-                  type="datetime-local"
-                  placeholder={t("campaignForm.placeholders.apply_till")}
-                  {...form.register("apply_till")}
-                  className={cn(errors.apply_till && invalidCls)}
-                />
-                {fieldError("apply_till") && <p className="mt-1 text-sm text-destructive">{fieldError("apply_till")}</p>}
-              </>
-            ) : (
-              <ReadOnlyText value={formatDateTime(fromLocal(form.getValues("apply_till") ?? ""))} />
-            )}
-          </div>
         </CardContent>
       </Card>
 
-      {/* Section 4: Barter */}
+      {/* Section 7: Barter (Akkordeon) */}
       <Card>
         <CardHeader>
-          <CardTitle>{t("campaignForm.sections.barter")}</CardTitle>
+          <div className="flex items-center justify-between gap-2">
+            <CardTitle className="flex items-center gap-2">
+              <Gift className="h-5 w-5 text-primary" />
+              {t("campaignForm.sections.barter")}
+            </CardTitle>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              aria-expanded={barterOpen}
+              aria-label={t("campaignForm.toggleSection")}
+              onClick={() => setBarterOpen((o) => !o)}
+            >
+              {barterOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
+          </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4" hidden={!barterOpen}>
           <div>
             <Label htmlFor="barter_desc">{t("campaignForm.labels.barter_desc")}</Label>
             {canEdit("barter_desc") ? (
@@ -737,13 +945,36 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
             )}
           </div>
           <div>
+            <Label htmlFor="barter_value">{t("campaignForm.labels.barter_value")}</Label>
+            {canEdit("barter_value") ? (
+              <>
+                <Input
+                  id="barter_value"
+                  inputMode="numeric"
+                  placeholder={t("campaignForm.placeholders.barter_value")}
+                  {...form.register("barter_value")}
+                  className={cn(errors.barter_value && invalidCls)}
+                />
+                {fieldError("barter_value") && <p className="mt-1 text-sm text-destructive">{fieldError("barter_value")}</p>}
+              </>
+            ) : (
+              <ReadOnlyText value={form.getValues("barter_value")} />
+            )}
+          </div>
+          <div>
             <Label htmlFor="barter_order_url">{t("campaignForm.labels.barter_order_url")}</Label>
             {canEdit("barter_order_url") ? (
               <>
                 <Input
                   id="barter_order_url"
                   placeholder={t("campaignForm.placeholders.barter_order_url")}
-                  {...form.register("barter_order_url")}
+                  {...form.register("barter_order_url", {
+                    onBlur: (e) =>
+                      form.setValue("barter_order_url", withHttps(e.target.value), {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      }),
+                  })}
                   className={cn(errors.barter_order_url && invalidCls)}
                 />
                 {fieldError("barter_order_url") && <p className="mt-1 text-sm text-destructive">{fieldError("barter_order_url")}</p>}
@@ -764,31 +995,28 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
               <ReadOnlyText value={form.getValues("barter_order_coupon")} />
             )}
           </div>
-          <div>
-            <Label htmlFor="barter_value">{t("campaignForm.labels.barter_value")}</Label>
-            {canEdit("barter_value") ? (
-              <>
-                <Input
-                  id="barter_value"
-                  inputMode="numeric"
-                  placeholder={t("campaignForm.placeholders.barter_value")}
-                  {...form.register("barter_value")}
-                  className={cn(errors.barter_value && invalidCls)}
-                />
-                {fieldError("barter_value") && <p className="mt-1 text-sm text-destructive">{fieldError("barter_value")}</p>}
-              </>
-            ) : (
-              <ReadOnlyText value={form.getValues("barter_value")} />
-            )}
-          </div>
         </CardContent>
       </Card>
 
       {!isLocked && (
         <div className="flex flex-wrap items-center gap-3">
-          <Button type="submit" disabled={mutation.isPending}>
-            {mutation.isPending ? t("common.loading") : t("common.save")}
+          <Button type="submit" onClick={() => setIntent("draft")} disabled={mutation.isPending}>
+            {mutation.isPending
+              ? t("common.loading")
+              : mode === "create"
+                ? t("campaignForm.actions.saveDraft")
+                : t("common.save")}
           </Button>
+          {mode === "create" && (
+            <Button
+              type="submit"
+              variant="secondary"
+              onClick={() => setIntent("publish")}
+              disabled={mutation.isPending}
+            >
+              {t("campaignForm.actions.saveAndPublish")}
+            </Button>
+          )}
           <Button type="button" variant="outline" onClick={handleCancel} disabled={mutation.isPending}>
             {t("common.cancel")}
           </Button>
