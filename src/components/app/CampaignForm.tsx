@@ -709,17 +709,55 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
               <ReadOnlyText value={form.getValues("requirements")} multiline />
             )}
           </div>
-          <div>
-            <Label htmlFor="post_type">{t("campaignForm.labels.post_type")}</Label>
-            {canEdit("post_type") ? (
-              <Input
-                id="post_type"
-                placeholder={t("campaignForm.placeholders.post_type")}
-                {...form.register("post_type")}
-              />
-            ) : (
-              <ReadOnlyText value={form.getValues("post_type")} />
-            )}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <Label htmlFor="platform">{t("campaignForm.labels.platform")}</Label>
+              {canEdit("platform") ? (
+                <Select value={platform || NONE} onValueChange={(v) => setPlatform(v === NONE ? "" : v)}>
+                  <SelectTrigger id="platform">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={NONE}>{t("campaignForm.options.noRequirement")}</SelectItem>
+                    {PLATFORM_VALUES.map((v) => (
+                      <SelectItem key={v} value={v}>
+                        {v}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <ReadOnlyText value={platform || t("campaignForm.options.noRequirement")} />
+              )}
+            </div>
+            <div>
+              <Label htmlFor="post_type">{t("campaignForm.labels.post_type")}</Label>
+              {canEdit("post_type") ? (
+                <Select
+                  value={form.watch("post_type") || NONE}
+                  onValueChange={(v) =>
+                    form.setValue("post_type", v === NONE ? "" : v, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    })
+                  }
+                >
+                  <SelectTrigger id="post_type">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={NONE}>{t("campaignForm.options.noRequirement")}</SelectItem>
+                    {POST_TYPE_VALUES.map((v) => (
+                      <SelectItem key={v} value={v}>
+                        {v}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <ReadOnlyText value={form.getValues("post_type") || t("campaignForm.options.noRequirement")} />
+              )}
+            </div>
           </div>
           <div>
             <Label htmlFor="type">{t("campaignForm.labels.type")} *</Label>
@@ -733,9 +771,9 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
                     <SelectValue placeholder={t("campaignForm.placeholders.type")} />
                   </SelectTrigger>
                   <SelectContent>
-                    {CAMPAIGN_TYPES.map((v) => (
+                    {CAMPAIGN_TYPE_KEYS.map((v) => (
                       <SelectItem key={v} value={v}>
-                        {v}
+                        {t(`campaignForm.typeOptions.${v}`)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -743,7 +781,15 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
                 {fieldError("type") && <p className="mt-1 text-sm text-destructive">{fieldError("type")}</p>}
               </>
             ) : (
-              <ReadOnlyText value={form.getValues("type")} />
+              <ReadOnlyText
+                value={
+                  form.getValues("type")
+                    ? t(`campaignForm.typeOptions.${form.getValues("type")}`, {
+                        defaultValue: form.getValues("type"),
+                      })
+                    : ""
+                }
+              />
             )}
           </div>
         </CardContent>
