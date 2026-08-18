@@ -665,7 +665,13 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
               <Input
                 id="hashtags"
                 placeholder={t("campaignForm.placeholders.hashtags")}
-                {...form.register("hashtags")}
+                {...form.register("hashtags", {
+                  onBlur: (e) =>
+                    form.setValue("hashtags", formatHashtags(e.target.value), {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    }),
+                })}
               />
             ) : (
               <ReadOnlyText value={form.getValues("hashtags")} />
