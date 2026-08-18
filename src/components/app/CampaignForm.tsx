@@ -49,7 +49,47 @@ import {
 import { ImageUploadField } from "@/components/app/ImageUploadField";
 import { cn } from "@/lib/utils";
 
-const CAMPAIGN_TYPES = ["Engagement mit Influencer"] as const;
+/** Werte des DB-Enums campaign_type (gespeichert wird der Key, angezeigt das Label). */
+const CAMPAIGN_TYPE_KEYS = [
+  "reach",
+  "engagement",
+  "click_through",
+  "subscription",
+  "download",
+  "lead_gen",
+] as const;
+const DEFAULT_CAMPAIGN_TYPE = "reach";
+
+/** Sprachneutrale, direkt gespeicherte Werte. */
+const POST_TYPE_VALUES = ["Post", "Reel", "Story"] as const;
+const PLATFORM_VALUES = ["Instagram"] as const;
+
+/** Sentinel für «keine Anforderung» (Radix Select erlaubt keinen leeren Wert). */
+const NONE = "__none__";
+
+const PROMOTION_FIELDS = ["target_url", "coupon"] as const;
+const BARTER_FIELDS = [
+  "barter_desc",
+  "barter_value",
+  "barter_order_url",
+  "barter_order_coupon",
+] as const;
+
+/** Ergänzt https:// falls kein Schema vorangestellt ist. */
+function withHttps(value: string): string {
+  const v = value.trim();
+  if (!v) return "";
+  return /^https?:\/\//i.test(v) ? v : `https://${v}`;
+}
+
+/** «sommer aktion» -> «#sommer #aktion» */
+function formatHashtags(value: string): string {
+  return value
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((w) => (w.startsWith("#") ? w : `#${w}`))
+    .join(" ");
+}
 
 const LOCKED_STATUSES = new Set(["running", "expired", "ended", "approved", "archived"]);
 const LIVE_STATUSES = new Set(["published", "running", "expired", "ended", "approved", "archived"]);
