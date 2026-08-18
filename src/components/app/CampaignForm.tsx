@@ -746,6 +746,30 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
               <ReadOnlyText value={form.getValues("type")} />
             )}
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Section 6: Promotion (Akkordeon) */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between gap-2">
+            <CardTitle className="flex items-center gap-2">
+              <Megaphone className="h-5 w-5 text-primary" />
+              {t("campaignForm.sections.promotion")}
+            </CardTitle>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              aria-expanded={promotionOpen}
+              aria-label={t("campaignForm.toggleSection")}
+              onClick={() => setPromotionOpen((o) => !o)}
+            >
+              {promotionOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4" hidden={!promotionOpen}>
           <div>
             <Label htmlFor="target_url">{t("campaignForm.labels.target_url")}</Label>
             {canEdit("target_url") ? (
@@ -753,7 +777,13 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
                 <Input
                   id="target_url"
                   placeholder={t("campaignForm.placeholders.target_url")}
-                  {...form.register("target_url")}
+                  {...form.register("target_url", {
+                    onBlur: (e) =>
+                      form.setValue("target_url", withHttps(e.target.value), {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      }),
+                  })}
                   className={cn(errors.target_url && invalidCls)}
                 />
                 {fieldError("target_url") && <p className="mt-1 text-sm text-destructive">{fieldError("target_url")}</p>}
@@ -772,23 +802,6 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
               />
             ) : (
               <ReadOnlyText value={form.getValues("coupon")} />
-            )}
-          </div>
-          <div>
-            <Label htmlFor="apply_till">{t("campaignForm.labels.apply_till")}</Label>
-            {canEdit("apply_till") ? (
-              <>
-                <Input
-                  id="apply_till"
-                  type="datetime-local"
-                  placeholder={t("campaignForm.placeholders.apply_till")}
-                  {...form.register("apply_till")}
-                  className={cn(errors.apply_till && invalidCls)}
-                />
-                {fieldError("apply_till") && <p className="mt-1 text-sm text-destructive">{fieldError("apply_till")}</p>}
-              </>
-            ) : (
-              <ReadOnlyText value={formatDateTime(fromLocal(form.getValues("apply_till") ?? ""))} />
             )}
           </div>
         </CardContent>
