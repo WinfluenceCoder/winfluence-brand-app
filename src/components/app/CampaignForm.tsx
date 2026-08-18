@@ -277,8 +277,16 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
       hashtags: initial?.hashtags ?? "",
       link_list: initial?.link_list ?? "",
       requirements: initial?.requirements ?? "",
-      post_type: initial?.post_type ?? "",
-      type: initial?.type ?? CAMPAIGN_TYPES[0],
+      post_type: POST_TYPE_VALUES.includes(
+        (initial?.post_type ?? "") as (typeof POST_TYPE_VALUES)[number],
+      )
+        ? (initial?.post_type as string)
+        : "",
+      type: CAMPAIGN_TYPE_KEYS.includes(
+        (initial?.type ?? "") as (typeof CAMPAIGN_TYPE_KEYS)[number],
+      )
+        ? (initial?.type as string)
+        : DEFAULT_CAMPAIGN_TYPE,
       target_url: initial?.target_url ?? "",
       coupon: initial?.coupon ?? "",
       apply_till: toLocal(initial?.apply_till as string | undefined),
