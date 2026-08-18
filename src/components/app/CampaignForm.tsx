@@ -448,7 +448,10 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
       {/* Section 1: Titel, Brand & Produkt */}
       <Card>
         <CardHeader>
-          <CardTitle>{t("campaignForm.sections.brand")}</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Tag className="h-5 w-5 text-primary" />
+            {t("campaignForm.sections.brand")}
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
