@@ -403,6 +403,13 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "editor" | "viewer"
+      campaign_type:
+        | "reach"
+        | "engagement"
+        | "click_through"
+        | "subscription"
+        | "download"
+        | "lead_gen"
     }
     CompositeTypes: {
       [_ in never]: never
