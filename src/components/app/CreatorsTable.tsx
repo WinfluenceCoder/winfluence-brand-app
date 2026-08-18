@@ -66,11 +66,14 @@ export function creatorStatusLabel(t: (k: string) => string, s: string | null) {
   }
 }
 
-function statusVariant(s: string | null): "default" | "secondary" | "outline" {
+function statusVariant(
+  s: string | null,
+): "default" | "secondary" | "outline" | "hired" | "working" {
   switch (s) {
     case "hired":
+      return "hired";
     case "working":
-      return "default";
+      return "working";
     case "delivered":
       return "outline";
     default:
