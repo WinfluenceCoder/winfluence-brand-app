@@ -299,6 +299,10 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
 
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [promotionOpen, setPromotionOpen] = useState(false);
+  const [barterOpen, setBarterOpen] = useState(false);
+  const [platform, setPlatform] = useState<string>("");
+  const [intent, setIntent] = useState<"draft" | "publish">("draft");
   const errors = form.formState.errors;
   const invalidCls = "border-destructive focus-visible:ring-destructive";
 
