@@ -794,12 +794,27 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
         </CardContent>
       </Card>
 
-      {/* Section 4: Barter */}
+      {/* Section 7: Barter (Akkordeon) */}
       <Card>
         <CardHeader>
-          <CardTitle>{t("campaignForm.sections.barter")}</CardTitle>
+          <div className="flex items-center justify-between gap-2">
+            <CardTitle className="flex items-center gap-2">
+              <Gift className="h-5 w-5 text-primary" />
+              {t("campaignForm.sections.barter")}
+            </CardTitle>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              aria-expanded={barterOpen}
+              aria-label={t("campaignForm.toggleSection")}
+              onClick={() => setBarterOpen((o) => !o)}
+            >
+              {barterOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
+          </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4" hidden={!barterOpen}>
           <div>
             <Label htmlFor="barter_desc">{t("campaignForm.labels.barter_desc")}</Label>
             {canEdit("barter_desc") ? (
@@ -814,13 +829,36 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
             )}
           </div>
           <div>
+            <Label htmlFor="barter_value">{t("campaignForm.labels.barter_value")}</Label>
+            {canEdit("barter_value") ? (
+              <>
+                <Input
+                  id="barter_value"
+                  inputMode="numeric"
+                  placeholder={t("campaignForm.placeholders.barter_value")}
+                  {...form.register("barter_value")}
+                  className={cn(errors.barter_value && invalidCls)}
+                />
+                {fieldError("barter_value") && <p className="mt-1 text-sm text-destructive">{fieldError("barter_value")}</p>}
+              </>
+            ) : (
+              <ReadOnlyText value={form.getValues("barter_value")} />
+            )}
+          </div>
+          <div>
             <Label htmlFor="barter_order_url">{t("campaignForm.labels.barter_order_url")}</Label>
             {canEdit("barter_order_url") ? (
               <>
                 <Input
                   id="barter_order_url"
                   placeholder={t("campaignForm.placeholders.barter_order_url")}
-                  {...form.register("barter_order_url")}
+                  {...form.register("barter_order_url", {
+                    onBlur: (e) =>
+                      form.setValue("barter_order_url", withHttps(e.target.value), {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      }),
+                  })}
                   className={cn(errors.barter_order_url && invalidCls)}
                 />
                 {fieldError("barter_order_url") && <p className="mt-1 text-sm text-destructive">{fieldError("barter_order_url")}</p>}
@@ -839,23 +877,6 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
               />
             ) : (
               <ReadOnlyText value={form.getValues("barter_order_coupon")} />
-            )}
-          </div>
-          <div>
-            <Label htmlFor="barter_value">{t("campaignForm.labels.barter_value")}</Label>
-            {canEdit("barter_value") ? (
-              <>
-                <Input
-                  id="barter_value"
-                  inputMode="numeric"
-                  placeholder={t("campaignForm.placeholders.barter_value")}
-                  {...form.register("barter_value")}
-                  className={cn(errors.barter_value && invalidCls)}
-                />
-                {fieldError("barter_value") && <p className="mt-1 text-sm text-destructive">{fieldError("barter_value")}</p>}
-              </>
-            ) : (
-              <ReadOnlyText value={form.getValues("barter_value")} />
             )}
           </div>
         </CardContent>
