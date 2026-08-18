@@ -863,9 +863,23 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
 
       {!isLocked && (
         <div className="flex flex-wrap items-center gap-3">
-          <Button type="submit" disabled={mutation.isPending}>
-            {mutation.isPending ? t("common.loading") : t("common.save")}
+          <Button type="submit" onClick={() => setIntent("draft")} disabled={mutation.isPending}>
+            {mutation.isPending
+              ? t("common.loading")
+              : mode === "create"
+                ? t("campaignForm.actions.saveDraft")
+                : t("common.save")}
           </Button>
+          {mode === "create" && (
+            <Button
+              type="submit"
+              variant="secondary"
+              onClick={() => setIntent("publish")}
+              disabled={mutation.isPending}
+            >
+              {t("campaignForm.actions.saveAndPublish")}
+            </Button>
+          )}
           <Button type="button" variant="outline" onClick={handleCancel} disabled={mutation.isPending}>
             {t("common.cancel")}
           </Button>
