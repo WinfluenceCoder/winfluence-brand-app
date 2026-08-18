@@ -529,6 +529,31 @@
       "errorMessage": "Die Kampagne konnte nicht gestartet werden. Bitte kontaktiere den Support.",
       "loadError": "Ausgewählte Influencer konnten nicht geladen werden.",
       "loading": "Wird gestartet…"
+    },
+    "monitor": {
+      "title": "Kampagne überwachen",
+      "notRunning": "Diese Ansicht steht nur für laufende Kampagnen zur Verfügung.",
+      "daysRemaining": "läuft noch {{count}} Tage",
+      "endedOn": "am {{date}} beendet",
+      "loading": "Influencer werden geladen …",
+      "errorTitle": "Influencer konnten nicht geladen werden",
+      "retry": "Erneut versuchen",
+      "hiredTitle": "beauftragt sind",
+      "hiredEmpty": "Noch keine Influencer beauftragt",
+      "deliveredTitle": "geliefert haben",
+      "deliveredEmpty": "Noch keine Lieferungen erhalten",
+      "endCampaign": "Kampagne beenden",
+      "performance": {
+        "title": "Performance",
+        "impressions": "Impressions",
+        "reach": "Reichweite",
+        "engagementRate": "Engagement Rate",
+        "clicks": "Klicks",
+        "cpm": "Cost per Mille (CPM)",
+        "cpe": "Cost per Engagement (CPE)",
+        "costCash": "Kosten Cash",
+        "costBarter": "Kosten Barter"
+      }
     }
   },
   "invite": {
