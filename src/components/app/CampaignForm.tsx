@@ -360,9 +360,14 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
       }
       return create({ data: payload });
     },
-    onSuccess: () => {
+    onSuccess: (row) => {
       qc.invalidateQueries({ queryKey: ["home", "campaigns"] });
       toast.success(mode === "edit" ? t("campaignForm.updated") : t("campaignForm.created"));
+      const newId = (row as { id?: number } | null)?.id;
+      if (mode === "create" && intent === "publish" && newId) {
+        router.navigate({ to: "/campaigns/publish/$id", params: { id: String(newId) } });
+        return;
+      }
       router.navigate({ to: "/" });
     },
     onError: (e) => {
@@ -371,7 +376,14 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
     },
   });
 
-  const onSubmit = form.handleSubmit((values) => mutation.mutate(values));
+  const onSubmit = form.handleSubmit(
+    (values) => mutation.mutate(values),
+    (formErrors) => {
+      const keys = Object.keys(formErrors);
+      if (PROMOTION_FIELDS.some((f) => keys.includes(f))) setPromotionOpen(true);
+      if (BARTER_FIELDS.some((f) => keys.includes(f))) setBarterOpen(true);
+    },
+  );
 
   const handleCancel = () => {
     if (form.formState.isDirty) {
