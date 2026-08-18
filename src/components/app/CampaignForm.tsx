@@ -686,10 +686,13 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
         </CardContent>
       </Card>
 
-      {/* Section 3: Influencer & Post */}
+      {/* Section 5: Influencer & Post */}
       <Card>
         <CardHeader>
-          <CardTitle>{t("campaignForm.sections.influencer")}</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5 text-primary" />
+            {t("campaignForm.sections.influencer")}
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
