@@ -602,63 +602,6 @@ export function CampaignForm({ mode, initial }: { mode: "create" | "edit"; initi
               <ReadOnlyText value={form.getValues("key_message")} multiline />
             )}
           </div>
-          <div className="grid gap-4 sm:grid-cols-3">
-            <div>
-              <Label htmlFor="budget">{t("campaignForm.labels.budget")} *</Label>
-              {canEdit("budget") ? (
-                <>
-                  <Input
-                    id="budget"
-                    inputMode="numeric"
-                    placeholder={t("campaignForm.placeholders.budget")}
-                    value={formatThousands(form.watch("budget"))}
-                    onChange={(e) => {
-                      const raw = e.target.value.replace(/\D/g, "");
-                      form.setValue("budget", raw, { shouldDirty: true, shouldValidate: true });
-                    }}
-                    className={cn(errors.budget && invalidCls)}
-                  />
-                  {fieldError("budget") && <p className="mt-1 text-sm text-destructive">{fieldError("budget")}</p>}
-                </>
-              ) : (
-                <ReadOnlyText value={formatThousands(form.getValues("budget"))} />
-              )}
-            </div>
-            <div>
-              <Label htmlFor="start">{t("campaignForm.labels.start")} *</Label>
-              {canEdit("start") ? (
-                <>
-                  <Input
-                    id="start"
-                    type="datetime-local"
-                    placeholder={t("campaignForm.placeholders.start")}
-                    {...form.register("start")}
-                    className={cn(errors.start && invalidCls)}
-                  />
-                  {fieldError("start") && <p className="mt-1 text-sm text-destructive">{fieldError("start")}</p>}
-                </>
-              ) : (
-                <ReadOnlyText value={formatDateTime(fromLocal(form.getValues("start") ?? ""))} />
-              )}
-            </div>
-            <div>
-              <Label htmlFor="ende">{t("campaignForm.labels.ende")} *</Label>
-              {canEdit("ende") ? (
-                <>
-                  <Input
-                    id="ende"
-                    type="datetime-local"
-                    placeholder={t("campaignForm.placeholders.ende")}
-                    {...form.register("ende")}
-                    className={cn(errors.ende && invalidCls)}
-                  />
-                  {fieldError("ende") && <p className="mt-1 text-sm text-destructive">{fieldError("ende")}</p>}
-                </>
-              ) : (
-                <ReadOnlyText value={formatDateTime(fromLocal(form.getValues("ende") ?? ""))} />
-              )}
-            </div>
-          </div>
           <div>
             <Label htmlFor="hashtags">{t("campaignForm.labels.hashtags")}</Label>
             {canEdit("hashtags") ? (
