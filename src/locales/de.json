@@ -283,7 +283,10 @@
       "brand": "Titel, Brand & Produkt",
       "content": "Inhalt & Briefing",
       "influencer": "Influencer & Post",
-      "barter": "Barter"
+      "barter": "Barter",
+      "budget": "Budget",
+      "schedule": "Laufzeit & Termine",
+      "promotion": "Promotion"
     },
     "labels": {
       "title": "Titel",
@@ -301,7 +304,7 @@
       "hashtags": "Hashtags",
       "link_list": "Links",
       "requirements": "Anforderungen an Influencer",
-      "post_type": "Post-Typ",
+      "post_type": "Gewünschter Post-Typ",
       "type": "Kampagnen-Typ",
       "target_url": "Ziel-URL",
       "coupon": "Coupon",
@@ -309,7 +312,8 @@
       "barter_desc": "Barter-Beschreibung",
       "barter_order_url": "Barter Bestell-URL",
       "barter_order_coupon": "Barter Gutscheincode",
-      "barter_value": "Barter Warenwert (CHF)"
+      "barter_value": "Barter Warenwert (CHF)",
+      "platform": "Gewünschte Plattform"
     },
     "hints": {
       "brand_logo_url": "Brand-Logo hochladen",
@@ -342,6 +346,22 @@
       "integer": "Bitte eine ganze Zahl ≥ 0 eingeben.",
       "endAfterStart": "Das Ende muss nach dem Start liegen.",
       "applyBeforeStart": "Die Bewerbungsfrist muss vor dem Start liegen."
+    },
+    "toggleSection": "Bereich ein-/ausklappen",
+    "options": {
+      "noRequirement": "keine Anforderung"
+    },
+    "actions": {
+      "saveDraft": "Als Entwurf speichern",
+      "saveAndPublish": "Speichern & Publizieren"
+    },
+    "typeOptions": {
+      "reach": "Reichweite",
+      "engagement": "Engagement",
+      "click_through": "Klicks auf Ziel-URL",
+      "subscription": "Registrierung",
+      "download": "App Download",
+      "lead_gen": "Lead Generation"
     }
   },
   "campaignPublish": {
