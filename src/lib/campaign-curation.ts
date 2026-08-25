@@ -19,6 +19,13 @@ export type CurationCreator = {
   address_zip: number | null;
   address_city: string | null;
   company_legal_name: string | null;
+  instagram_followers: number | null;
+  instagram_engagement_rate: number | null;
+  tiktok_followers: number | null;
+  tiktok_engagement_rate: number | null;
+  youtube_subscribers: number | null;
+  youtube_engagement_rate: number | null;
+  stats_fetched_at: string | null;
 };
 
 export type CurationCollab = {
@@ -28,11 +35,25 @@ export type CurationCollab = {
   pitch: string | null;
   rank: number | null;
   match: number | null;
+  platform: string | null;
+  post_type: string | null;
   creator: CurationCreator;
 };
 
-const CREATOR_FIELDS =
-  "id, nick_name, first_name, last_name, foto_url, e_mail_address, mobile, insta_url, tiktok_url, youtube_url, linkedin_url, status, address_street, address_nr, address_zip, address_city, company_legal_name";
+export const CREATOR_FIELDS =
+  "id, nick_name, first_name, last_name, foto_url, e_mail_address, mobile, insta_url, tiktok_url, youtube_url, linkedin_url, status, address_street, address_nr, address_zip, address_city, company_legal_name, instagram_followers, instagram_engagement_rate, tiktok_followers, tiktok_engagement_rate, youtube_subscribers, youtube_engagement_rate, stats_fetched_at";
+
+/** Rohform der View: numeric-Spalten liefert PostgREST als String. */
+type RawCreator = Omit<
+  CurationCreator,
+  | "instagram_engagement_rate"
+  | "tiktok_engagement_rate"
+  | "youtube_engagement_rate"
+> & {
+  instagram_engagement_rate: number | string | null;
+  tiktok_engagement_rate: number | string | null;
+  youtube_engagement_rate: number | string | null;
+};
 
 type Raw = {
   id: number;
@@ -41,8 +62,41 @@ type Raw = {
   pitch: string | null;
   rank: number | null;
   match: number | null;
-  creators: CurationCreator | null;
+  platform: string | null;
+  post_type: string | null;
+  creator: RawCreator | null;
 };
+
+function toNumber(value: number | string | null | undefined): number | null {
+  if (value === null || value === undefined || value === "") return null;
+  const n = Number(value);
+  return Number.isNaN(n) ? null : n;
+}
+
+function mapCreator(c: RawCreator): CurationCreator {
+  return {
+    ...c,
+    instagram_engagement_rate: toNumber(c.instagram_engagement_rate),
+    tiktok_engagement_rate: toNumber(c.tiktok_engagement_rate),
+    youtube_engagement_rate: toNumber(c.youtube_engagement_rate),
+  };
+}
+
+function mapCollab(r: Raw & { creator: RawCreator }): CurationCollab {
+  return {
+    id: r.id,
+    status: r.status,
+    price: r.price,
+    pitch: r.pitch,
+    rank: r.rank,
+    match: r.match,
+    platform: r.platform,
+    post_type: r.post_type,
+    creator: mapCreator(r.creator),
+  };
+}
+
+const COLLAB_SELECT = `id, status, price, pitch, rank, match, platform, post_type, creator:creator_sedcard!inner(${CREATOR_FIELDS})`;
 
 function describe(error: {
   message: string;
