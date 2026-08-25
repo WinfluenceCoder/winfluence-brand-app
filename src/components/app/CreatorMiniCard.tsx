@@ -102,10 +102,37 @@ export function CreatorMiniCardBody({
           </span>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <SocialStat url={c.insta_url} Icon={Instagram} label="Instagram" />
-          <SocialStat url={c.tiktok_url} Icon={TikTokIcon} label="TikTok" />
-          <SocialStat url={c.youtube_url} Icon={Youtube} label="YouTube" />
+          <SocialStat
+            url={c.insta_url}
+            Icon={Instagram}
+            label="Instagram"
+            value={c.instagram_followers}
+            rate={c.instagram_engagement_rate}
+            title={t("creatorCard.followers", { platform: "Instagram" })}
+          />
+          <SocialStat
+            url={c.tiktok_url}
+            Icon={TikTokIcon}
+            label="TikTok"
+            value={c.tiktok_followers}
+            rate={c.tiktok_engagement_rate}
+            title={t("creatorCard.followers", { platform: "TikTok" })}
+          />
+          <SocialStat
+            url={c.youtube_url}
+            Icon={Youtube}
+            label="YouTube"
+            value={c.youtube_subscribers}
+            rate={c.youtube_engagement_rate}
+            title={t("creatorCard.subscribers", { platform: "YouTube" })}
+          />
         </div>
+        {hasOffer ? (
+          <p className="text-xs text-muted-foreground">
+            {t("creatorCard.offer")}: {collab.platform ?? "–"} ·{" "}
+            {collab.post_type ?? "–"}
+          </p>
+        ) : null}
         {collab.pitch ? (
           <p className="line-clamp-3 text-xs text-muted-foreground">{collab.pitch}</p>
         ) : null}
