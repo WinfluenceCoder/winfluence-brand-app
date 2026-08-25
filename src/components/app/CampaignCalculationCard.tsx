@@ -1,7 +1,7 @@
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  FOLLOWER_PLACEHOLDER,
   formatChf,
   formatNumberCh,
   type CurationCollab,
