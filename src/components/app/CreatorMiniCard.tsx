@@ -63,9 +63,11 @@ export function CreatorMiniCardBody({
   collab: CurationCollab;
   dragHandle?: React.ReactNode;
 }) {
+  const { t } = useTranslation();
   const c = collab.creator;
   const fullName = [c.first_name, c.last_name].filter(Boolean).join(" ");
   const matchLabel = formatMatchPercent(collab.match);
+  const hasOffer = Boolean(collab.platform || collab.post_type);
 
   return (
     <div className="flex gap-3 p-3">
