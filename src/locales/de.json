@@ -1,4 +1,9 @@
 {
+  "creatorCard": {
+    "followers": "{{platform}}: Follower",
+    "subscribers": "{{platform}}: Abonnenten",
+    "offer": "Angebot"
+  },
   "common": {
     "appName": "winfluence",
     "save": "Speichern",

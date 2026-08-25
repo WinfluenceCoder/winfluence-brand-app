@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { TikTokIcon } from "@/components/app/CreatorsTable";
 import {
-  FOLLOWER_PLACEHOLDER,
   formatChf,
   formatMatchPercent,
   formatNumberCh,
@@ -21,10 +20,16 @@ function SocialStat({
   url,
   Icon,
   label,
+  value,
+  rate,
+  title,
 }: {
   url: string | null;
   Icon: React.ComponentType<{ className?: string }>;
   label: string;
+  value: number | null;
+  rate?: number | null;
+  title: string;
 }) {
   if (!url) return null;
   return (
@@ -33,12 +38,20 @@ function SocialStat({
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
+      title={title}
       onClick={(e) => e.stopPropagation()}
       onPointerDown={(e) => e.stopPropagation()}
       className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
     >
       <Icon className="h-4 w-4" />
-      {formatNumberCh(FOLLOWER_PLACEHOLDER)}
+      {value === null ? (
+        <span className="text-muted-foreground/60">–</span>
+      ) : (
+        <span className="tabular-nums">
+          {formatNumberCh(value)}
+          {rate != null ? ` (${rate.toFixed(1)}%)` : ""}
+        </span>
+      )}
     </a>
   );
 }
@@ -50,9 +63,11 @@ export function CreatorMiniCardBody({
   collab: CurationCollab;
   dragHandle?: React.ReactNode;
 }) {
+  const { t } = useTranslation();
   const c = collab.creator;
   const fullName = [c.first_name, c.last_name].filter(Boolean).join(" ");
   const matchLabel = formatMatchPercent(collab.match);
+  const hasOffer = Boolean(collab.platform || collab.post_type);
 
   return (
     <div className="flex gap-3 p-3">
@@ -87,10 +102,37 @@ export function CreatorMiniCardBody({
           </span>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <SocialStat url={c.insta_url} Icon={Instagram} label="Instagram" />
-          <SocialStat url={c.tiktok_url} Icon={TikTokIcon} label="TikTok" />
-          <SocialStat url={c.youtube_url} Icon={Youtube} label="YouTube" />
+          <SocialStat
+            url={c.insta_url}
+            Icon={Instagram}
+            label="Instagram"
+            value={c.instagram_followers}
+            rate={c.instagram_engagement_rate}
+            title={t("creatorCard.followers", { platform: "Instagram" })}
+          />
+          <SocialStat
+            url={c.tiktok_url}
+            Icon={TikTokIcon}
+            label="TikTok"
+            value={c.tiktok_followers}
+            rate={c.tiktok_engagement_rate}
+            title={t("creatorCard.followers", { platform: "TikTok" })}
+          />
+          <SocialStat
+            url={c.youtube_url}
+            Icon={Youtube}
+            label="YouTube"
+            value={c.youtube_subscribers}
+            rate={c.youtube_engagement_rate}
+            title={t("creatorCard.subscribers", { platform: "YouTube" })}
+          />
         </div>
+        {hasOffer ? (
+          <p className="text-xs text-muted-foreground">
+            {t("creatorCard.offer")}: {collab.platform ?? "–"} ·{" "}
+            {collab.post_type ?? "–"}
+          </p>
+        ) : null}
         {collab.pitch ? (
           <p className="line-clamp-3 text-xs text-muted-foreground">{collab.pitch}</p>
         ) : null}
