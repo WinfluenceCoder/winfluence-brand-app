@@ -24,9 +24,33 @@ export function CampaignCalculationCard({
   barterValue: number | null;
 }) {
   const { t } = useTranslation();
-  const followers = selected.length * FOLLOWER_PLACEHOLDER;
-  const cash = selected.reduce((sum, c) => sum + (c.price ?? 0), 0);
-  const barter = selected.length * (barterValue ?? 0);
+
+  const { followers, engagementRate, cash, barter, cpm, cpe } = useMemo(() => {
+    const rows = selected.map((c) => ({
+      followers: c.creator.instagram_followers,
+      rate: c.creator.instagram_engagement_rate,
+      price: c.price ?? 0,
+    }));
+
+    const followers = rows.reduce((s, r) => s + (r.followers ?? 0), 0);
+
+    const weighted = rows.filter((r) => r.followers != null && r.rate != null);
+    const weightSum = weighted.reduce((s, r) => s + r.followers!, 0);
+    const engagementRate =
+      weightSum > 0
+        ? weighted.reduce((s, r) => s + r.followers! * r.rate!, 0) / weightSum
+        : null;
+
+    const cash = rows.reduce((s, r) => s + r.price, 0);
+    const barter = selected.length * (barterValue ?? 0);
+
+    const cpm = followers > 0 ? (cash / followers) * 1000 : null;
+    const engagements =
+      engagementRate != null ? followers * (engagementRate / 100) : null;
+    const cpe = engagements && engagements > 0 ? cash / engagements : null;
+
+    return { followers, engagementRate, cash, barter, cpm, cpe };
+  }, [selected, barterValue]);
 
   return (
     <Card>
