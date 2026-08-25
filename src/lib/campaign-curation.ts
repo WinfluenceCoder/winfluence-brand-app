@@ -228,7 +228,7 @@ export function saveAppliedOrder(campaignId: number, ids: number[]) {
 async function fetchSelectedCollabs(campaignId: number): Promise<CurationCollab[]> {
   const { data, error } = await supabase
     .from("collabs")
-    .select(`id, status, price, pitch, rank, match, creators!inner(${CREATOR_FIELDS})`)
+    .select(COLLAB_SELECT)
     .eq("campaign_id", campaignId)
     .eq("status", "selected")
     .order("rank", { ascending: true })
@@ -240,16 +240,8 @@ async function fetchSelectedCollabs(campaignId: number): Promise<CurationCollab[
   }
 
   return (data ?? [])
-    .filter((r): r is Raw & { creators: CurationCreator } => r.creators != null)
-    .map((r) => ({
-      id: r.id,
-      status: r.status,
-      price: r.price,
-      pitch: r.pitch,
-      rank: r.rank,
-      match: r.match,
-      creator: r.creators,
-    }));
+    .filter((r): r is Raw & { creator: RawCreator } => r.creator != null)
+    .map(mapCollab);
 }
 
 export function startSelectionQueryOptions(campaignId: number) {
