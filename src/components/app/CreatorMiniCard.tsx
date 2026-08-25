@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { TikTokIcon } from "@/components/app/CreatorsTable";
 import {
-  FOLLOWER_PLACEHOLDER,
   formatChf,
   formatMatchPercent,
   formatNumberCh,
@@ -21,10 +20,16 @@ function SocialStat({
   url,
   Icon,
   label,
+  value,
+  rate,
+  title,
 }: {
   url: string | null;
   Icon: React.ComponentType<{ className?: string }>;
   label: string;
+  value: number | null;
+  rate?: number | null;
+  title: string;
 }) {
   if (!url) return null;
   return (
@@ -33,12 +38,20 @@ function SocialStat({
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
+      title={title}
       onClick={(e) => e.stopPropagation()}
       onPointerDown={(e) => e.stopPropagation()}
       className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
     >
       <Icon className="h-4 w-4" />
-      {formatNumberCh(FOLLOWER_PLACEHOLDER)}
+      {value === null ? (
+        <span className="text-muted-foreground/60">–</span>
+      ) : (
+        <span className="tabular-nums">
+          {formatNumberCh(value)}
+          {rate != null ? ` (${rate.toFixed(1)}%)` : ""}
+        </span>
+      )}
     </a>
   );
 }
