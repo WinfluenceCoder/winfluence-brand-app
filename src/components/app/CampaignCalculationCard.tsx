@@ -87,11 +87,11 @@ export function CampaignCalculationCard({
           />
           <Metric
             label={t("campaigns.curate.calculation.cpm")}
-            value={formatChf(12.91)}
+            value={cpm != null ? formatChf(cpm) : "–"}
           />
           <Metric
             label={t("campaigns.curate.calculation.cpe")}
-            value={formatChf(3.17)}
+            value={cpe != null ? formatChf(cpe) : "–"}
           />
         </div>
       </CardContent>
