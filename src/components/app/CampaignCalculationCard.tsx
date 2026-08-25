@@ -65,15 +65,15 @@ export function CampaignCalculationCard({
           />
           <Metric
             label={t("campaigns.curate.calculation.engagementRate")}
-            value="12.4%"
+            value={engagementRate != null ? `${engagementRate.toFixed(1)}%` : "–"}
           />
           <Metric
             label={t("campaigns.curate.calculation.matchingAudience")}
-            value="88.7%"
+            value="n/a"
           />
           <Metric
             label={t("campaigns.curate.calculation.matchingRegion")}
-            value="92.2%"
+            value="n/a"
           />
         </div>
         <div>
