@@ -1,9 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-/** Platzhalter, bis echte Follower-Zahlen verfügbar sind. */
-export const FOLLOWER_PLACEHOLDER = 1234;
-
 export type CurationCreator = {
   id: number;
   nick_name: string | null;
