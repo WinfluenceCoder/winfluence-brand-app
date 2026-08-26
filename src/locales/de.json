@@ -2,7 +2,8 @@
   "creatorCard": {
     "followers": "{{platform}}: Follower",
     "subscribers": "{{platform}}: Abonnenten",
-    "offer": "Angebot"
+    "offer": "Angebot",
+    "ecpeTitle": "Expected Cost per Engagement (Preis / (Follower × Engagement-Rate))"
   },
   "common": {
     "appName": "winfluence",

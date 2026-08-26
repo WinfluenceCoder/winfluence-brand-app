@@ -1,5 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { GripVertical, Instagram, User, Youtube } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -8,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { TikTokIcon } from "@/components/app/CreatorsTable";
 import {
   formatChf,
+  formatEcpe,
   formatMatchPercent,
   formatNumberCh,
   matchBadgeClasses,
@@ -69,6 +71,18 @@ export function CreatorMiniCardBody({
   const matchLabel = formatMatchPercent(collab.match);
   const hasOffer = Boolean(collab.platform || collab.post_type);
 
+  const ecpe = useMemo(() => {
+    const followers = c.instagram_followers;
+    const rate = c.instagram_engagement_rate;
+    const price = collab.price;
+    if (followers == null || followers <= 0 || rate == null || price == null) {
+      return null;
+    }
+    const engagements = followers * (rate / 100);
+    if (engagements <= 0) return null;
+    return price / engagements;
+  }, [c.instagram_followers, c.instagram_engagement_rate, collab.price]);
+
   return (
     <div className="flex gap-3 p-3">
       {dragHandle}
@@ -126,6 +140,12 @@ export function CreatorMiniCardBody({
             rate={c.youtube_engagement_rate}
             title={t("creatorCard.subscribers", { platform: "YouTube" })}
           />
+          <span
+            className="ml-auto shrink-0 rounded bg-primary/10 px-1.5 py-0.5 text-xs font-semibold tabular-nums text-primary"
+            title={t("creatorCard.ecpeTitle")}
+          >
+            {ecpe != null ? `ECPE: ${formatEcpe(ecpe)}` : "ECPE: –"}
+          </span>
         </div>
         {hasOffer ? (
           <p className="text-xs text-muted-foreground">
