@@ -21,7 +21,7 @@ Bleibt eigenständig (kein Import von `CreatorMiniCard`), rendert zwei Varianten
 ## Performance-Card (`MonitoringPerformanceCard.tsx`)
 
 - Neue Props `{ delivered: MonitoringCollab[]; barterValue: number | null }`.
-- `useMemo` summiert ausschliesslich über gelieferte Collabs: Reichweite, Likes, Kommentare, Shares (`?? 0`), daraus Engagements, effektive Engagement Rate (Engagements/Reichweite in %), Cash (Summe Preise), Barter (Anzahl × Warenwert), eCPM (Cash/Reichweite × 1000) und eCPE (Cash/Engagements); Quotienten `null`, wenn der Divisor 0 ist.
+- `useMemo` summiert ausschliesslich über gelieferte/approved Collabs: Reichweite, Likes, Kommentare, Shares (`?? 0`), daraus Engagements, effektive Engagement Rate (Engagements/Reichweite in %), Cash (Summe Preise), Barter (Anzahl × Warenwert), eCPM (Cash/Reichweite × 1000) und eCPE (Cash/Engagements); Quotienten `null`, wenn der Divisor 0 ist.
 - Titel «Performance effektiv». Links 5 Zeilen (Reichweite, Likes, Kommentare, Shares, effektive Engagement Rate), rechts 5 Zeilen (Kosten Cash, Kosten Barter, eCPM, eCPE, Zielerreichung fix `--`), gleiches `Metric`-Layout wie bisher.
 
 ## Route (`campaigns.monitor.$id.tsx`)
