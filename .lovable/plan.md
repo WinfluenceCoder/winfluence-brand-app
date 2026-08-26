@@ -4,7 +4,7 @@ Ergänzung der Creator-Karte auf `/campaigns/curate/$id` um den Kennwert **ECPE*
 
 ## Was sich für dich ändert
 
-- Auf jeder Creator-Karte erscheint rechts in der Social-Stat-Zeile (dieselbe Zeile wie Instagram/TikTok/YouTube) ein hervorgehobener Wert «ECPE: CHF 0.05».
+- Auf jeder Creator-Karte erscheint rechts in der Social-Stat-Zeile (dieselbe Zeile wie Instagram/TikTok/YouTube) ein hervorgehobener Wert «ECPE: 0.05» (ohne CHF-Präfix).
 - Berechnet aus Instagram-Followern × Engagement-Rate und dem Collab-Preis.
 - Fehlen Instagram-Follower, Engagement-Rate oder Preis → zeigt `–`.
 
@@ -38,17 +38,16 @@ In `CreatorMiniCardBody`:
     {ecpe != null ? `ECPE: ${formatEcpe(ecpe)}` : "ECPE: –"}
   </span>
   ```
+  `formatEcpe` liefert eine reine Zahl (z. B. `0.0516`), kein CHF-Präfix.
   «Hervorgehoben» = `text-primary` + dezenter `bg-primary/10`-Hintergrund (passt zum bestehenden Design-System, keine hartcodierten Farben).
 - Die ECPE-Berechnung wird auch dann gerendert, wenn kein Social-Stat vorhanden ist (die Zeile existiert immer, da ECPE nicht von einer Social-URL abhängt). Die Zeile soll also immer gerendert werden, nicht nur wenn mindestens ein Social-Stat gesetzt ist — dafür nötigenfalls die `flex-wrap`-Zeile immer ausgeben (aktuell wird sie immer gerendert, SocialStat gibt nur intern `null` zurück; also keine Strukturänderung nötig).
 
 ### Formatierung `formatEcpe`
 
-ECPE-Werte sind oft klein (< 0.10). `formatChf` (2 Nachkommastellen) würde zu `CHF 0.00` bei Werten < 0.005. Daher neue Helferfunktion in `src/lib/campaign-curation.ts`:
+ECPE-Werte sind oft klein (< 0.10) und sollen ohne CHF-Präfix als reine Zahl erscheinen. Neue Helferfunktion in `src/lib/campaign-curation.ts`:
 
 ```ts
 const ef = new Intl.NumberFormat("de-CH", {
-  style: "currency",
-  currency: "CHF",
   minimumFractionDigits: 2,
   maximumFractionDigits: 4,
 });
@@ -57,7 +56,7 @@ export function formatEcpe(value: number | null | undefined): string {
 }
 ```
 
-So bleibt `CHF 0.0516` sichtbar; ab 1 CHF reicht die Standardanzeige.
+So bleibt `0.0516` sichtbar; ab 1 reicht die Standardanzeige (z. B. `1.25`).
 
 ### i18n (`src/locales/de.json`)
 
