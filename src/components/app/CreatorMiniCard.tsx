@@ -71,6 +71,18 @@ export function CreatorMiniCardBody({
   const matchLabel = formatMatchPercent(collab.match);
   const hasOffer = Boolean(collab.platform || collab.post_type);
 
+  const ecpe = useMemo(() => {
+    const followers = c.instagram_followers;
+    const rate = c.instagram_engagement_rate;
+    const price = collab.price;
+    if (followers == null || followers <= 0 || rate == null || price == null) {
+      return null;
+    }
+    const engagements = followers * (rate / 100);
+    if (engagements <= 0) return null;
+    return price / engagements;
+  }, [c.instagram_followers, c.instagram_engagement_rate, collab.price]);
+
   return (
     <div className="flex gap-3 p-3">
       {dragHandle}
