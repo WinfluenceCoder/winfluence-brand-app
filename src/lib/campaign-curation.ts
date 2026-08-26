@@ -67,13 +67,13 @@ type Raw = {
   creator: RawCreator | null;
 };
 
-function toNumber(value: number | string | null | undefined): number | null {
+export function toNumber(value: number | string | null | undefined): number | null {
   if (value === null || value === undefined || value === "") return null;
   const n = Number(value);
   return Number.isNaN(n) ? null : n;
 }
 
-function mapCreator(c: RawCreator): CurationCreator {
+export function mapCreator(c: RawCreator): CurationCreator {
   return {
     ...c,
     instagram_engagement_rate: toNumber(c.instagram_engagement_rate),
