@@ -1,5 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { GripVertical, Instagram, User, Youtube } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -8,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { TikTokIcon } from "@/components/app/CreatorsTable";
 import {
   formatChf,
+  formatEcpe,
   formatMatchPercent,
   formatNumberCh,
   matchBadgeClasses,
