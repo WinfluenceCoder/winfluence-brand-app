@@ -89,6 +89,7 @@ function MonitorCampaignPage() {
     campaign_visual_url: string | null;
     ende: string | null;
     status: string | null;
+    barter_value: number | null;
   } | null;
 
   const monitoring = useQuery(monitoringQueryOptions(campaignId));
@@ -109,7 +110,9 @@ function MonitorCampaignPage() {
 
   const rows = monitoring.data ?? [];
   const hired = rows.filter((c) => c.status === "hired" || c.status === "working");
-  const delivered = rows.filter((c) => c.status === "delivered");
+  const delivered = rows.filter(
+    (c) => c.status === "delivered" || c.status === "approved",
+  );
 
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-8">
