@@ -38,6 +38,7 @@ In `CreatorMiniCardBody`:
     {ecpe != null ? `ECPE: ${formatEcpe(ecpe)}` : "ECPE: –"}
   </span>
   ```
+  `formatEcpe` liefert eine reine Zahl (z. B. `0.0516`), kein CHF-Präfix.
   «Hervorgehoben» = `text-primary` + dezenter `bg-primary/10`-Hintergrund (passt zum bestehenden Design-System, keine hartcodierten Farben).
 - Die ECPE-Berechnung wird auch dann gerendert, wenn kein Social-Stat vorhanden ist (die Zeile existiert immer, da ECPE nicht von einer Social-URL abhängt). Die Zeile soll also immer gerendert werden, nicht nur wenn mindestens ein Social-Stat gesetzt ist — dafür nötigenfalls die `flex-wrap`-Zeile immer ausgeben (aktuell wird sie immer gerendert, SocialStat gibt nur intern `null` zurück; also keine Strukturänderung nötig).
 
