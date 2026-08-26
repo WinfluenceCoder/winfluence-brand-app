@@ -23,7 +23,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CreatorMiniCard, CreatorMiniCardBody } from "@/components/app/CreatorMiniCard";
-import { CreatorProfileDialog } from "@/components/app/CreatorProfileDialog";
+import { CollabDialog } from "@/components/app/CollabDialog";
 import { CampaignCalculationCard } from "@/components/app/CampaignCalculationCard";
 import {
   loadAppliedOrder,
@@ -303,8 +303,8 @@ export function CurationBoard({
         </DragOverlay>
       </DndContext>
 
-      <CreatorProfileDialog
-        creator={profile?.creator ?? null}
+      <CollabDialog
+        collab={profile}
         open={profile != null}
         onOpenChange={(open) => {
           if (!open) setProfile(null);

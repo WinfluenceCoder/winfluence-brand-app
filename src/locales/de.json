@@ -780,5 +780,19 @@
       "agency": "Agentur",
       "stars": "Sterne"
     }
+  },
+  "collabDialog": {
+    "title": "Collab mit {{name}}",
+    "application": "Bewerbung",
+    "noPitch": "Kein Pitch hinterlegt",
+    "creatorRemark": "Bemerkung Creator",
+    "rank": "Rang",
+    "confirmationPending": "Bestätigung ausstehend – der Creator hat die Beauftragung noch nicht bestätigt.",
+    "deliveryPending": "Lieferung ausstehend – der Creator arbeitet am Beitrag.",
+    "delivery": "Lieferung",
+    "noDeliveryNote": "Keine Notiz zur Lieferung",
+    "noContentLinked": "Noch kein Beitrag verknüpft.",
+    "uploadedAt": "Veröffentlicht",
+    "rating": "Bewertung"
   }
 }
