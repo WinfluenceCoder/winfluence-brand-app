@@ -44,12 +44,10 @@ In `CreatorMiniCardBody`:
 
 ### Formatierung `formatEcpe`
 
-ECPE-Werte sind oft klein (< 0.10). `formatChf` (2 Nachkommastellen) würde zu `CHF 0.00` bei Werten < 0.005. Daher neue Helferfunktion in `src/lib/campaign-curation.ts`:
+ECPE-Werte sind oft klein (< 0.10) und sollen ohne CHF-Präfix als reine Zahl erscheinen. Neue Helferfunktion in `src/lib/campaign-curation.ts`:
 
 ```ts
 const ef = new Intl.NumberFormat("de-CH", {
-  style: "currency",
-  currency: "CHF",
   minimumFractionDigits: 2,
   maximumFractionDigits: 4,
 });
@@ -58,7 +56,7 @@ export function formatEcpe(value: number | null | undefined): string {
 }
 ```
 
-So bleibt `CHF 0.0516` sichtbar; ab 1 CHF reicht die Standardanzeige.
+So bleibt `0.0516` sichtbar; ab 1 reicht die Standardanzeige (z. B. `1.25`).
 
 ### i18n (`src/locales/de.json`)
 
