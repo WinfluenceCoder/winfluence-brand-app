@@ -37,7 +37,10 @@ import {
   formatNumberCh,
   matchBadgeClasses,
 } from "@/lib/campaign-curation";
-import { effectiveCpe } from "@/lib/campaign-monitoring";
+import {
+  effectiveCpe,
+  type MonitoringCollab,
+} from "@/lib/campaign-monitoring";
 import {
   collabStatus,
   showContact,
@@ -205,6 +208,14 @@ export function CollabDialog({
   const rating = collab?.brand_rating ?? null;
   const content = collab?.content ?? null;
   const isDelivered = status === "delivered" || status === "approved";
+  const cpe =
+    collab && content
+      ? effectiveCpe({
+          ...collab,
+          delivery_note: collab.delivery_note ?? null,
+          content,
+        } as MonitoringCollab)
+      : null;
 
   const application = collab ? (
     <div className="space-y-2">
@@ -349,7 +360,7 @@ export function CollabDialog({
                 {t("collabDialog.uploadedAt")}: {formatDate(content.uploaded_at)}
               </span>
               <span className="text-xs font-semibold tabular-nums">
-                eCPE: {formatChf(effectiveCpe({ ...collab, content } as never)) || "–"}
+                eCPE: {formatChf(cpe)}
               </span>
             </div>
           </div>
