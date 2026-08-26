@@ -140,6 +140,12 @@ export function CreatorMiniCardBody({
             rate={c.youtube_engagement_rate}
             title={t("creatorCard.subscribers", { platform: "YouTube" })}
           />
+          <span
+            className="ml-auto shrink-0 rounded bg-primary/10 px-1.5 py-0.5 text-xs font-semibold tabular-nums text-primary"
+            title={t("creatorCard.ecpeTitle")}
+          >
+            {ecpe != null ? `ECPE: ${formatEcpe(ecpe)}` : "ECPE: –"}
+          </span>
         </div>
         {hasOffer ? (
           <p className="text-xs text-muted-foreground">
