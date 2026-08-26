@@ -44,7 +44,7 @@ export const CREATOR_FIELDS =
   "id, nick_name, first_name, last_name, foto_url, e_mail_address, mobile, insta_url, tiktok_url, youtube_url, linkedin_url, status, address_street, address_nr, address_zip, address_city, company_legal_name, instagram_followers, instagram_engagement_rate, tiktok_followers, tiktok_engagement_rate, youtube_subscribers, youtube_engagement_rate, stats_fetched_at";
 
 /** Rohform der View: numeric-Spalten liefert PostgREST als String. */
-type RawCreator = Omit<
+export type RawCreator = Omit<
   CurationCreator,
   | "instagram_engagement_rate"
   | "tiktok_engagement_rate"
