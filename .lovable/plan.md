@@ -16,7 +16,7 @@ Die Monitoring-Seite lädt Creator-Stammdaten künftig aus der View `creator_sed
 Bleibt eigenständig (kein Import von `CreatorMiniCard`), rendert zwei Varianten:
 
 - **hired / working:** Layout wie auf /curate — Avatar + Match-Badge, Zeile mit Nickname, Status-Badge und Preis, Social-Zeile (lokale `SocialStat`-Kopie: Instagram mit Follower + Rate, TikTok, YouTube; `–` bei `null`, Link nur bei vorhandener URL), «Angebot»-Zeile, Pitch mit `line-clamp-3`. Keine ECPE-Anzeige.
-- **delivered:** Avatar + Match-Badge, Zeile mit Nickname, schwarzem Status-Badge, External-Link-Icon (nur wenn `content.platform_link` gesetzt, öffnet neuen Tab, stoppt den Karten-Klick) und Preis. Keine Follower-Zeile. Darunter «geliefert: platform · post_type» links und hervorgehoben `eCPE: …` rechts, dann die Metrik-Zeile mit Eye/Heart/MessageCircle/Share2 (nur wenn Content vorhanden, `–` bei `null`) und schliesslich `delivery_note` mit `line-clamp-3`.
+- **delivered / approved:** Avatar + Match-Badge, Zeile mit Nickname, schwarzem Status-Badge, External-Link-Icon (nur wenn `content.platform_link` gesetzt, öffnet neuen Tab, stoppt den Karten-Klick) und Preis. Keine Follower-Zeile. Darunter «geliefert: platform · post_type» links und hervorgehoben `eCPE: …` rechts, dann die Metrik-Zeile mit Eye/Heart/MessageCircle/Share2 (nur wenn Content vorhanden, `–` bei `null`) und schliesslich `delivery_note` mit `line-clamp-3`.
 
 ## Performance-Card (`MonitoringPerformanceCard.tsx`)
 
