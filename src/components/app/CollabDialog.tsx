@@ -360,7 +360,7 @@ export function CollabDialog({
                 {t("collabDialog.uploadedAt")}: {formatDate(content.uploaded_at)}
               </span>
               <span className="text-xs font-semibold tabular-nums">
-                eCPE: {formatChf(cpe)}
+                eCPE: {cpe == null ? "–" : formatChf(cpe)}
               </span>
             </div>
           </div>

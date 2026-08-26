@@ -7,7 +7,7 @@ import { ChevronLeft } from "lucide-react";
 
 import { getMyCampaign } from "@/lib/campaigns.functions";
 import { CampaignCard } from "@/components/app/CampaignCard";
-import { CreatorProfileDialog } from "@/components/app/CreatorProfileDialog";
+import { CollabDialog } from "@/components/app/CollabDialog";
 import { MonitoringCreatorCard } from "@/components/app/MonitoringCreatorCard";
 import { MonitoringPerformanceCard } from "@/components/app/MonitoringPerformanceCard";
 import {
@@ -194,8 +194,8 @@ function MonitorCampaignPage() {
         </>
       )}
 
-      <CreatorProfileDialog
-        creator={profile?.creator ?? null}
+      <CollabDialog
+        collab={profile}
         open={profile != null}
         onOpenChange={(open) => {
           if (!open) setProfile(null);

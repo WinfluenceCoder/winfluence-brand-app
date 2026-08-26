@@ -16,11 +16,18 @@ export type DeliveredContent = {
   comments: number | null;
   shares: number | null;
   platform_link: string | null;
+  image_url: string | null;
+  video_url: string | null;
+  caption: string | null;
+  uploaded_at: string | null;
 };
 
 export type MonitoringCollab = CurationCollab & {
   delivery_note: string | null;
   content: DeliveredContent | null;
+  brand_rating: number | null;
+  brand_feedback: string | null;
+  creator_remark: string | null;
 };
 
 /** Status der rechten Spalte: gelieferte oder freigegebene Beiträge. */
@@ -39,6 +46,9 @@ type Raw = {
   platform: string | null;
   post_type: string | null;
   delivery_note: string | null;
+  brand_rating: number | null;
+  brand_feedback: string | null;
+  creator_remark: string | null;
   creator: RawCreator | null;
   content: RawContent | null;
 };
@@ -59,7 +69,7 @@ function describe(error: {
     .join(" | ");
 }
 
-const MONITORING_SELECT = `id, status, price, pitch, rank, match, platform, post_type, delivery_note, creator:creator_sedcard!inner(${CREATOR_FIELDS}), content:creator_content(id, platform, content_type, reach, likes, comments, shares, platform_link)`;
+const MONITORING_SELECT = `id, status, price, pitch, rank, match, platform, post_type, delivery_note, brand_rating, brand_feedback, creator_remark, creator:creator_sedcard!inner(${CREATOR_FIELDS}), content:creator_content(id, platform, content_type, reach, likes, comments, shares, platform_link, image_url, video_url, caption, uploaded_at)`;
 
 async function fetchMonitoringCollabs(campaignId: number): Promise<MonitoringCollab[]> {
   const { data, error } = await supabase
@@ -87,6 +97,9 @@ async function fetchMonitoringCollabs(campaignId: number): Promise<MonitoringCol
       platform: r.platform,
       post_type: r.post_type,
       delivery_note: r.delivery_note,
+      brand_rating: r.brand_rating,
+      brand_feedback: r.brand_feedback,
+      creator_remark: r.creator_remark,
       content: r.content ?? null,
       creator: mapCreator(r.creator),
     }));
