@@ -1,16 +1,33 @@
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { CurationCollab, CurationCreator } from "@/lib/campaign-curation";
+import {
+  CREATOR_FIELDS,
+  mapCreator,
+  type CurationCollab,
+  type RawCreator,
+} from "@/lib/campaign-curation";
 
-export type MonitoringCollab = CurationCollab & {
+export type DeliveredContent = {
+  id: string;
   platform: string | null;
-  post_type: string | null;
+  content_type: string | null;
+  reach: number | null;
+  likes: number | null;
+  comments: number | null;
+  shares: number | null;
+  platform_link: string | null;
 };
 
-const CREATOR_FIELDS =
-  "id, nick_name, first_name, last_name, foto_url, e_mail_address, mobile, insta_url, tiktok_url, youtube_url, linkedin_url, status, address_street, address_nr, address_zip, address_city, company_legal_name";
+export type MonitoringCollab = CurationCollab & {
+  delivery_note: string | null;
+  content: DeliveredContent | null;
+};
 
-const MONITORING_STATUSES = ["hired", "working", "delivered"] as const;
+/** Status der rechten Spalte: gelieferte oder freigegebene Beiträge. */
+export const DELIVERED_STATUSES = ["delivered", "approved"] as const;
+const MONITORING_STATUSES = ["hired", "working", ...DELIVERED_STATUSES] as const;
+
+type RawContent = DeliveredContent;
 
 type Raw = {
   id: number;
@@ -21,7 +38,9 @@ type Raw = {
   match: number | null;
   platform: string | null;
   post_type: string | null;
-  creators: CurationCreator | null;
+  delivery_note: string | null;
+  creator: RawCreator | null;
+  content: RawContent | null;
 };
 
 function describe(error: {
@@ -40,12 +59,12 @@ function describe(error: {
     .join(" | ");
 }
 
+const MONITORING_SELECT = `id, status, price, pitch, rank, match, platform, post_type, delivery_note, creator:creator_sedcard!inner(${CREATOR_FIELDS}), content:creator_content(id, platform, content_type, reach, likes, comments, shares, platform_link)`;
+
 async function fetchMonitoringCollabs(campaignId: number): Promise<MonitoringCollab[]> {
   const { data, error } = await supabase
     .from("collabs")
-    .select(
-      `id, status, price, pitch, rank, match, platform, post_type, creators!inner(${CREATOR_FIELDS})`,
-    )
+    .select(MONITORING_SELECT)
     .eq("campaign_id", campaignId)
     .in("status", [...MONITORING_STATUSES])
     .order("rank", { ascending: true })
@@ -57,7 +76,7 @@ async function fetchMonitoringCollabs(campaignId: number): Promise<MonitoringCol
   }
 
   return (data ?? [])
-    .filter((r): r is Raw & { creators: CurationCreator } => r.creators != null)
+    .filter((r): r is Raw & { creator: RawCreator } => r.creator != null)
     .map((r) => ({
       id: r.id,
       status: r.status,
@@ -67,7 +86,9 @@ async function fetchMonitoringCollabs(campaignId: number): Promise<MonitoringCol
       match: r.match,
       platform: r.platform,
       post_type: r.post_type,
-      creator: r.creators,
+      delivery_note: r.delivery_note,
+      content: r.content ?? null,
+      creator: mapCreator(r.creator),
     }));
 }
 
@@ -76,4 +97,24 @@ export function monitoringQueryOptions(campaignId: number) {
     queryKey: ["campaign-monitoring", campaignId] as const,
     queryFn: () => fetchMonitoringCollabs(campaignId),
   });
+}
+
+/** Engagements = likes + comments + shares. null, wenn kein Content oder alle drei null. */
+export function contentEngagements(c: DeliveredContent | null): number | null {
+  if (!c) return null;
+  const likes = c.likes ?? 0;
+  const comments = c.comments ?? 0;
+  const shares = c.shares ?? 0;
+  const sum = likes + comments + shares;
+  if (sum === 0 && c.likes === null && c.comments === null && c.shares === null) {
+    return null;
+  }
+  return sum;
+}
+
+/** eCPE = price / engagements. null, wenn engagements null/0 oder price null. */
+export function effectiveCpe(collab: MonitoringCollab): number | null {
+  const engagements = contentEngagements(collab.content);
+  if (engagements === null || engagements <= 0 || collab.price === null) return null;
+  return collab.price / engagements;
 }

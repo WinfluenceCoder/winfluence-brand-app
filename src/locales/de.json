@@ -549,16 +549,20 @@
       "deliveredTitle": "geliefert haben",
       "deliveredEmpty": "Noch keine Lieferungen erhalten",
       "endCampaign": "Kampagne beenden",
+      "deliveredLabel": "geliefert",
+      "openContent": "Original-Beitrag öffnen",
       "performance": {
-        "title": "Performance",
-        "impressions": "Impressions",
+        "title": "Performance effektiv",
         "reach": "Reichweite",
-        "engagementRate": "Engagement Rate",
-        "clicks": "Klicks",
-        "cpm": "Cost per Mille (CPM)",
-        "cpe": "Cost per Engagement (CPE)",
+        "likes": "Likes",
+        "comments": "Kommentare",
+        "shares": "Shares",
+        "effectiveEngagementRate": "effektive Engagement Rate",
         "costCash": "Kosten Cash",
-        "costBarter": "Kosten Barter"
+        "costBarter": "Kosten Barter",
+        "eCpm": "effektive Cost per Mille (eCPM)",
+        "eCpe": "effektive Cost per Engagement (eCPE)",
+        "goalAchievement": "Zielerreichung"
       }
     }
   },
