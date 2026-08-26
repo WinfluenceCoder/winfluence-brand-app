@@ -173,6 +173,16 @@ export function formatChf(value: number | null | undefined): string {
   return cf.format(value ?? 0);
 }
 
+const ef = new Intl.NumberFormat("de-CH", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 4,
+});
+
+/** ECPE als reine Zahl ohne CHF-Präfix, z. B. 0.0516 -> "0.0516". */
+export function formatEcpe(value: number | null | undefined): string {
+  return ef.format(value ?? 0);
+}
+
 /** Match-Wert (0..1) als Prozent mit einer Dezimalstelle, z. B. 0.765 -> "76.5%". */
 export function formatMatchPercent(value: number | null | undefined): string | null {
   if (value === null || value === undefined || Number.isNaN(value)) return null;
