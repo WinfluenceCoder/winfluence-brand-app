@@ -150,7 +150,10 @@ function MonitorCampaignPage() {
         <InfoCard>{t("campaigns.monitor.notRunning")}</InfoCard>
       ) : (
         <>
-          <MonitoringPerformanceCard />
+          <MonitoringPerformanceCard
+            delivered={delivered}
+            barterValue={campaign?.barter_value ?? null}
+          />
 
           {monitoring.isLoading ? (
             <InfoCard>{t("campaigns.monitor.loading")}</InfoCard>
