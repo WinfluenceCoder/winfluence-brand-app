@@ -4,7 +4,7 @@ Ergänzung der Creator-Karte auf `/campaigns/curate/$id` um den Kennwert **ECPE*
 
 ## Was sich für dich ändert
 
-- Auf jeder Creator-Karte erscheint rechts in der Social-Stat-Zeile (dieselbe Zeile wie Instagram/TikTok/YouTube) ein hervorgehobener Wert «ECPE: CHF 0.05».
+- Auf jeder Creator-Karte erscheint rechts in der Social-Stat-Zeile (dieselbe Zeile wie Instagram/TikTok/YouTube) ein hervorgehobener Wert «ECPE: 0.05» (ohne CHF-Präfix).
 - Berechnet aus Instagram-Followern × Engagement-Rate und dem Collab-Preis.
 - Fehlen Instagram-Follower, Engagement-Rate oder Preis → zeigt `–`.
 
