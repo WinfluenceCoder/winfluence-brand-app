@@ -398,7 +398,7 @@ export function CollabDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-h-[85vh] overflow-y-auto pt-8 sm:max-w-2xl"
+        className="max-h-[85vh] overflow-y-auto pt-14 sm:max-w-2xl"
         closeClassName="bg-primary text-primary-foreground opacity-100 hover:opacity-100 rounded-md p-1.5 [&_svg]:h-5 [&_svg]:w-5"
       >
         <DialogHeader className="sr-only">
