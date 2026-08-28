@@ -520,14 +520,21 @@ export function CollabDialog({
               </>
             )}
 
-            <Separator />
-            <div className="flex justify-end gap-2">
-              {actions ?? (
-                <Button variant="outline" onClick={() => onOpenChange(false)}>
-                  {t("common.close")}
-                </Button>
-              )}
-            </div>
+            {showApproval && campaignId != null && brandId != null ? (
+              <CollabApprovalPanel
+                key={collab.id}
+                collab={collab}
+                campaignId={campaignId}
+                brandId={brandId}
+                onDone={() => onOpenChange(false)}
+                closeSlot={closeSlot}
+              />
+            ) : (
+              <>
+                <Separator />
+                <div className="flex justify-end gap-2">{closeSlot}</div>
+              </>
+            )}
             </div>
           </div>
         ) : null}
