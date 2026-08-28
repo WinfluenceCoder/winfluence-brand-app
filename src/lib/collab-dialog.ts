@@ -3,7 +3,10 @@ import type { DeliveredContent } from "@/lib/campaign-monitoring";
 
 /** Gemeinsamer Datenvertrag für CollabDialog. Delivery-/Rating-Felder sind optional,
  *  damit sowohl Curation- als auch Monitoring-Loader den Typ erfüllen. */
+export type CollabApproval = "rejected" | "approved" | "expectations_exceeded";
+
 export type CollabDialogData = CurationCollab & {
+  approval?: CollabApproval | null;
   delivery_note?: string | null;
   content?: DeliveredContent | null;
   brand_rating?: number | null;
@@ -18,6 +21,7 @@ export const COLLAB_STATUSES = [
   "working",
   "delivered",
   "approved",
+  "rejected",
 ] as const;
 export type CollabStatus = (typeof COLLAB_STATUSES)[number];
 
