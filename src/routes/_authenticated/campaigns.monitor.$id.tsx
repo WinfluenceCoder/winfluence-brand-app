@@ -15,6 +15,7 @@ import {
   type MonitoringCollab,
 } from "@/lib/campaign-monitoring";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/campaigns/monitor/$id")({
@@ -25,11 +26,13 @@ function Column({
   title,
   emptyText,
   items,
+  rejected,
   onOpen,
 }: {
   title: string;
   emptyText: string;
   items: MonitoringCollab[];
+  rejected?: MonitoringCollab[];
   onOpen: (c: MonitoringCollab) => void;
 }) {
   return (
@@ -42,10 +45,18 @@ function Column({
           {items.map((c) => (
             <MonitoringCreatorCard key={c.id} collab={c} onOpen={onOpen} />
           ))}
-          {items.length === 0 ? (
+          {items.length === 0 && (rejected?.length ?? 0) === 0 ? (
             <p className="py-10 text-center text-sm text-muted-foreground">
               {emptyText}
             </p>
+          ) : null}
+          {rejected && rejected.length > 0 ? (
+            <>
+              <Separator />
+              {rejected.map((c) => (
+                <MonitoringCreatorCard key={c.id} collab={c} onOpen={onOpen} />
+              ))}
+            </>
           ) : null}
         </div>
       </CardContent>
@@ -90,6 +101,7 @@ function MonitorCampaignPage() {
     ende: string | null;
     status: string | null;
     barter_value: number | null;
+    brand_id: number | null;
   } | null;
 
   const monitoring = useQuery(monitoringQueryOptions(campaignId));
@@ -113,6 +125,7 @@ function MonitorCampaignPage() {
   const delivered = rows.filter(
     (c) => c.status === "delivered" || c.status === "approved",
   );
+  const rejected = rows.filter((c) => c.status === "rejected");
 
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-8">
@@ -152,6 +165,7 @@ function MonitorCampaignPage() {
         <>
           <MonitoringPerformanceCard
             delivered={delivered}
+            barterCount={delivered.length + rejected.length}
             barterValue={campaign?.barter_value ?? null}
           />
 
@@ -183,6 +197,7 @@ function MonitorCampaignPage() {
                 title={t("campaigns.monitor.deliveredTitle")}
                 emptyText={t("campaigns.monitor.deliveredEmpty")}
                 items={delivered}
+                rejected={rejected}
                 onOpen={setProfile}
               />
             </div>
@@ -196,6 +211,8 @@ function MonitorCampaignPage() {
 
       <CollabDialog
         collab={profile}
+        campaignId={campaignId}
+        brandId={campaign?.brand_id ?? null}
         open={profile != null}
         onOpenChange={(open) => {
           if (!open) setProfile(null);
