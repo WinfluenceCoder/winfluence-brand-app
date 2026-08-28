@@ -41,6 +41,17 @@ function statusVariant(
   }
 }
 
+/** Badge-Farben der rechten Spalte: delivered schwarz, approved grün, rejected dezent rot. */
+function deliveredBadgeClasses(status: string | null): string {
+  if (status === "approved") {
+    return "border-transparent bg-emerald-600 text-white";
+  }
+  if (status === "rejected") {
+    return "border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300";
+  }
+  return "border-transparent bg-foreground text-background";
+}
+
 function SocialStat({
   url,
   Icon,
@@ -184,9 +195,7 @@ function DeliveredBody({ collab }: { collab: MonitoringCollab }) {
           <span className="truncate text-sm font-medium">
             {c.nick_name || fullName || "–"}
           </span>
-          <Badge
-            className="shrink-0 border-transparent bg-foreground text-background"
-          >
+          <Badge className={cn("shrink-0", deliveredBadgeClasses(collab.status))}>
             {creatorStatusLabel(t, collab.status)}
           </Badge>
           {content?.platform_link ? (
@@ -251,7 +260,10 @@ export function MonitoringCreatorCard({
   collab: MonitoringCollab;
   onOpen: (collab: MonitoringCollab) => void;
 }) {
-  const isDelivered = collab.status === "delivered" || collab.status === "approved";
+  const isDelivered =
+    collab.status === "delivered" ||
+    collab.status === "approved" ||
+    collab.status === "rejected";
   return (
     <Card
       onClick={() => onOpen(collab)}

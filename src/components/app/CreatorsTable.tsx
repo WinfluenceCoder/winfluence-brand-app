@@ -61,6 +61,10 @@ export function creatorStatusLabel(t: (k: string) => string, s: string | null) {
       return t("creatorsList.status.working");
     case "delivered":
       return t("creatorsList.status.delivered");
+    case "approved":
+      return t("creatorsList.status.approved");
+    case "rejected":
+      return t("creatorsList.status.rejected");
     default:
       return s ?? "–";
   }

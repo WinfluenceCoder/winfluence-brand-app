@@ -447,7 +447,9 @@
       "selected": "Ausgewählt",
       "hired": "Beauftragt",
       "working": "In Arbeit",
-      "delivered": "Geliefert"
+      "delivered": "Geliefert",
+      "approved": "Genehmigt",
+      "rejected": "Zurückgewiesen"
     },
     "actions": {
       "openMenu": "Menü öffnen",
@@ -793,6 +795,22 @@
     "noDeliveryNote": "Keine Notiz zur Lieferung",
     "noContentLinked": "Noch kein Beitrag verknüpft.",
     "uploadedAt": "Veröffentlicht",
-    "rating": "Bewertung"
+    "rating": "Bewertung",
+    "approval": {
+      "title": "Lieferung genehmigen",
+      "approveButton": "Lieferung genehmigen",
+      "rejectButton": "Lieferung zurückweisen",
+      "fulfillment": "Auftragserfüllung",
+      "notFulfilled": "nicht erfüllt",
+      "fulfilled": "erfüllt",
+      "exceeded": "Erwartungen übertroffen",
+      "rating": "Bewertung des Resultates",
+      "starLabel": "{{count}} von 5 Sternen",
+      "feedback": "Mitteilung an den Creator",
+      "feedbackMin": "Mindestens 20 Zeichen",
+      "addFavorite": "Influencer zu den persönlichen Favoriten hinzufügen?",
+      "toastApproved": "Lieferung genehmigt",
+      "toastRejected": "Lieferung zurückgewiesen"
+    }
   }
 }

@@ -19,9 +19,13 @@ function sum(delivered: MonitoringCollab[], pick: (c: MonitoringCollab) => numbe
 
 export function MonitoringPerformanceCard({
   delivered,
+  barterCount,
   barterValue,
 }: {
+  /** delivered + approved – Basis aller Kennzahlen ausser Barter. */
   delivered: MonitoringCollab[];
+  /** delivered + approved + rejected – das Barter-Produkt wurde immer versandt. */
+  barterCount: number;
   barterValue: number | null;
 }) {
   const { t } = useTranslation();
@@ -35,7 +39,7 @@ export function MonitoringPerformanceCard({
 
     const effectiveEngagementRate = reach > 0 ? (engagements / reach) * 100 : null;
     const cash = delivered.reduce((s, c) => s + (c.price ?? 0), 0);
-    const barter = delivered.length * (barterValue ?? 0);
+    const barter = barterCount * (barterValue ?? 0);
     const eCpm = reach > 0 ? (cash / reach) * 1000 : null;
     const eCpe = engagements > 0 ? cash / engagements : null;
 
@@ -50,7 +54,7 @@ export function MonitoringPerformanceCard({
       eCpm,
       eCpe,
     };
-  }, [delivered, barterValue]);
+  }, [delivered, barterCount, barterValue]);
 
   return (
     <Card>
