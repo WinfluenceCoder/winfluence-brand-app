@@ -551,6 +551,8 @@
       "deliveredTitle": "geliefert haben",
       "deliveredEmpty": "Noch keine Lieferungen erhalten",
       "endCampaign": "Kampagne beenden",
+      "endSuccess": "Kampagne wurde beendet.",
+      "endError": "Kampagne konnte nicht beendet werden.",
       "deliveredLabel": "geliefert",
       "openContent": "Original-Beitrag öffnen",
       "performance": {

@@ -1,11 +1,12 @@
 import { useState, type ReactNode } from "react";
-import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute, useRouter, useNavigate } from "@tanstack/react-router";
+import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import { ChevronLeft } from "lucide-react";
 
-import { getMyCampaign } from "@/lib/campaigns.functions";
+import { endCampaign, getMyCampaign } from "@/lib/campaigns.functions";
 import { CampaignCard } from "@/components/app/CampaignCard";
 import { CollabDialog } from "@/components/app/CollabDialog";
 import { MonitoringCreatorCard } from "@/components/app/MonitoringCreatorCard";
@@ -86,6 +87,9 @@ function MonitorCampaignPage() {
   const router = useRouter();
   const { t } = useTranslation();
   const fetchCampaign = useServerFn(getMyCampaign);
+  const endCampaignFn = useServerFn(endCampaign);
+  const queryClient = useQueryClient();
+  const navigate = useNavigate({ from: Route.fullPath });
   const [profile, setProfile] = useState<MonitoringCollab | null>(null);
 
   const { data } = useSuspenseQuery({
@@ -126,6 +130,26 @@ function MonitorCampaignPage() {
     (c) => c.status === "delivered" || c.status === "approved",
   );
   const rejected = rows.filter((c) => c.status === "rejected");
+
+  const nowMs = Date.now();
+  const endeMs = campaign?.ende ? new Date(campaign.ende).getTime() : null;
+  const expired = endeMs != null && !Number.isNaN(endeMs) && nowMs > endeMs;
+  const allDelivered =
+    monitoring.data != null &&
+    rows.every((c) => c.status !== "hired" && c.status !== "working");
+  const canEnd = expired || allDelivered;
+
+  const endMutation = useMutation({
+    mutationFn: () => endCampaignFn({ data: { id: campaignId } }),
+    onSuccess: () => {
+      toast.success(t("campaigns.monitor.endSuccess"));
+      void queryClient.invalidateQueries({ queryKey: ["campaign", campaignId] });
+      void queryClient.invalidateQueries({ queryKey: ["campaigns", "list"] });
+      navigate({ to: "/campaigns", search: { status: "ended" } });
+    },
+    onError: (e) =>
+      toast.error(e instanceof Error ? e.message : t("campaigns.monitor.endError")),
+  });
 
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-8">
@@ -204,7 +228,13 @@ function MonitorCampaignPage() {
           )}
 
           <div className="flex justify-start pt-4">
-            <Button size="lg">{t("campaigns.monitor.endCampaign")}</Button>
+            <Button
+              size="lg"
+              disabled={!canEnd || endMutation.isPending}
+              onClick={() => endMutation.mutate()}
+            >
+              {t("campaigns.monitor.endCampaign")}
+            </Button>
           </div>
         </>
       )}
