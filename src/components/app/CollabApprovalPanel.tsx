@@ -15,11 +15,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import type { CollabApproval, CollabDialogData } from "@/lib/collab-dialog";
 import { cn } from "@/lib/utils";
 
 const FEEDBACK_MIN = 20;
+
+/** Tabelle `favorites` ist in den generierten Typen noch nicht enthalten. */
+const untypedDb = supabase as unknown as SupabaseClient;
 
 function describe(e: unknown) {
   return e instanceof Error ? e.message : String(e);
@@ -125,7 +129,7 @@ export function CollabApprovalPanel({
     if (!expanded) return;
     let active = true;
     void (async () => {
-      const { data, error } = await supabase
+      const { data, error } = await untypedDb
         .from("favorites")
         .select("id")
         .eq("brand_id", brandId)
@@ -182,16 +186,15 @@ export function CollabApprovalPanel({
 
       if (!rejected) {
         if (favorite) {
-          const { error } = await supabase
+          const { error } = await untypedDb
             .from("favorites")
-            // Tabelle ist in den generierten Typen noch nicht enthalten.
-            .upsert({ brand_id: brandId, creator_id: creatorId } as never, {
+            .upsert({ brand_id: brandId, creator_id: creatorId }, {
               onConflict: "brand_id,creator_id",
               ignoreDuplicates: true,
             });
           if (error) throw new Error(error.message);
         } else if (wasFavorite) {
-          const { error } = await supabase
+          const { error } = await untypedDb
             .from("favorites")
             .delete()
             .eq("brand_id", brandId)
