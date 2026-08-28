@@ -41,6 +41,7 @@ import {
   effectiveCpe,
   type MonitoringCollab,
 } from "@/lib/campaign-monitoring";
+import { CollabApprovalPanel } from "@/components/app/CollabApprovalPanel";
 import {
   collabStatus,
   showContact,
@@ -180,12 +181,17 @@ export function CollabDialog({
   open,
   onOpenChange,
   actions,
+  campaignId,
+  brandId,
 }: {
   collab: CollabDialogData | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   /** Optionaler Slot für kontextspezifische Buttons in der Fusszeile. */
   actions?: ReactNode;
+  /** Beide gesetzt (Monitoring): Genehmigungs-Flow für delivered-Collabs. */
+  campaignId?: number;
+  brandId?: number | null;
 }) {
   const { t } = useTranslation();
   const [fullCaption, setFullCaption] = useState(false);
@@ -208,6 +214,13 @@ export function CollabDialog({
   const rating = collab?.brand_rating ?? null;
   const content = collab?.content ?? null;
   const isDelivered = status === "delivered" || status === "approved";
+  const showApproval = status === "delivered";
+  const closeSlot =
+    actions ?? (
+      <Button variant="outline" onClick={() => onOpenChange(false)}>
+        {t("common.close")}
+      </Button>
+    );
   const cpe =
     collab && content
       ? effectiveCpe({
@@ -515,14 +528,21 @@ export function CollabDialog({
               </>
             )}
 
-            <Separator />
-            <div className="flex justify-end gap-2">
-              {actions ?? (
-                <Button variant="outline" onClick={() => onOpenChange(false)}>
-                  {t("common.close")}
-                </Button>
-              )}
-            </div>
+            {showApproval && campaignId != null && brandId != null ? (
+              <CollabApprovalPanel
+                key={collab.id}
+                collab={collab}
+                campaignId={campaignId}
+                brandId={brandId}
+                onDone={() => onOpenChange(false)}
+                closeSlot={closeSlot}
+              />
+            ) : (
+              <>
+                <Separator />
+                <div className="flex justify-end gap-2">{closeSlot}</div>
+              </>
+            )}
             </div>
           </div>
         ) : null}
