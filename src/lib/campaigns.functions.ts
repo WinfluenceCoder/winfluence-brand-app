@@ -129,7 +129,7 @@ async function loadOwnedCampaign(
   if (!brand) throw new Error("no-brand");
   const { data: row, error } = await ctx.supabase
     .from("campaigns")
-    .select("id, status, brand_id")
+    .select("id, status, brand_id, ende")
     .eq("id", id)
     .eq("brand_id", brand.id)
     .maybeSingle();
@@ -207,6 +207,47 @@ export const publishCampaign = createServerFn({ method: "POST" })
       start: start.toISOString(),
       ende: ende.toISOString(),
       updated_at: new Date().toISOString(),
+    } as unknown as never;
+    const { error } = await context.supabase
+      .from("campaigns")
+      .update(patch)
+      .eq("id", data.id)
+      .eq("brand_id", brand.id);
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
+
+export const endCampaign = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => z.object({ id: z.number().int() }).parse(data))
+  .handler(async ({ context, data }) => {
+    const { brand, row } = await loadOwnedCampaign(context, data.id);
+    if (row.status !== "running" && row.status !== "expired") {
+      throw new Error("not-endable-status");
+    }
+    const now = new Date();
+    let expired = false;
+    if (row.ende) {
+      const ende = new Date(row.ende);
+      if (!Number.isNaN(ende.getTime()) && now.getTime() > ende.getTime()) {
+        expired = true;
+      }
+    }
+    if (!expired) {
+      const { data: collabs, error: cErr } = await context.supabase
+        .from("collabs")
+        .select("status")
+        .eq("campaign_id", data.id);
+      if (cErr) throw new Error(cErr.message);
+      const hasPending = (collabs ?? []).some(
+        (c: { status: string | null }) =>
+          c.status === "hired" || c.status === "working",
+      );
+      if (hasPending) throw new Error("not-endable-condition");
+    }
+    const patch = {
+      status: "ended",
+      updated_at: now.toISOString(),
     } as unknown as never;
     const { error } = await context.supabase
       .from("campaigns")
