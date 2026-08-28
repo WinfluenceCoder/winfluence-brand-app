@@ -180,12 +180,17 @@ export function CollabDialog({
   open,
   onOpenChange,
   actions,
+  campaignId,
+  brandId,
 }: {
   collab: CollabDialogData | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   /** Optionaler Slot für kontextspezifische Buttons in der Fusszeile. */
   actions?: ReactNode;
+  /** Beide gesetzt (Monitoring): Genehmigungs-Flow für delivered-Collabs. */
+  campaignId?: number;
+  brandId?: number | null;
 }) {
   const { t } = useTranslation();
   const [fullCaption, setFullCaption] = useState(false);
