@@ -398,7 +398,7 @@ export function CollabDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-h-[85vh] overflow-y-auto pt-14 sm:max-w-2xl"
+        className="flex max-h-[85vh] flex-col overflow-hidden pt-14 sm:max-w-2xl"
         closeClassName="bg-primary text-primary-foreground opacity-100 hover:opacity-100 rounded-md p-1.5 [&_svg]:h-5 [&_svg]:w-5"
       >
         <DialogHeader className="sr-only">
@@ -406,7 +406,8 @@ export function CollabDialog({
         </DialogHeader>
 
         {collab && creator ? (
-          <div className="space-y-6">
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            <div className="space-y-6">
             <div className="flex items-start justify-between gap-4">
               <div className="flex min-w-0 items-start gap-4">
                 <Avatar className="h-16 w-16">
@@ -521,6 +522,7 @@ export function CollabDialog({
                   {t("common.close")}
                 </Button>
               )}
+            </div>
             </div>
           </div>
         ) : null}
