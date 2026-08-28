@@ -41,6 +41,7 @@ import {
   effectiveCpe,
   type MonitoringCollab,
 } from "@/lib/campaign-monitoring";
+import { CollabApprovalPanel } from "@/components/app/CollabApprovalPanel";
 import {
   collabStatus,
   showContact,
@@ -213,6 +214,13 @@ export function CollabDialog({
   const rating = collab?.brand_rating ?? null;
   const content = collab?.content ?? null;
   const isDelivered = status === "delivered" || status === "approved";
+  const showApproval = status === "delivered";
+  const closeSlot =
+    actions ?? (
+      <Button variant="outline" onClick={() => onOpenChange(false)}>
+        {t("common.close")}
+      </Button>
+    );
   const cpe =
     collab && content
       ? effectiveCpe({

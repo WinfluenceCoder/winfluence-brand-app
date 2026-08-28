@@ -22,7 +22,13 @@ export type DeliveredContent = {
   uploaded_at: string | null;
 };
 
+export type CollabApprovalValue =
+  | "rejected"
+  | "approved"
+  | "expectations_exceeded";
+
 export type MonitoringCollab = CurationCollab & {
+  approval: CollabApprovalValue | null;
   delivery_note: string | null;
   content: DeliveredContent | null;
   brand_rating: number | null;
@@ -32,13 +38,21 @@ export type MonitoringCollab = CurationCollab & {
 
 /** Status der rechten Spalte: gelieferte oder freigegebene Beiträge. */
 export const DELIVERED_STATUSES = ["delivered", "approved"] as const;
-const MONITORING_STATUSES = ["hired", "working", ...DELIVERED_STATUSES] as const;
+/** Zurückgewiesene Lieferungen erscheinen unterhalb des Rulers. */
+export const REJECTED_STATUS = "rejected" as const;
+const MONITORING_STATUSES = [
+  "hired",
+  "working",
+  ...DELIVERED_STATUSES,
+  REJECTED_STATUS,
+] as const;
 
 type RawContent = DeliveredContent;
 
 type Raw = {
   id: number;
   status: string | null;
+  approval: CollabApprovalValue | null;
   price: number | null;
   pitch: string | null;
   rank: number | null;
@@ -69,7 +83,7 @@ function describe(error: {
     .join(" | ");
 }
 
-const MONITORING_SELECT = `id, status, price, pitch, rank, match, platform, post_type, delivery_note, brand_rating, brand_feedback, creator_remark, creator:creator_sedcard!inner(${CREATOR_FIELDS}), content:creator_content(id, platform, content_type, reach, likes, comments, shares, platform_link, image_url, video_url, caption, uploaded_at)`;
+const MONITORING_SELECT = `id, status, approval, price, pitch, rank, match, platform, post_type, delivery_note, brand_rating, brand_feedback, creator_remark, creator:creator_sedcard!inner(${CREATOR_FIELDS}), content:creator_content(id, platform, content_type, reach, likes, comments, shares, platform_link, image_url, video_url, caption, uploaded_at)`;
 
 async function fetchMonitoringCollabs(campaignId: number): Promise<MonitoringCollab[]> {
   const { data, error } = await supabase
@@ -90,6 +104,7 @@ async function fetchMonitoringCollabs(campaignId: number): Promise<MonitoringCol
     .map((r) => ({
       id: r.id,
       status: r.status,
+      approval: r.approval ?? null,
       price: r.price,
       pitch: r.pitch,
       rank: r.rank,
