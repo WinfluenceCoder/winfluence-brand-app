@@ -182,6 +182,15 @@ export function CollabApprovalPanel({
     mutationFn: async () => {
       if (approval == null) return;
       const rejected = approval === "rejected";
+      // Noch nicht per Blur gespeichertes Feedback zuerst persistieren.
+      const pendingFeedback = feedback.trim();
+      if (
+        pendingFeedback.length >= FEEDBACK_MIN &&
+        pendingFeedback !== savedFeedback
+      ) {
+        await patchCollab({ brand_feedback: pendingFeedback });
+        setSavedFeedback(pendingFeedback);
+      }
       await patchCollab({ status: rejected ? "rejected" : "approved" });
 
       if (!rejected) {
@@ -219,7 +228,9 @@ export function CollabApprovalPanel({
   });
 
   const isRejected = approval === "rejected";
-  const feedbackOk = savedFeedback.trim().length >= FEEDBACK_MIN;
+  // Zählt auch ungespeicherter Text, damit der Button ohne vorheriges
+  // Blur aktiviert wird; das Speichern erfolgt spätestens beim Finalisieren.
+  const feedbackOk = feedback.trim().length >= FEEDBACK_MIN;
   const canFinalize =
     approval != null && rating != null && rating >= 1 && feedbackOk;
 
