@@ -119,19 +119,25 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon" className="border-r">
-      <SidebarHeader className="h-14 px-4 flex items-start justify-start pt-3">
-        <Link to="/" className="flex items-center justify-start">
+      <SidebarHeader
+        className={
+          collapsed
+            ? "h-14 px-0 flex items-center justify-center"
+            : "h-16 px-4 pt-4 flex items-start justify-center"
+        }
+      >
+        <Link to="/" className="flex items-center justify-center">
           {collapsed ? (
             <img
               src={icon}
               alt="winfluence"
-              className="h-8 w-8 object-contain rounded-sm"
+              className="h-10 w-10 object-contain rounded-sm"
             />
           ) : (
             <img
               src={logo}
               alt="winfluence"
-              className="h-6 w-auto object-contain"
+              className="h-10 w-auto object-contain"
             />
           )}
         </Link>
