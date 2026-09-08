@@ -219,7 +219,9 @@ export function CollabApprovalPanel({
   });
 
   const isRejected = approval === "rejected";
-  const feedbackOk = savedFeedback.trim().length >= FEEDBACK_MIN;
+  // Zählt auch ungespeicherter Text, damit der Button ohne vorheriges
+  // Blur aktiviert wird; das Speichern erfolgt spätestens beim Finalisieren.
+  const feedbackOk = feedback.trim().length >= FEEDBACK_MIN;
   const canFinalize =
     approval != null && rating != null && rating >= 1 && feedbackOk;
 
