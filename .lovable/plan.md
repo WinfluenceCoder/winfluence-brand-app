@@ -1,18 +1,17 @@
-# Winfluence-Logo durch neues Logo ersetzen
+# Winfluence-Logo, -Icon und Favicon ersetzen
 
 ## Ziel
-Das bestehende Winfluence-Logo (`src/assets/winfluence-logo.png`) wird durch das neu hochgeladene Logo ersetzt. Alle Stellen, die das Logo einbinden, zeigen danach automatisch die neue Grafik.
+Neues Branding übernehmen: Logo, Sidebar-Icon und Favicon werden durch die hochgeladenen Dateien ersetzt.
 
 ## Änderungen
 
-1. **Datei ersetzen**: Das hochgeladene `logo.png` wird nach `src/assets/winfluence-logo.png` kopiert (gleicher Dateiname, bestehender Import-Mechanismus bleibt). Kein Code-Change nötig.
-2. **Betroffene Stellen** (zeigen danach automatisch das neue Logo):
+1. **Logo**: `user-uploads://logo.png` ersetzt `src/assets/winfluence-logo.png` (gleicher Dateiname, bestehende Imports bleiben). Zeigt danach automatisch überall das neue Logo:
    - Sidebar (`AppSidebar.tsx`)
    - `/login`, `/welcome`, `/reset-password`, `/set-password`, `/signed-out`
    - Öffentliche Kampagnen-Preview (`/campaigns/preview/$id`)
-3. **Favicon prüfen**: Das Favicon in `public/` wird aus dem neuen Logo-Mark (das rote Spark-Symbol) neu generiert (64×64, quadratisch, mit Padding), damit es zum neuen Branding passt.
+2. **Sidebar-Icon (zugeklappt)**: `user-uploads://favicon_brand.png` (Spark-Symbol) ersetzt `src/assets/winfluence-icon.png`.
+3. **Favicon**: Aus `favicon_brand.png` wird eine quadratische 64×64-Version als `public/favicon.png` erzeugt; der Root-Head (`src/routes/__root.tsx`) verweist darauf; das alte Template-`favicon.ico` wird entfernt, falls noch vorhanden.
 
 ## Nicht angefasst
 
-- `winfluence-icon.png` (zugeklappte Sidebar) bleibt unverändert — das neue Logo enthält kein separates „W"-Icon; falls gewünscht, kann das Spark-Symbol daraus extrahiert werden (separater Wunsch).
-- Keine Schema-, Backend- oder Layout-Änderungen.
+- Keine Code-Struktur-, Backend- oder Layout-Änderungen — nur Asset-Dateien und der Favicon-Link im Root-Head.
